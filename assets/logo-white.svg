@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 40" role="img" aria-label="MISIMA">
+  <g>
+    <circle cx="31.0" cy="20.0" r="3.3" fill="#e60012"/>
+    <circle cx="27.8" cy="27.8" r="3.3" fill="#ed6d1f"/>
+    <circle cx="20.0" cy="31.0" r="3.3" fill="#f5a200"/>
+    <circle cx="12.2" cy="27.8" r="3.3" fill="#009944"/>
+    <circle cx="9.0"  cy="20.0" r="3.3" fill="#41a1be"/>
+    <circle cx="12.2" cy="12.2" r="3.3" fill="#1d2088"/>
+    <circle cx="20.0" cy="9.0"  r="3.3" fill="#601986"/>
+    <circle cx="27.8" cy="12.2" r="3.3" fill="#e95383"/>
+  </g>
+  <text x="46" y="27" font-family="Inter, sans-serif" font-size="20" font-weight="600" letter-spacing="1.5" fill="#ffffff">MISIMA</text>
+</svg>

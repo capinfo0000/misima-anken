@@ -1,17 +1,17 @@
 /* ============================================================
-   株式会社ミシマ — Site interactions
+   株式会社ミシマ — Site interactions (FLOCSS)
    ============================================================ */
 (function () {
   "use strict";
 
-  /* ---------- Header shrink on scroll + to-top button ---------- */
-  const header = document.getElementById("siteHeader");
-  const toTop = document.getElementById("toTop");
+  /* ---------- Header shrink on scroll + to-top ---------- */
+  var header = document.querySelector(".l-header");
+  var toTop = document.querySelector(".c-to-top");
 
   function onScroll() {
-    const y = window.scrollY;
-    header.classList.toggle("is-scrolled", y > 20);
-    toTop.classList.toggle("is-visible", y > 600);
+    var y = window.scrollY;
+    if (header) header.classList.toggle("is-scrolled", y > 20);
+    if (toTop) toTop.classList.toggle("is-visible", y > 600);
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -23,70 +23,25 @@
     });
   }
 
-  /* ---------- Mobile nav toggle ---------- */
-  const navToggle = document.getElementById("navToggle");
-  const nav = document.getElementById("primaryNav");
-
-  function closeNav() {
-    nav.classList.remove("is-open");
-    navToggle.setAttribute("aria-expanded", "false");
-    navToggle.setAttribute("aria-label", "メニューを開く");
-  }
-
-  navToggle.addEventListener("click", function () {
-    const open = nav.classList.toggle("is-open");
-    navToggle.setAttribute("aria-expanded", String(open));
-    navToggle.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
-  });
-
-  // Close the mobile menu after selecting a link
-  nav.addEventListener("click", function (e) {
-    if (e.target.closest("a")) closeNav();
-  });
-
-  // Close on Escape
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeNav();
-  });
-
-  /* ---------- Dropdown accordions (mobile) ---------- */
-  const parents = document.querySelectorAll(".nav__parent");
-  parents.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      const li = btn.closest(".has-sub");
-      const open = li.classList.toggle("is-open");
-      btn.setAttribute("aria-expanded", String(open));
-      // Close sibling dropdowns
-      parents.forEach(function (other) {
-        if (other !== btn) {
-          const oli = other.closest(".has-sub");
-          oli.classList.remove("is-open");
-          other.setAttribute("aria-expanded", "false");
-        }
-      });
-    });
-  });
-
   /* ---------- Loader ---------- */
-  const loader = document.getElementById("loader");
+  var loader = document.querySelector(".c-loader");
   if (loader) {
-    const hideLoader = function () { loader.classList.add("is-loaded"); };
+    var hideLoader = function () { loader.classList.add("is-loaded"); };
     window.addEventListener("load", function () { setTimeout(hideLoader, 600); });
-    // Safety: never let the loader block the page
-    setTimeout(hideLoader, 3500);
+    setTimeout(hideLoader, 3500); // safety
   }
 
-  /* ---------- Hero romaji typing ---------- */
-  const roman = document.querySelector(".hero__roman[data-text]");
+  /* ---------- MV romaji typing ---------- */
+  var roman = document.querySelector(".p-top-mv__roman[data-text]");
   if (roman) {
-    const text = roman.getAttribute("data-text");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var text = roman.getAttribute("data-text");
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       roman.textContent = text;
     } else {
       roman.textContent = "";
-      let i = 0;
-      const type = function () {
+      var i = 0;
+      var type = function () {
         if (i <= text.length) {
           roman.textContent = text.slice(0, i);
           i++;
@@ -97,45 +52,75 @@
     }
   }
 
-  /* ---------- Reveal on scroll ---------- */
-  const revealEls = document.querySelectorAll(".reveal");
-  if ("IntersectionObserver" in window) {
-    const io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
-    );
-    revealEls.forEach(function (el) {
-      io.observe(el);
+  /* ---------- Mobile nav toggle ---------- */
+  var navToggle = document.querySelector(".c-hamburger-btn");
+  var nav = document.querySelector(".p-global-nav");
+
+  function closeNav() {
+    if (!nav) return;
+    nav.classList.remove("is-open");
+    navToggle.setAttribute("aria-expanded", "false");
+  }
+
+  if (navToggle && nav) {
+    navToggle.addEventListener("click", function () {
+      var open = nav.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", String(open));
     });
-  } else {
-    revealEls.forEach(function (el) {
-      el.classList.add("is-visible");
+    nav.addEventListener("click", function (e) {
+      if (e.target.closest("a")) closeNav();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeNav();
     });
   }
 
-  /* ---------- Contact form (static, demo) ---------- */
-  const form = document.getElementById("contactForm");
-  const note = document.getElementById("formNote");
+  /* ---------- Dropdown accordions (mobile) ---------- */
+  var parents = document.querySelectorAll(".p-global-nav__parent");
+  parents.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var li = btn.closest(".has-sub");
+      var open = li.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+      parents.forEach(function (other) {
+        if (other !== btn) {
+          other.closest(".has-sub").classList.remove("is-open");
+          other.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+  });
 
+  /* ---------- Reveal on scroll ---------- */
+  var revealEls = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function (el) { io.observe(el); });
+  } else {
+    revealEls.forEach(function (el) { el.classList.add("is-visible"); });
+  }
+
+  /* ---------- Contact form (static demo) ---------- */
+  var form = document.getElementById("contactForm");
+  var note = document.getElementById("formNote");
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!form.checkValidity()) {
         note.textContent = "未入力の必須項目があります。ご確認ください。";
-        note.className = "form-note is-err";
+        note.className = "p-form__note is-err";
         form.reportValidity();
         return;
       }
-      // Static site: no backend. Show a confirmation message.
       note.textContent = "お問い合わせありがとうございます。内容を送信しました（デモ）。";
-      note.className = "form-note is-ok";
+      note.className = "p-form__note is-ok";
       form.reset();
     });
   }
