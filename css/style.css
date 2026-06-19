@@ -98,9 +98,17 @@ body::before {
   font-weight: 500; line-height: 1.5; letter-spacing: .06em; color: var(--text-strong);
 }
 .section__title::after {
-  content: ""; display: block; width: 46px; height: 3px; border-radius: 2px;
-  margin: var(--space-3) auto 0; background: var(--rainbow);
+  content: ""; display: block; width: 64px; height: 7px; border-radius: 1px;
+  margin: var(--space-3) auto 0; transform: skewX(-15deg);
+  background: var(--c-pink);
 }
+/* Per-section marker colour (peers-style "workcolor" signature, original impl) */
+.news    .section__title::after { background: var(--c-yellow); }
+.purpose .section__title::after { background: var(--c-blue); }
+.message .section__title::after { background: var(--c-pink); }
+.services .section__title::after { background: var(--c-green); }
+.group   .section__title::after { background: var(--c-orange); }
+.contact .section__title::after { background: var(--c-purple); }
 .section__head--row > div { display: contents; }
 
 /* ---------- Buttons ---------- */
@@ -406,7 +414,7 @@ body::before {
 .page-hero__lead { color: var(--text-muted); margin-top: var(--space-3); max-width: 60ch; margin-inline: auto; font-size: .92rem; }
 
 .breadcrumb { padding: var(--space-3) 0; font-size: .76rem; color: var(--text-muted); border-bottom: 1px solid var(--line); }
-.breadcrumb ol { display: flex; flex-wrap: wrap; gap: .5em; align-items: center; }
+.breadcrumb ol { display: flex; flex-wrap: wrap; gap: .5em; align-items: center; list-style: none; margin: 0; padding: 0; }
 .breadcrumb li::after { content: "/"; margin-left: .5em; color: var(--line); }
 .breadcrumb li:last-child::after { content: ""; }
 .breadcrumb a:hover { color: var(--accent); }
