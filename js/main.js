@@ -52,6 +52,55 @@
     }
   }
 
+  /* ---------- Top intro: scroll storytelling → brand reveal ---------- */
+  var intro = document.querySelector(".p-intro");
+  if (intro) {
+    var lines = intro.querySelectorAll(".p-intro__line");
+    var statements = intro.querySelector(".p-intro__statements");
+    var brand = intro.querySelector(".p-intro__brand");
+    var introScroll = intro.querySelector(".p-intro__scroll");
+    var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var introDone = false; // in-memory: resets on reload only
+    var brandAt = 0.72;
+
+    var lockBrand = function () {
+      statements.classList.add("is-hide");
+      lines.forEach(function (l) { l.classList.remove("is-show"); });
+      intro.classList.add("is-brand");
+      if (introScroll) introScroll.classList.add("is-hide");
+    };
+
+    if (introReduced) {
+      lockBrand();
+      introDone = true;
+    }
+
+    var onIntro = function () {
+      if (introDone) return; // once shown, only the brand remains until reload
+      var total = intro.offsetHeight - window.innerHeight;
+      var p = total > 0 ? Math.min(Math.max(-intro.getBoundingClientRect().top / total, 0), 1) : 0;
+
+      lines.forEach(function (l, idx) {
+        var th = 0.06 + idx * (brandAt - 0.10) / lines.length;
+        l.classList.toggle("is-show", p >= th);
+      });
+
+      if (p >= brandAt) {
+        statements.classList.add("is-hide");
+        intro.classList.add("is-brand");
+        if (introScroll) introScroll.classList.add("is-hide");
+      } else {
+        statements.classList.remove("is-hide");
+        intro.classList.remove("is-brand");
+        if (introScroll) introScroll.classList.remove("is-hide");
+      }
+
+      if (p >= 0.97) { introDone = true; lockBrand(); }
+    };
+    window.addEventListener("scroll", onIntro, { passive: true });
+    onIntro();
+  }
+
   /* ---------- Mobile nav toggle ---------- */
   var navToggle = document.querySelector(".c-hamburger-btn");
   var nav = document.querySelector(".p-global-nav");
