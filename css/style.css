@@ -274,6 +274,22 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-intro__line.is-show{opacity:1;transform:none;}
 .p-intro__brand{position:relative;z-index:1;opacity:0;transform:scale(.84);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.9,.3,1.35);}
 .p-intro.is-brand .p-intro__brand{opacity:1;transform:scale(1);}
+/* explosion reveal */
+.p-intro__flash{position:absolute;inset:0;z-index:3;background:#fff;opacity:0;pointer-events:none;}
+.p-intro.is-burst .p-intro__flash{animation:introFlash .55s ease-out both;}
+@keyframes introFlash{0%{opacity:0;}12%{opacity:.9;}100%{opacity:0;}}
+.p-intro__shock{position:absolute;left:50%;top:50%;z-index:2;width:60px;height:60px;border-radius:50%;border:3px solid #fff;transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none;}
+.p-intro.is-burst .p-intro__shock{animation:introShock .85s cubic-bezier(.15,.6,.3,1) both;}
+@keyframes introShock{0%{opacity:.85;transform:translate(-50%,-50%) scale(0);}100%{opacity:0;transform:translate(-50%,-50%) scale(16);}}
+.p-intro__burst{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:visible;}
+.p-intro__particle{position:absolute;left:50%;top:50%;border-radius:50%;opacity:0;}
+.p-intro.is-burst .p-intro__particle{animation:introParticle .9s cubic-bezier(.1,.7,.3,1) forwards;}
+@keyframes introParticle{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}80%{opacity:1;}100%{opacity:0;transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.2);}}
+.p-intro.is-burst .p-intro__brand-jp{animation:introBang .7s cubic-bezier(.2,.9,.3,1.5) both;}
+@keyframes introBang{0%{transform:scale(1.45);}30%{transform:scale(.94) translateX(5px);}45%{transform:translateX(-5px);}60%{transform:translateX(4px);}75%{transform:translateX(-3px);}100%{transform:none;}}
+@media (prefers-reduced-motion:reduce){
+  .p-intro__flash,.p-intro__shock,.p-intro__burst{display:none;}
+}
 .p-intro__brand-en{font-family:var(--font-en);letter-spacing:.42em;text-transform:uppercase;font-size:.78rem;color:#fff;opacity:.85;margin-bottom:var(--space-3);}
 .p-intro__brand-jp{font-family:var(--font-serif);font-weight:600;font-size:clamp(2.4rem,8vw,5.4rem);letter-spacing:.14em;line-height:1.3;color:#fff;text-shadow:0 4px 40px rgba(0,0,0,.4);}
 .p-intro__brand-tag{margin-top:var(--space-3);color:#fff;opacity:.92;font-size:clamp(.95rem,2vw,1.15rem);letter-spacing:.06em;}

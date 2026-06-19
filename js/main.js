@@ -64,11 +64,36 @@
     var introDone = false;          // in-memory: resets on reload only
     var openUntil = 0.08, brandAt = 0.78;
 
+    /* explosion particles */
+    var burstBox = intro.querySelector(".p-intro__burst");
+    var burstDone = false;
+    var palette = ["#e60012","#ed6d1f","#f5a200","#009944","#41a1be","#1d2088","#601986","#e95383"];
+    if (burstBox && !introReduced) {
+      for (var bi = 0; bi < 30; bi++) {
+        var sp = document.createElement("span");
+        sp.className = "p-intro__particle";
+        var ang = Math.random() * Math.PI * 2, dist = 130 + Math.random() * 280;
+        sp.style.setProperty("--tx", Math.cos(ang) * dist + "px");
+        sp.style.setProperty("--ty", Math.sin(ang) * dist + "px");
+        var sz = 6 + Math.random() * 11;
+        sp.style.width = sz + "px"; sp.style.height = sz + "px";
+        sp.style.background = palette[bi % palette.length];
+        sp.style.animationDelay = (Math.random() * 0.06) + "s";
+        burstBox.appendChild(sp);
+      }
+    }
+    var fireBurst = function () {
+      if (burstDone || introReduced) return;
+      burstDone = true;
+      intro.classList.add("is-burst");
+    };
+
     var lockBrand = function () {
       if (opening) opening.classList.add("is-hide");
       statements.classList.add("is-hide");
       lines.forEach(function (l) { l.classList.remove("is-show"); });
       intro.classList.add("is-brand");
+      fireBurst();
       if (introScroll) introScroll.classList.add("is-hide");
     };
 
@@ -108,6 +133,7 @@
       if (p >= brandAt) {
         statements.classList.add("is-hide");
         intro.classList.add("is-brand");
+        fireBurst();
         if (introScroll) introScroll.classList.add("is-hide");
       } else {
         statements.classList.remove("is-hide");
