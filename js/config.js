@@ -14,5 +14,5 @@
 window.MISIMA_WP_BASE = "";
 
 /* 1ページに表示する件数（トップ＝既定4 / 一覧＝既定20）を上書きしたい場合 */
-window.MISIMA_NEWS_COUNT_TOP = 4;
+window.MISIMA_NEWS_COUNT_TOP = 2;
 window.MISIMA_NEWS_COUNT_LIST = 20;
