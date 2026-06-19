@@ -52,7 +52,7 @@
     }
   }
 
-  /* ---------- Top intro: opening roulette → scroll story → brand ---------- */
+  /* ---------- Top intro: isolated, one-way overlay (page locked) ---------- */
   var intro = document.querySelector(".p-intro");
   if (intro) {
     var opening = intro.querySelector(".p-intro__opening");
@@ -61,14 +61,15 @@
     var statements = intro.querySelector(".p-intro__statements");
     var mediaImgs = intro.querySelectorAll(".p-intro__media-img");
     var introScroll = intro.querySelector(".p-intro__scroll");
-    var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var introDone = false;          // in-memory: resets on reload only
-    var openUntil = 0.07, brandAt = 0.70;
-
-    /* explosion particles */
     var burstBox = intro.querySelector(".p-intro__burst");
-    var burstDone = false;
+    var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var docEl = document.documentElement;
+    var prog = 0, introDone = false, burstDone = false;
+    var openUntil = 0.07, brandAt = 0.70;
+    var SENS = 1 / 1500; // wheel units needed to complete the intro (~one screen of scrolling)
     var palette = ["#e60012","#ed6d1f","#f5a200","#009944","#41a1be","#1d2088","#601986","#e95383"];
+
+    /* build explosion particles */
     if (burstBox && !introReduced) {
       for (var bi = 0; bi < 64; bi++) {
         var sp = document.createElement("span");
@@ -86,53 +87,23 @@
     }
     var fireBurst = function () {
       if (burstDone || introReduced) return;
-      burstDone = true;
-      intro.classList.add("is-burst");
+      burstDone = true; intro.classList.add("is-burst");
     };
 
-    var lockBrand = function () {
-      if (opening) opening.classList.add("is-hide");
-      statements.classList.add("is-hide");
-      lines.forEach(function (l) { l.classList.remove("is-show"); });
-      intro.classList.add("is-brand");
-      fireBurst();
-      if (introScroll) introScroll.classList.add("is-hide");
-    };
+    var lockScroll = function () { docEl.classList.add("is-intro-lock"); document.body.classList.add("is-intro-lock"); };
+    var unlockScroll = function () { docEl.classList.remove("is-intro-lock"); document.body.classList.remove("is-intro-lock"); };
 
-    /* Opening word roulette (auto, runs once on load) */
-    if (roulette && !introReduced) {
-      var words = (roulette.getAttribute("data-words") || "").split(",").filter(Boolean);
-      var finalWord = roulette.getAttribute("data-final") || roulette.textContent;
-      var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
-      var spin = function () {
-        if (introDone) return;
-        roulette.textContent = words.length ? words[idx % words.length] : finalWord;
-        idx++; ticks++;
-        if (ticks >= maxTicks) { roulette.textContent = finalWord; roulette.classList.add("is-set"); return; }
-        if (ticks > maxTicks - 7) delay += 45; else delay += 5; // decelerate near the end
-        setTimeout(spin, delay);
-      };
-      setTimeout(spin, 900);
-    }
-
-    if (introReduced) { lockBrand(); introDone = true; }
-
-    var onIntro = function () {
+    var render = function () {
       if (introDone) return;
-      var total = intro.offsetHeight - window.innerHeight;
-      var p = total > 0 ? Math.min(Math.max(-intro.getBoundingClientRect().top / total, 0), 1) : 0;
-
+      var p = prog;
       if (p < openUntil) {
         if (opening) opening.classList.remove("is-hide");
         statements.classList.add("is-hide");
-        intro.classList.remove("is-story");
-        lines.forEach(function (l) { l.classList.remove("is-show"); });
-        intro.classList.remove("is-brand");
+        intro.classList.remove("is-story", "is-brand");
         if (introScroll) introScroll.classList.remove("is-hide");
         return;
       }
       if (opening) opening.classList.add("is-hide");
-
       if (p >= brandAt) {
         statements.classList.add("is-hide");
         intro.classList.remove("is-story");
@@ -154,10 +125,73 @@
           mediaImgs.forEach(function (im, i) { im.classList.toggle("is-show", i === stage); });
         }
       }
-      if (p >= 0.90) { introDone = true; lockBrand(); }
     };
-    window.addEventListener("scroll", onIntro, { passive: true });
-    onIntro();
+
+    var finish = function () {
+      if (introDone) return;
+      introDone = true;
+      intro.classList.add("is-brand"); fireBurst();
+      setTimeout(function () {
+        intro.classList.add("is-done");
+        unlockScroll();
+        window.scrollTo(0, 0);
+        setTimeout(function () { intro.style.display = "none"; }, 850);
+      }, 750);
+    };
+
+    /* one-way only: downward input advances, upward is ignored */
+    var advance = function (delta) {
+      if (introDone || delta <= 0) return;
+      prog = Math.min(1, prog + delta * SENS);
+      render();
+      if (prog >= 1) finish();
+    };
+
+    if (introReduced) {
+      // skip the sequence entirely; reveal the page
+      introDone = true;
+      intro.style.display = "none";
+    } else {
+      lockScroll();
+
+      /* opening word roulette (auto, once) */
+      if (roulette) {
+        var words = (roulette.getAttribute("data-words") || "").split(",").filter(Boolean);
+        var finalWord = roulette.getAttribute("data-final") || roulette.textContent;
+        var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
+        var spin = function () {
+          if (introDone) return;
+          roulette.textContent = words.length ? words[idx % words.length] : finalWord;
+          idx++; ticks++;
+          if (ticks >= maxTicks) { roulette.textContent = finalWord; roulette.classList.add("is-set"); return; }
+          delay += (ticks > maxTicks - 7) ? 45 : 5;
+          setTimeout(spin, delay);
+        };
+        setTimeout(spin, 900);
+      }
+
+      var onWheel = function (e) { if (introDone) return; e.preventDefault(); advance(e.deltaY); };
+      window.addEventListener("wheel", onWheel, { passive: false });
+
+      var ty = null;
+      window.addEventListener("touchstart", function (e) { if (introDone) return; ty = e.touches[0].clientY; }, { passive: true });
+      window.addEventListener("touchmove", function (e) {
+        if (introDone) return;
+        e.preventDefault();
+        var y = e.touches[0].clientY;
+        if (ty !== null) advance((ty - y) * 2.2);
+        ty = y;
+      }, { passive: false });
+
+      window.addEventListener("keydown", function (e) {
+        if (introDone) return;
+        if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") {
+          e.preventDefault(); advance(150);
+        }
+      });
+
+      render();
+    }
   }
 
   /* ---------- Mobile nav toggle ---------- */
