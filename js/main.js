@@ -67,6 +67,36 @@
     });
   });
 
+  /* ---------- Loader ---------- */
+  const loader = document.getElementById("loader");
+  if (loader) {
+    const hideLoader = function () { loader.classList.add("is-loaded"); };
+    window.addEventListener("load", function () { setTimeout(hideLoader, 600); });
+    // Safety: never let the loader block the page
+    setTimeout(hideLoader, 3500);
+  }
+
+  /* ---------- Hero romaji typing ---------- */
+  const roman = document.querySelector(".hero__roman[data-text]");
+  if (roman) {
+    const text = roman.getAttribute("data-text");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      roman.textContent = text;
+    } else {
+      roman.textContent = "";
+      let i = 0;
+      const type = function () {
+        if (i <= text.length) {
+          roman.textContent = text.slice(0, i);
+          i++;
+          setTimeout(type, 130);
+        }
+      };
+      setTimeout(type, 1100);
+    }
+  }
+
   /* ---------- Reveal on scroll ---------- */
   const revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window) {
