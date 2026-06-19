@@ -16,6 +16,13 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
+  if (toTop) {
+    toTop.addEventListener("click", function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
   /* ---------- Mobile nav toggle ---------- */
   const navToggle = document.getElementById("navToggle");
   const nav = document.getElementById("primaryNav");
@@ -40,6 +47,24 @@
   // Close on Escape
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeNav();
+  });
+
+  /* ---------- Dropdown accordions (mobile) ---------- */
+  const parents = document.querySelectorAll(".nav__parent");
+  parents.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const li = btn.closest(".has-sub");
+      const open = li.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+      // Close sibling dropdowns
+      parents.forEach(function (other) {
+        if (other !== btn) {
+          const oli = other.closest(".has-sub");
+          oli.classList.remove("is-open");
+          other.setAttribute("aria-expanded", "false");
+        }
+      });
+    });
   });
 
   /* ---------- Reveal on scroll ---------- */

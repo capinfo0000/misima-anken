@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="株式会社ミシマへのお問い合わせ。" />
+  <title>お問い合わせ | 株式会社ミシマ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+  <header class="site-header" id="siteHeader">
+    <div class="container header__inner">
+      <a href="index.html" class="brand" aria-label="株式会社ミシマ ホーム">
+        <img src="assets/logo.svg" alt="株式会社ミシマ" class="brand__logo" />
+      </a>
+      <nav class="nav" id="primaryNav" aria-label="メインナビゲーション">
+        <ul class="nav__list">
+          <li class="has-sub">
+            <button class="nav__parent" aria-expanded="false">会社情報</button>
+            <ul class="nav__sub">
+              <li><a href="message.html">代表メッセージ</a></li>
+              <li><a href="purpose.html">パーパス・社名の由来</a></li>
+              <li><a href="profile.html">会社概要</a></li>
+              <li><a href="history.html">沿革</a></li>
+              <li><a href="group.html">グループ会社</a></li>
+            </ul>
+          </li>
+          <li><a href="services.html" class="">サービス</a></li>
+          <li><a href="news.html" class="">ニュース</a></li>
+          <li class="has-sub">
+            <button class="nav__parent" aria-expanded="false">採用情報</button>
+            <ul class="nav__sub">
+              <li><a href="recruit.html">採用ページ</a></li>
+              <li><a href="organization.html">組織情報</a></li>
+            </ul>
+          </li>
+          <li><a href="contact.html" class="nav__cta">お問い合わせ</a></li>
+        </ul>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="メニューを開く">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="page-hero__eyebrow">CONTACT</p>
+      <h1 class="page-hero__title">お問い合わせ</h1>
+      <p class="page-hero__lead">人材派遣・業務委託のご相談、スタッフ登録のご希望など、お気軽にご連絡ください。</p>
+    </div>
+  </section>
+  <nav class="breadcrumb" aria-label="パンくずリスト">
+    <div class="container"><ol><li><a href="index.html">ホーム</a></li><li aria-current="page">お問い合わせ</li></ol></div>
+  </nav>
+
+  <section class="section">
+    <div class="container">
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-row">
+          <label>お名前<span class="req">必須</span>
+            <input type="text" name="name" required placeholder="山田 太郎" />
+          </label>
+          <label>会社名
+            <input type="text" name="company" placeholder="株式会社〇〇" />
+          </label>
+        </div>
+        <label>お問い合わせ種別
+          <select name="type">
+            <option>人材派遣について</option>
+            <option>業務委託（運営受託）について</option>
+            <option>スタッフ登録・採用について</option>
+            <option>その他</option>
+          </select>
+        </label>
+        <label>メールアドレス<span class="req">必須</span>
+          <input type="email" name="email" required placeholder="example@misima.co.jp" />
+        </label>
+        <label>お問い合わせ内容<span class="req">必須</span>
+          <textarea name="message" rows="6" required placeholder="お問い合わせ内容をご記入ください"></textarea>
+        </label>
+        <button type="submit" class="btn btn--primary btn--full">送信する</button>
+        <p class="form-note" id="formNote" role="status"></p>
+      </form>
+      <p class="lead-text" style="margin-top:1.5rem;">
+        お電話でのお問い合わせ：<strong>03-XXXX-XXXX</strong>（受付時間 平日 9:00〜18:00）
+      </p>
+    </div>
+  </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/logo.svg" alt="株式会社ミシマ" class="footer__logo" />
+        <p class="footer__addr">〒140-0000 東京都品川区〇〇 1-2-3 ミシマビル<br />通信業界専門の人材派遣・業務委託</p>
+      </div>
+      <nav class="footer__nav" aria-label="フッターナビゲーション">
+        <div class="footer__cols">
+          <div class="footer__col">
+            <h4>COMPANY</h4>
+            <ul>
+              <li><a href="message.html">代表メッセージ</a></li>
+              <li><a href="purpose.html">パーパス・社名の由来</a></li>
+              <li><a href="profile.html">会社概要</a></li>
+              <li><a href="history.html">沿革</a></li>
+              <li><a href="group.html">グループ会社</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>SERVICE / NEWS</h4>
+            <ul>
+              <li><a href="services.html">事業・サービス一覧</a></li>
+              <li><a href="news.html">ニュース一覧</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>RECRUIT</h4>
+            <ul>
+              <li><a href="recruit.html">採用ページ</a></li>
+              <li><a href="organization.html">組織情報</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>OTHERS</h4>
+            <ul>
+              <li><a href="contact.html">お問い合わせ</a></li>
+              <li><a href="privacy.html">プライバシーポリシー</a></li>
+              <li><a href="security.html">情報セキュリティ基本方針</a></li>
+              <li><a href="sitepolicy.html">サイトポリシー</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="container footer__bottom">
+      <small>&copy; 2026 MISIMA Inc. All Rights Reserved.</small>
+      <div class="footer__policy">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="security.html">情報セキュリティ基本方針</a>
+        <a href="sitepolicy.html">サイトポリシー</a>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" class="to-top" id="toTop" aria-label="ページトップへ戻る">↑</a>
+  <script src="js/main.js"></script>
+</body>
+</html>

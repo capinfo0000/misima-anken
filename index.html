@@ -3,36 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="株式会社ミシマ — 先端技術とイノベーションの社会実装を通じて、いつかの未来を、いつもの日々に。" />
-  <title>株式会社ミシマ | いつかの未来を、いつもの日々に</title>
-
-  <!-- Fonts -->
+  <meta name="description" content="株式会社ミシマ — 通信業界に特化した人材派遣・業務委託サービス。" />
+  <title>通信業界専門の人材派遣・業務委託 | 株式会社ミシマ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
 </head>
 <body>
-  <!-- ===================== Header / Nav ===================== -->
   <header class="site-header" id="siteHeader">
     <div class="container header__inner">
-      <a href="#hero" class="brand" aria-label="株式会社ミシマ ホーム">
+      <a href="index.html" class="brand" aria-label="株式会社ミシマ ホーム">
         <img src="assets/logo.svg" alt="株式会社ミシマ" class="brand__logo" />
       </a>
-
       <nav class="nav" id="primaryNav" aria-label="メインナビゲーション">
         <ul class="nav__list">
-          <li><a href="#purpose">会社情報</a></li>
-          <li><a href="#services">サービス</a></li>
-          <li><a href="#ir">IR情報</a></li>
-          <li><a href="#news">ニュース</a></li>
-          <li><a href="#recruit">採用</a></li>
-          <li><a href="#contact" class="nav__cta">お問い合わせ</a></li>
+          <li class="has-sub">
+            <button class="nav__parent" aria-expanded="false">会社情報</button>
+            <ul class="nav__sub">
+              <li><a href="message.html">代表メッセージ</a></li>
+              <li><a href="purpose.html">パーパス・社名の由来</a></li>
+              <li><a href="profile.html">会社概要</a></li>
+              <li><a href="history.html">沿革</a></li>
+              <li><a href="group.html">グループ会社</a></li>
+            </ul>
+          </li>
+          <li><a href="services.html" class="">サービス</a></li>
+          <li><a href="news.html" class="">ニュース</a></li>
+          <li class="has-sub">
+            <button class="nav__parent" aria-expanded="false">採用情報</button>
+            <ul class="nav__sub">
+              <li><a href="recruit.html">採用ページ</a></li>
+              <li><a href="organization.html">組織情報</a></li>
+            </ul>
+          </li>
+          <li><a href="contact.html" class="nav__cta">お問い合わせ</a></li>
         </ul>
       </nav>
-
       <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="primaryNav" aria-label="メニューを開く">
         <span></span><span></span><span></span>
       </button>
@@ -40,261 +48,185 @@
   </header>
 
   <main>
-    <!-- ===================== Hero ===================== -->
-    <section class="hero" id="hero">
-      <div class="hero__bg" aria-hidden="true">
-        <span class="hero__orb hero__orb--1"></span>
-        <span class="hero__orb hero__orb--2"></span>
+
+  <section class="hero" id="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <span class="hero__orb hero__orb--1"></span>
+      <span class="hero__orb hero__orb--2"></span>
+    </div>
+    <div class="container hero__inner">
+      <p class="hero__eyebrow">STAFFING FOR TELECOM</p>
+      <h1 class="hero__title">通信の最前線に、<br /><span class="shimmer">確かな人材</span>を。</h1>
+      <p class="hero__lead">
+        携帯ショップ・コールセンターから通信インフラまで。<br class="br-pc" />
+        通信業界に特化した人材派遣・業務委託で、企業の成長と人の活躍をつなぎます。
+      </p>
+      <div class="hero__actions">
+        <a href="services.html" class="btn btn--primary">事業内容を見る</a>
+        <a href="contact.html" class="btn btn--ghost">お問い合わせ</a>
       </div>
-      <div class="container hero__inner">
-        <p class="hero__eyebrow">PURPOSE</p>
-        <h1 class="hero__title">
-          <span class="shimmer">いつかの未来</span>を、<br />
-          いつもの日々に。
-        </h1>
-        <p class="hero__lead">
-          先端技術とイノベーションの社会実装を通じて、<br class="br-pc" />
-          一人ひとりの「いつか」を、当たり前の毎日へ。
+    </div>
+    <div class="hero__scroll" aria-hidden="true"><span>SCROLL</span><span class="hero__scroll-line"></span></div>
+  </section>
+
+  <section class="section purpose">
+    <div class="container">
+      <div class="section__head reveal">
+        <p class="section__eyebrow">ABOUT US</p>
+        <h2 class="section__title">通信業界に特化した、<br class="br-pc" />人材のプロフェッショナル。</h2>
+      </div>
+      <div class="purpose__grid">
+        <p class="purpose__text reveal">
+          私たち株式会社ミシマは、通信業界専門の人材派遣・業務委託サービスを提供しています。
+          携帯キャリアショップ、家電量販店の通信コーナー、コールセンターなど、
+          通信の現場を知り尽くしたスタッフが、企業の人材課題をワンストップで解決。
+          人と企業の最適なマッチングで、通信業界の成長を支えます。
         </p>
-        <div class="hero__actions">
-          <a href="#services" class="btn btn--primary">事業を見る</a>
-          <a href="#contact" class="btn btn--ghost">お問い合わせ</a>
-        </div>
-      </div>
-      <div class="hero__scroll" aria-hidden="true">
-        <span>SCROLL</span>
-        <span class="hero__scroll-line"></span>
-      </div>
-    </section>
-
-    <!-- ===================== Purpose ===================== -->
-    <section class="section purpose" id="purpose">
-      <div class="container">
-        <div class="section__head reveal">
-          <p class="section__eyebrow">OUR PURPOSE</p>
-          <h2 class="section__title">先端技術とイノベーションの<br class="br-pc" />社会実装を。</h2>
-        </div>
-        <div class="purpose__grid">
-          <p class="purpose__text reveal">
-            私たちミシマグループは、最先端のテクノロジーとイノベーションを社会に実装し、
-            持続可能でインクルーシブな成長を実現することを存在意義としています。
-            人の可能性を最大化し、デジタルの力で日々の仕事をより豊かに。
-            一社一社、一人ひとりに寄り添いながら、社会の「いつか」を前へと進めます。
-          </p>
-          <ul class="purpose__pillars">
-            <li class="pillar reveal">
-              <span class="pillar__num">01</span>
-              <h3 class="pillar__title">人の可能性の最大化</h3>
-              <p>幸福とモチベーションを起点に、組織と個人のパフォーマンスを引き出します。</p>
-            </li>
-            <li class="pillar reveal">
-              <span class="pillar__num">02</span>
-              <h3 class="pillar__title">デジタル技術の活用</h3>
-              <p>定型業務を自動化し、創造的な仕事に集中できる環境をつくります。</p>
-            </li>
-            <li class="pillar reveal">
-              <span class="pillar__num">03</span>
-              <h3 class="pillar__title">社会への実装</h3>
-              <p>研究で終わらせず、現場で動く価値として社会に届けます。</p>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== CEO Message ===================== -->
-    <section class="section message" id="message">
-      <div class="container message__inner">
-        <div class="message__photo reveal" aria-hidden="true">
-          <div class="message__photo-placeholder">
-            <span>CEO</span>
-          </div>
-        </div>
-        <div class="message__body reveal">
-          <p class="section__eyebrow">MESSAGE</p>
-          <h2 class="section__title">代表メッセージ</h2>
-          <p class="message__lead">
-            「いつかできたらいいな」を、今日の当たり前に変えていく。
-          </p>
-          <p class="message__text">
-            変化の速い時代だからこそ、私たちは技術の進歩を一部の人だけのものにせず、
-            あらゆる人の日常へと届けたいと考えています。働くことが、もっと自由で、もっとカラフルに。
-            その実現に向けて、ミシマグループは挑戦を続けます。
-          </p>
-          <p class="message__sign">代表取締役社長　三島 太郎</p>
-          <a href="#" class="link-arrow">メッセージ全文を読む</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== Services ===================== -->
-    <section class="section services" id="services">
-      <div class="container">
-        <div class="section__head reveal">
-          <p class="section__eyebrow">SERVICES</p>
-          <h2 class="section__title">事業・サービス</h2>
-        </div>
-        <div class="card-grid">
-          <article class="card reveal">
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
-            </div>
-            <h3 class="card__title">DX コンサルティング</h3>
-            <p class="card__text">業務プロセスの可視化から自動化まで、データドリブンな変革を伴走支援します。</p>
-          </article>
-          <article class="card reveal">
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 4-9 4-9-4 9-4z"/><path d="M3 12l9 4 9-4"/><path d="M3 17l9 4 9-4"/></svg>
-            </div>
-            <h3 class="card__title">M&A・CVC 戦略</h3>
-            <p class="card__text">事業ポートフォリオの最適化と新規領域への投資で、成長の角度を高めます。</p>
-          </article>
-          <article class="card reveal">
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
-            </div>
-            <h3 class="card__title">働き方デザイン</h3>
-            <p class="card__text">場所や時間にとらわれない、人を起点とした新しい働き方を設計します。</p>
-          </article>
-          <article class="card reveal">
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
-            </div>
-            <h3 class="card__title">プロダクト開発</h3>
-            <p class="card__text">AI・5G・XR を活用した次世代プロダクトを企画・開発・運用します。</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== Group Companies ===================== -->
-    <section class="section group" id="ir">
-      <div class="container">
-        <div class="section__head reveal">
-          <p class="section__eyebrow">GROUP</p>
-          <h2 class="section__title">グループ会社</h2>
-        </div>
-        <div class="group-grid">
-          <a href="#" class="group-card reveal">
-            <span class="group-card__logo">Qualia<strong>gram</strong></span>
-            <span class="group-card__desc">AI / 5G / XR テクノロジー</span>
-          </a>
-          <a href="#" class="group-card reveal">
-            <span class="group-card__logo">2<strong>Links</strong></span>
-            <span class="group-card__desc">リモートワークスペース</span>
-          </a>
-          <a href="#" class="group-card reveal">
-            <span class="group-card__logo">Bell<strong>Face</strong></span>
-            <span class="group-card__desc">オンライン営業システム</span>
-          </a>
-          <a href="#" class="group-card reveal">
-            <span class="group-card__logo">Fork<strong>well</strong></span>
-            <span class="group-card__desc">エンジニアキャリア支援</span>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== News ===================== -->
-    <section class="section news" id="news">
-      <div class="container">
-        <div class="section__head section__head--row reveal">
-          <div>
-            <p class="section__eyebrow">NEWS</p>
-            <h2 class="section__title">ニュース</h2>
-          </div>
-          <a href="#" class="link-arrow">一覧を見る</a>
-        </div>
-        <ul class="news-list">
-          <li class="news-item reveal">
-            <time datetime="2026-06-10">2026.06.10</time>
-            <span class="news-tag">プレスリリース</span>
-            <a href="#">大手通信事業者との協業によるAIソリューション提供開始のお知らせ</a>
-          </li>
-          <li class="news-item reveal">
-            <time datetime="2026-05-22">2026.05.22</time>
-            <span class="news-tag">お知らせ</span>
-            <a href="#">2026年3月期 通期決算説明資料を公開しました</a>
-          </li>
-          <li class="news-item reveal">
-            <time datetime="2026-04-15">2026.04.15</time>
-            <span class="news-tag">サービス</span>
-            <a href="#">働き方デザイン支援サービスの提供エリアを全国に拡大</a>
-          </li>
-          <li class="news-item reveal">
-            <time datetime="2026-03-01">2026.03.01</time>
-            <span class="news-tag">採用</span>
-            <a href="#">2027年度 新卒採用エントリー受付を開始しました</a>
-          </li>
+        <ul class="purpose__pillars">
+          <li class="pillar reveal"><span class="pillar__num">01</span><h3 class="pillar__title">通信業界への特化</h3><p>業界知識を持つスタッフだから、即戦力としてすぐに現場で活躍します。</p></li>
+          <li class="pillar reveal"><span class="pillar__num">02</span><h3 class="pillar__title">教育・研修体制</h3><p>接客から最新サービスの知識まで、独自プログラムで人材を育成します。</p></li>
+          <li class="pillar reveal"><span class="pillar__num">03</span><h3 class="pillar__title">派遣から委託まで</h3><p>人材派遣・業務委託（運営受託）まで、課題に合わせて柔軟にご提案します。</p></li>
         </ul>
       </div>
-    </section>
+      <div class="btn-row reveal"><a href="purpose.html" class="link-arrow">パーパス・社名の由来を見る</a></div>
+    </div>
+  </section>
 
-    <!-- ===================== Recruit Banner ===================== -->
-    <section class="recruit" id="recruit">
-      <div class="container recruit__inner reveal">
-        <p class="recruit__eyebrow">RECRUIT</p>
-        <h2 class="recruit__title">いつかを、一緒に動かす仲間へ。</h2>
-        <p class="recruit__text">多様なバックグラウンドを持つ仲間と、社会の未来をつくりませんか。</p>
-        <a href="#contact" class="btn btn--light">採用情報を見る</a>
+  <section class="section services">
+    <div class="container">
+      <div class="section__head section__head--row reveal">
+        <div><p class="section__eyebrow">SERVICES</p><h2 class="section__title">事業内容</h2></div>
+        <a href="services.html" class="link-arrow">サービス一覧</a>
       </div>
-    </section>
+      <div class="card-grid">
+        <article class="card reveal"><div class="card__icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M17 9l2 2 3-4"/></svg></div><h3 class="card__title">人材派遣</h3><p class="card__text">通信業界の各現場へ、業界知識を備えた即戦力スタッフを派遣します。</p></article>
+        <article class="card reveal"><div class="card__icon"><svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg></div><h3 class="card__title">業務委託（運営受託）</h3><p class="card__text">携帯ショップなどの店舗運営を、採用・教育・管理まで一括で受託します。</p></article>
+        <article class="card reveal"><div class="card__icon"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3 class="card__title">販売・接客スタッフ</h3><p class="card__text">携帯ショップ・家電量販店での販売、契約対応、カウンター接客を担います。</p></article>
+        <article class="card reveal"><div class="card__icon"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></div><h3 class="card__title">採用・教育支援</h3><p class="card__text">採用代行から研修プログラムの提供まで、人材の確保と育成を支援します。</p></article>
+      </div>
+    </div>
+  </section>
 
-    <!-- ===================== Contact ===================== -->
-    <section class="section contact" id="contact">
-      <div class="container contact__inner">
-        <div class="section__head reveal">
-          <p class="section__eyebrow">CONTACT</p>
-          <h2 class="section__title">お問い合わせ</h2>
-          <p class="contact__lead">サービスに関するご相談・取材・採用など、お気軽にご連絡ください。</p>
-        </div>
-        <form class="contact-form reveal" id="contactForm" novalidate>
-          <div class="form-row">
-            <label>お名前<span class="req">必須</span>
-              <input type="text" name="name" required placeholder="山田 太郎" />
-            </label>
-            <label>会社名
-              <input type="text" name="company" placeholder="株式会社〇〇" />
-            </label>
-          </div>
-          <label>メールアドレス<span class="req">必須</span>
-            <input type="email" name="email" required placeholder="example@misima.co.jp" />
-          </label>
-          <label>お問い合わせ内容<span class="req">必須</span>
-            <textarea name="message" rows="5" required placeholder="お問い合わせ内容をご記入ください"></textarea>
-          </label>
-          <button type="submit" class="btn btn--primary btn--full">送信する</button>
-          <p class="form-note" id="formNote" role="status"></p>
-        </form>
+  <section class="section group">
+    <div class="container">
+      <div class="section__head reveal"><p class="section__eyebrow">OUR STRENGTHS</p><h2 class="section__title">選ばれる理由</h2></div>
+      <div class="card-grid">
+        <div class="card reveal"><span class="pillar__num">01</span><h3 class="card__title">通信業界に特化</h3><p class="card__text">通信分野に絞った人材サービスだからこそ、現場が求めるスキルを的確にご提供します。</p></div>
+        <div class="card reveal"><span class="pillar__num">02</span><h3 class="card__title">充実の研修・資格支援</h3><p class="card__text">入社時研修から資格取得支援まで、スタッフの成長を会社が後押しします。</p></div>
+        <div class="card reveal"><span class="pillar__num">03</span><h3 class="card__title">全国エリアに対応</h3><p class="card__text">主要都市を中心に全国の現場へ対応。広域の人材ニーズにお応えします。</p></div>
+        <div class="card reveal"><span class="pillar__num">04</span><h3 class="card__title">柔軟なご提案</h3><p class="card__text">人材派遣・業務委託を組み合わせ、ご要望に合わせた最適なプランをご提案します。</p></div>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <section class="section message">
+    <div class="container message__inner">
+      <div class="message__photo reveal" aria-hidden="true"><div class="message__photo-placeholder"><span>CEO</span></div></div>
+      <div class="message__body reveal">
+        <p class="section__eyebrow">MESSAGE</p>
+        <h2 class="section__title">代表メッセージ</h2>
+        <p class="message__lead">人の力で、通信の未来を支える。</p>
+        <p class="message__text">通信サービスは、いまや暮らしと社会に欠かせないインフラです。その最前線を支えているのは、一人ひとりの「人」の力にほかなりません。私たちは、通信業界で働く人の活躍の場を広げ、企業の成長に貢献することを使命としています。</p>
+        <p class="message__sign">代表取締役社長　三島 太郎</p>
+        <a href="message.html" class="link-arrow">メッセージ全文を読む</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section news">
+    <div class="container">
+      <div class="section__head section__head--row reveal">
+        <div><p class="section__eyebrow">NEWS</p><h2 class="section__title">ニュース</h2></div>
+        <a href="news.html" class="link-arrow">一覧を見る</a>
+      </div>
+      <ul class="news-list">
+        <li class="news-item reveal"><time datetime="2026-06-10">2026.06.10</time><span class="news-tag">プレスリリース</span><a href="news.html">大手通信キャリアとの店舗運営業務委託契約を締結しました</a></li>
+        <li class="news-item reveal"><time datetime="2026-05-22">2026.05.22</time><span class="news-tag">お知らせ</span><a href="news.html">スタッフ向け研修プログラムをリニューアルしました</a></li>
+        <li class="news-item reveal"><time datetime="2026-04-15">2026.04.15</time><span class="news-tag">拠点</span><a href="news.html">関西エリアの人材ニーズ拡大に伴い、大阪支社を開設</a></li>
+        <li class="news-item reveal"><time datetime="2026-03-01">2026.03.01</time><span class="news-tag">採用</span><a href="news.html">2027年度 販売・接客スタッフの採用エントリーを開始しました</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="recruit">
+    <div class="container recruit__inner reveal">
+      <p class="recruit__eyebrow">RECRUIT</p>
+      <h2 class="recruit__title">あなたの「働きたい」を、通信の現場で。</h2>
+      <p class="recruit__text">未経験から始められる研修制度あり。通信業界で活躍したい仲間を募集しています。</p>
+      <a href="recruit.html" class="btn btn--light">採用情報を見る</a>
+    </div>
+  </section>
+
+  <section class="section contact">
+    <div class="container">
+      <div class="section__head reveal" style="text-align:center;">
+        <p class="section__eyebrow">CONTACT</p>
+        <h2 class="section__title">お問い合わせ</h2>
+        <p class="contact__lead">人材派遣・業務委託のご相談、スタッフ登録のご希望など、お気軽にご連絡ください。</p>
+      </div>
+      <div class="btn-row reveal" style="justify-content:center;">
+        <a href="contact.html" class="btn btn--primary">お問い合わせフォームへ</a>
+      </div>
+    </div>
+  </section>
+
   </main>
 
-  <!-- ===================== Footer ===================== -->
   <footer class="site-footer">
     <div class="container footer__inner">
       <div class="footer__brand">
         <img src="assets/logo.svg" alt="株式会社ミシマ" class="footer__logo" />
-        <p class="footer__addr">〒140-0000 東京都品川区〇〇 1-2-3 ミシマビル</p>
+        <p class="footer__addr">〒140-0000 東京都品川区〇〇 1-2-3 ミシマビル<br />通信業界専門の人材派遣・業務委託</p>
       </div>
       <nav class="footer__nav" aria-label="フッターナビゲーション">
-        <ul>
-          <li><a href="#purpose">会社情報</a></li>
-          <li><a href="#services">サービス</a></li>
-          <li><a href="#ir">IR情報</a></li>
-          <li><a href="#news">ニュース</a></li>
-          <li><a href="#recruit">採用</a></li>
-          <li><a href="#contact">お問い合わせ</a></li>
-        </ul>
+        <div class="footer__cols">
+          <div class="footer__col">
+            <h4>COMPANY</h4>
+            <ul>
+              <li><a href="message.html">代表メッセージ</a></li>
+              <li><a href="purpose.html">パーパス・社名の由来</a></li>
+              <li><a href="profile.html">会社概要</a></li>
+              <li><a href="history.html">沿革</a></li>
+              <li><a href="group.html">グループ会社</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>SERVICE / NEWS</h4>
+            <ul>
+              <li><a href="services.html">事業・サービス一覧</a></li>
+              <li><a href="news.html">ニュース一覧</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>RECRUIT</h4>
+            <ul>
+              <li><a href="recruit.html">採用ページ</a></li>
+              <li><a href="organization.html">組織情報</a></li>
+            </ul>
+          </div>
+          <div class="footer__col">
+            <h4>OTHERS</h4>
+            <ul>
+              <li><a href="contact.html">お問い合わせ</a></li>
+              <li><a href="privacy.html">プライバシーポリシー</a></li>
+              <li><a href="security.html">情報セキュリティ基本方針</a></li>
+              <li><a href="sitepolicy.html">サイトポリシー</a></li>
+            </ul>
+          </div>
+        </div>
       </nav>
     </div>
     <div class="container footer__bottom">
       <small>&copy; 2026 MISIMA Inc. All Rights Reserved.</small>
+      <div class="footer__policy">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="security.html">情報セキュリティ基本方針</a>
+        <a href="sitepolicy.html">サイトポリシー</a>
+      </div>
     </div>
   </footer>
 
-  <a href="#hero" class="to-top" id="toTop" aria-label="ページトップへ戻る">↑</a>
-
+  <a href="#" class="to-top" id="toTop" aria-label="ページトップへ戻る">↑</a>
   <script src="js/main.js"></script>
 </body>
 </html>
