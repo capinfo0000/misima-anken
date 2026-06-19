@@ -52,38 +52,58 @@
     }
   }
 
-  /* ---------- Top intro: scroll storytelling → brand reveal ---------- */
+  /* ---------- Top intro: opening roulette → scroll story → brand ---------- */
   var intro = document.querySelector(".p-intro");
   if (intro) {
+    var opening = intro.querySelector(".p-intro__opening");
+    var roulette = intro.querySelector(".p-intro__roulette");
     var lines = intro.querySelectorAll(".p-intro__line");
     var statements = intro.querySelector(".p-intro__statements");
-    var brand = intro.querySelector(".p-intro__brand");
     var introScroll = intro.querySelector(".p-intro__scroll");
     var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var introDone = false; // in-memory: resets on reload only
-    var brandAt = 0.72;
+    var introDone = false;          // in-memory: resets on reload only
+    var openUntil = 0.08, brandAt = 0.78;
 
     var lockBrand = function () {
+      if (opening) opening.classList.add("is-hide");
       statements.classList.add("is-hide");
       lines.forEach(function (l) { l.classList.remove("is-show"); });
       intro.classList.add("is-brand");
       if (introScroll) introScroll.classList.add("is-hide");
     };
 
-    if (introReduced) {
-      lockBrand();
-      introDone = true;
+    /* Opening word roulette (auto, runs once on load) */
+    if (roulette && !introReduced) {
+      var words = (roulette.getAttribute("data-words") || "").split(",").filter(Boolean);
+      var finalWord = roulette.getAttribute("data-final") || roulette.textContent;
+      var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
+      var spin = function () {
+        if (introDone) return;
+        roulette.textContent = words.length ? words[idx % words.length] : finalWord;
+        idx++; ticks++;
+        if (ticks >= maxTicks) { roulette.textContent = finalWord; roulette.classList.add("is-set"); return; }
+        if (ticks > maxTicks - 7) delay += 45; else delay += 5; // decelerate near the end
+        setTimeout(spin, delay);
+      };
+      setTimeout(spin, 900);
     }
 
+    if (introReduced) { lockBrand(); introDone = true; }
+
     var onIntro = function () {
-      if (introDone) return; // once shown, only the brand remains until reload
+      if (introDone) return;
       var total = intro.offsetHeight - window.innerHeight;
       var p = total > 0 ? Math.min(Math.max(-intro.getBoundingClientRect().top / total, 0), 1) : 0;
 
-      lines.forEach(function (l, idx) {
-        var th = 0.06 + idx * (brandAt - 0.10) / lines.length;
-        l.classList.toggle("is-show", p >= th);
-      });
+      if (p < openUntil) {
+        if (opening) opening.classList.remove("is-hide");
+        statements.classList.add("is-hide");
+        lines.forEach(function (l) { l.classList.remove("is-show"); });
+        intro.classList.remove("is-brand");
+        if (introScroll) introScroll.classList.remove("is-hide");
+        return;
+      }
+      if (opening) opening.classList.add("is-hide");
 
       if (p >= brandAt) {
         statements.classList.add("is-hide");
@@ -93,8 +113,11 @@
         statements.classList.remove("is-hide");
         intro.classList.remove("is-brand");
         if (introScroll) introScroll.classList.remove("is-hide");
+        var span = brandAt - openUntil;
+        lines.forEach(function (l, i) {
+          l.classList.toggle("is-show", p >= openUntil + span * i / lines.length);
+        });
       }
-
       if (p >= 0.97) { introDone = true; lockBrand(); }
     };
     window.addEventListener("scroll", onIntro, { passive: true });
