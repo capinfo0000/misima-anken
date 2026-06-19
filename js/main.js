@@ -59,6 +59,7 @@
     var roulette = intro.querySelector(".p-intro__roulette");
     var lines = intro.querySelectorAll(".p-intro__line");
     var statements = intro.querySelector(".p-intro__statements");
+    var mediaImgs = intro.querySelectorAll(".p-intro__media-img");
     var introScroll = intro.querySelector(".p-intro__scroll");
     var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var introDone = false;          // in-memory: resets on reload only
@@ -69,16 +70,17 @@
     var burstDone = false;
     var palette = ["#e60012","#ed6d1f","#f5a200","#009944","#41a1be","#1d2088","#601986","#e95383"];
     if (burstBox && !introReduced) {
-      for (var bi = 0; bi < 30; bi++) {
+      for (var bi = 0; bi < 64; bi++) {
         var sp = document.createElement("span");
         sp.className = "p-intro__particle";
-        var ang = Math.random() * Math.PI * 2, dist = 130 + Math.random() * 280;
+        var ang = Math.random() * Math.PI * 2, dist = 150 + Math.random() * 420;
         sp.style.setProperty("--tx", Math.cos(ang) * dist + "px");
         sp.style.setProperty("--ty", Math.sin(ang) * dist + "px");
-        var sz = 6 + Math.random() * 11;
+        var sz = 6 + Math.random() * 18;
         sp.style.width = sz + "px"; sp.style.height = sz + "px";
-        sp.style.background = palette[bi % palette.length];
-        sp.style.animationDelay = (Math.random() * 0.06) + "s";
+        var col = palette[bi % palette.length];
+        sp.style.background = col; sp.style.color = col;
+        sp.style.animationDelay = (Math.random() * 0.08) + "s";
         burstBox.appendChild(sp);
       }
     }
@@ -123,6 +125,7 @@
       if (p < openUntil) {
         if (opening) opening.classList.remove("is-hide");
         statements.classList.add("is-hide");
+        intro.classList.remove("is-story");
         lines.forEach(function (l) { l.classList.remove("is-show"); });
         intro.classList.remove("is-brand");
         if (introScroll) introScroll.classList.remove("is-hide");
@@ -132,17 +135,24 @@
 
       if (p >= brandAt) {
         statements.classList.add("is-hide");
+        intro.classList.remove("is-story");
         intro.classList.add("is-brand");
         fireBurst();
         if (introScroll) introScroll.classList.add("is-hide");
       } else {
         statements.classList.remove("is-hide");
+        intro.classList.add("is-story");
         intro.classList.remove("is-brand");
         if (introScroll) introScroll.classList.remove("is-hide");
         var span = brandAt - openUntil;
         lines.forEach(function (l, i) {
           l.classList.toggle("is-show", p >= openUntil + span * i / lines.length);
         });
+        if (mediaImgs.length) {
+          var frac = (p - openUntil) / span;
+          var stage = Math.min(mediaImgs.length - 1, Math.floor(frac * mediaImgs.length));
+          mediaImgs.forEach(function (im, i) { im.classList.toggle("is-show", i === stage); });
+        }
       }
       if (p >= 0.97) { introDone = true; lockBrand(); }
     };
