@@ -63,7 +63,7 @@
     var introScroll = intro.querySelector(".p-intro__scroll");
     var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var introDone = false;          // in-memory: resets on reload only
-    var openUntil = 0.08, brandAt = 0.78;
+    var openUntil = 0.07, brandAt = 0.70;
 
     /* explosion particles */
     var burstBox = intro.querySelector(".p-intro__burst");
@@ -154,7 +154,7 @@
           mediaImgs.forEach(function (im, i) { im.classList.toggle("is-show", i === stage); });
         }
       }
-      if (p >= 0.97) { introDone = true; lockBrand(); }
+      if (p >= 0.90) { introDone = true; lockBrand(); }
     };
     window.addEventListener("scroll", onIntro, { passive: true });
     onIntro();

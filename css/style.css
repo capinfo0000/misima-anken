@@ -256,7 +256,7 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 /* ============================================================
    Project : Top Intro (scroll storytelling → brand reveal)
    ============================================================ */
-.p-intro{position:relative;height:300vh;background:#fff;}
+.p-intro{position:relative;height:230vh;background:#fff;}
 .p-intro__sticky{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center;}
 .p-intro__bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;opacity:0;transition:opacity .9s ease;}
 .p-intro__bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,22,26,.5),rgba(18,22,26,.72));}
