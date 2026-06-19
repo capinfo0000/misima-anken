@@ -70,7 +70,7 @@
     var burstBox = intro.querySelector(".p-intro__burst");
     var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var docEl = document.documentElement;
-    var prog = 0, introDone = false, burstDone = false;
+    var prog = 0, introDone = false, burstDone = false, brandReached = false, brandTime = 0;
     var openUntil = 0.07, brandAt = 0.70;
     var SENS = 1 / 1500; // wheel units needed to complete the intro (~one screen of scrolling)
     var palette = ["#e60012","#ed6d1f","#f5a200","#009944","#41a1be","#1d2088","#601986","#e95383"];
@@ -142,15 +142,20 @@
         intro.classList.add("is-resolved");   // 社名ヒーローとして在流配置で残す
         window.scrollTo(0, 0);
         if (introScroll) introScroll.classList.remove("is-hide"); // 下へ誘導するSCROLLを再表示
-      }, 800);
+      }, 350);
     };
 
-    /* one-way only: downward input advances, upward is ignored */
+    /* one-way only: downward input advances, upward is ignored.
+       社名が出たら、少しの間(演出を見せる)のあと“ひと押し”で本編へ解放する */
     var advance = function (delta) {
       if (introDone || delta <= 0) return;
+      if (brandReached) {
+        if (Date.now() - brandTime > 450) finish();   // 社名表示後の次のスクロールで解放
+        return;
+      }
       prog = Math.min(1, prog + delta * SENS);
       render();
-      if (prog >= 1) finish();
+      if (prog >= brandAt && !brandReached) { brandReached = true; brandTime = Date.now(); }
     };
 
     if (introReduced) {
