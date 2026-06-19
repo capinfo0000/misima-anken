@@ -520,6 +520,15 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .reveal.-d2{transition-delay:.2s;}
 .reveal.-d3{transition-delay:.3s;}
 
+/* intro text wrapping (Japanese) */
+.p-intro__line,.p-intro__opening-catch,.p-intro__brand-tag{line-break:strict;overflow-wrap:break-word;}
+@media (max-width:600px){
+  .p-intro__line{font-size:1.18rem;line-height:1.95;}
+  .p-intro__statements{gap:1.4rem;}
+  .p-intro__opening-catch{font-size:1.9rem;}
+  .p-intro__brand-tag{font-size:.92rem;}
+}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
   html{scroll-behavior:auto;}
