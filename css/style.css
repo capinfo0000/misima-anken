@@ -464,6 +464,40 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 .reveal.-left{transform:translateX(-40px);}
 .reveal.-right{transform:translateX(40px);}
 .reveal.-left.is-visible,.reveal.-right.is-visible{transform:translateX(0);}
+/* extra reveal variants */
+.reveal.-zoom{transform:translateY(30px) scale(.94);}
+.reveal.-zoom.is-visible{transform:none;}
+.reveal.-blur{filter:blur(12px);}
+.reveal.-blur.is-visible{filter:none;}
+.reveal.-clip{transition:opacity .9s ease,transform .9s ease,clip-path 1.1s cubic-bezier(.2,.8,.2,1);clip-path:inset(0 0 100% 0);}
+.reveal.-clip.is-visible{clip-path:inset(0 0 0 0);}
+.reveal.-rise{transform:translateY(60px) scale(.97);}
+.reveal.-rise.is-visible{transform:none;}
+
+/* card grids: zoom-in + stagger */
+.p-top-service__card.reveal,.p-top-reasons__grid .c-card.reveal,.p-top-group__item.reveal{transform:translateY(34px) scale(.93);}
+.p-top-service__card.reveal.is-visible,.p-top-reasons__grid .c-card.reveal.is-visible,.p-top-group__item.reveal.is-visible{transform:none;}
+.p-top-service__grid>*:nth-child(2),.p-top-reasons__grid>*:nth-child(2),.p-top-group__grid>*:nth-child(2){transition-delay:.1s;}
+.p-top-service__grid>*:nth-child(3),.p-top-reasons__grid>*:nth-child(3),.p-top-group__grid>*:nth-child(3){transition-delay:.2s;}
+.p-top-service__grid>*:nth-child(4),.p-top-reasons__grid>*:nth-child(4),.p-top-group__grid>*:nth-child(4){transition-delay:.3s;}
+.p-top-news__item:nth-child(2){transition-delay:.08s;}
+.p-top-news__item:nth-child(3){transition-delay:.16s;}
+.p-top-news__item:nth-child(4){transition-delay:.24s;}
+
+/* ============================================================
+   Diagonal color band (section separator, original)
+   ============================================================ */
+.c-band{position:relative;height:120px;overflow:hidden;pointer-events:none;}
+.c-band__bar{position:absolute;left:-12%;width:124%;height:34px;transform:skewY(-4deg) scaleX(0);transform-origin:left center;opacity:.9;transition:transform 1.1s cubic-bezier(.2,.85,.2,1);}
+.c-band.-rtl .c-band__bar{transform-origin:right center;}
+.c-band.is-visible .c-band__bar{transform:skewY(-4deg) scaleX(1);}
+.c-band__bar:nth-child(1){top:14%;}
+.c-band__bar:nth-child(2){top:40%;transition-delay:.12s;}
+.c-band__bar:nth-child(3){top:66%;transition-delay:.24s;}
+/* gentle continuous drift once revealed */
+.c-band.is-visible .c-band__bar{animation:bandDrift 9s ease-in-out infinite alternate;}
+@keyframes bandDrift{from{margin-left:-8px;}to{margin-left:8px;}}
+@media (max-width:600px){.c-band{height:80px;}.c-band__bar{height:22px;}}
 
 /* ============================================================
    Extra animations & micro-interactions

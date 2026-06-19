@@ -4,6 +4,12 @@
 (function () {
   "use strict";
 
+  /* ---------- Always start at the very top on (re)load ---------- */
+  if ("scrollRestoration" in history) { try { history.scrollRestoration = "manual"; } catch (e) {} }
+  window.scrollTo(0, 0);
+  window.addEventListener("load", function () { window.scrollTo(0, 0); });
+  window.addEventListener("pageshow", function () { window.scrollTo(0, 0); });
+
   /* ---------- Header shrink on scroll + to-top ---------- */
   var header = document.querySelector(".l-header");
   var toTop = document.querySelector(".c-to-top");
