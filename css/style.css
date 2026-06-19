@@ -257,7 +257,7 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
    Project : Top Intro (scroll storytelling → brand reveal)
    ============================================================ */
 .p-intro{position:fixed;inset:0;z-index:50;height:100svh;background:#fff;overflow:hidden;}
-.p-intro.is-done{opacity:0;visibility:hidden;transition:opacity .8s ease,visibility .8s ease;}
+.p-intro.is-resolved{position:relative;inset:auto;z-index:1;height:100svh;}
 html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touch-action:none;overscroll-behavior:none;}
 .p-intro__sticky{position:absolute;inset:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center;}
 .p-intro__bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;opacity:0;transition:opacity .9s ease;}
@@ -487,17 +487,38 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 /* ============================================================
    Diagonal color band (section separator, original)
    ============================================================ */
-.c-band{position:relative;height:120px;overflow:hidden;pointer-events:none;}
-.c-band__bar{position:absolute;left:-12%;width:124%;height:34px;transform:skewY(-4deg) scaleX(0);transform-origin:left center;opacity:.9;transition:transform 1.1s cubic-bezier(.2,.85,.2,1);}
-.c-band.-rtl .c-band__bar{transform-origin:right center;}
-.c-band.is-visible .c-band__bar{transform:skewY(-4deg) scaleX(1);}
-.c-band__bar:nth-child(1){top:14%;}
-.c-band__bar:nth-child(2){top:40%;transition-delay:.12s;}
-.c-band__bar:nth-child(3){top:66%;transition-delay:.24s;}
-/* gentle continuous drift once revealed */
-.c-band.is-visible .c-band__bar{animation:bandDrift 9s ease-in-out infinite alternate;}
-@keyframes bandDrift{from{margin-left:-8px;}to{margin-left:8px;}}
-@media (max-width:600px){.c-band{height:80px;}.c-band__bar{height:22px;}}
+.c-band{position:relative;height:130px;overflow:hidden;pointer-events:none;}
+.c-band__bar{position:absolute;left:-12%;width:124%;height:12px;transform:skewY(-4deg);}
+/* 1) rail draws first */
+.c-band__bar::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(0,0,0,.14);transform:translateY(-50%) scaleX(0);transform-origin:left center;transition:transform 1.6s cubic-bezier(.2,.8,.2,1);}
+/* 2) colour flows along the rail (slower, after a delay) */
+.c-band__bar::after{content:"";position:absolute;inset:0;background:var(--c,#888);transform:scaleX(0);transform-origin:left center;transition:transform 2.1s cubic-bezier(.3,.7,.2,1) 1.3s;}
+.c-band.-rtl .c-band__bar::before,.c-band.-rtl .c-band__bar::after{transform-origin:right center;}
+.c-band.is-visible .c-band__bar::before{transform:translateY(-50%) scaleX(1);}
+.c-band.is-visible .c-band__bar::after{transform:scaleX(1);}
+.c-band__bar:nth-child(1){top:22%;}
+.c-band__bar:nth-child(2){top:46%;}
+.c-band__bar:nth-child(3){top:70%;}
+.c-band__bar:nth-child(2)::before{transition-delay:.15s;}
+.c-band__bar:nth-child(3)::before{transition-delay:.3s;}
+.c-band__bar:nth-child(2)::after{transition-delay:1.5s;}
+.c-band__bar:nth-child(3)::after{transition-delay:1.7s;}
+/* single-colour bands: tonal depth using the section colour */
+.c-band:not(.-multi) .c-band__bar:nth-child(2)::after{opacity:.6;}
+.c-band:not(.-multi) .c-band__bar:nth-child(3)::after{opacity:.38;}
+/* multi-colour band (the most colourful spot) */
+.c-band.-multi{height:150px;}
+.c-band.-multi .c-band__bar{height:10px;}
+.c-band.-multi .c-band__bar:nth-child(1){top:12%;}
+.c-band.-multi .c-band__bar:nth-child(2){top:30%;}
+.c-band.-multi .c-band__bar:nth-child(3){top:48%;}
+.c-band.-multi .c-band__bar:nth-child(4){top:66%;}
+.c-band.-multi .c-band__bar:nth-child(5){top:84%;}
+.c-band.-multi .c-band__bar:nth-child(4)::before{transition-delay:.45s;}
+.c-band.-multi .c-band__bar:nth-child(5)::before{transition-delay:.6s;}
+.c-band.-multi .c-band__bar:nth-child(4)::after{transition-delay:1.9s;}
+.c-band.-multi .c-band__bar:nth-child(5)::after{transition-delay:2.1s;}
+@media (max-width:600px){.c-band{height:90px;}.c-band.-multi{height:110px;}}
 
 /* ============================================================
    Extra animations & micro-interactions
@@ -555,9 +576,6 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .reveal.-d1{transition-delay:.1s;}
 .reveal.-d2{transition-delay:.2s;}
 .reveal.-d3{transition-delay:.3s;}
-
-/* first content section sits below fixed header after the intro overlay */
-.p-intro + .p-top-news{padding-top:calc(var(--header-h) + var(--space-6));}
 
 /* intro text wrapping (Japanese) */
 .p-intro__line,.p-intro__opening-catch,.p-intro__brand-tag{line-break:strict;overflow-wrap:break-word;}

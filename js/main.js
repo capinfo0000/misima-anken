@@ -138,11 +138,11 @@
       introDone = true;
       intro.classList.add("is-brand"); fireBurst();
       setTimeout(function () {
-        intro.classList.add("is-done");
         unlockScroll();
+        intro.classList.add("is-resolved");   // 社名ヒーローとして在流配置で残す
         window.scrollTo(0, 0);
-        setTimeout(function () { intro.style.display = "none"; }, 850);
-      }, 750);
+        if (introScroll) introScroll.classList.remove("is-hide"); // 下へ誘導するSCROLLを再表示
+      }, 800);
     };
 
     /* one-way only: downward input advances, upward is ignored */
