@@ -272,4 +272,40 @@
       form.reset();
     });
   }
+
+  /* ---------- News via WordPress REST (optional, graceful fallback) ---------- */
+  (function loadWpNews() {
+    var base = (window.MISIMA_WP_BASE || "").replace(/\/+$/, "");
+    if (!base) return;                         // WP未設定 → 静的ニュースを維持
+    var list = document.querySelector(".p-top-news__list");
+    if (!list || !window.fetch) return;
+    var count = parseInt(list.getAttribute("data-news-count") || "4", 10);
+
+    var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+    var esc = function (s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    };
+
+    fetch(base + "/wp-json/wp/v2/posts?_embed&per_page=" + count)
+      .then(function (r) { if (!r.ok) throw new Error("wp"); return r.json(); })
+      .then(function (posts) {
+        if (!Array.isArray(posts) || !posts.length) return;
+        list.innerHTML = posts.map(function (p) {
+          var d = new Date(p.date);
+          var disp = d.getFullYear() + "." + pad(d.getMonth() + 1) + "." + pad(d.getDate());
+          var iso = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+          var cat = "お知らせ";
+          try { cat = p._embedded["wp:term"][0][0].name || cat; } catch (e) {}
+          var title = (p.title && p.title.rendered) ? p.title.rendered : "";
+          return '<li class="p-top-news__item reveal"><a class="p-top-news__link" href="' + p.link + '">' +
+                 '<time class="p-top-news__date" datetime="' + iso + '">' + disp + '</time>' +
+                 '<span class="c-label-category">' + esc(cat) + '</span>' +
+                 '<p class="p-top-news__title">' + title + '</p></a></li>';
+        }).join("");
+        list.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("is-visible"); });
+      })
+      .catch(function () { /* 取得失敗時は静的ニュースのまま */ });
+  })();
 })();

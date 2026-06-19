@@ -63,3 +63,38 @@ python3 -m http.server 8000
 - **ロゴ**: `assets/logo.svg` / `assets/favicon.svg` を差し替えてください。
 - **ナビ / フッター**: 全ページに同じマークアップが埋め込まれています。リンク構成を変更する場合は各ページのヘッダー／フッターを揃えて編集してください。
 - **お問い合わせフォーム**（`contact.html`）: 現在は静的なデモ動作です。実送信にはバックエンド（フォーム送信サービス等）への接続が必要です。
+
+## ニュースを WordPress で運用する（任意・ヘッドレス連携）
+
+ニュースは **WordPress の管理画面から記事を追加** すると、トップと一覧に自動反映できます。
+サイト本体は静的のまま、ニュース部分だけ WordPress の REST API から読み込む方式（ヘッドレス）です。
+**未設定の間は、HTML に書かれた静的なニュースがそのまま表示されます。**
+
+### 1. WordPress を用意する（CORESERVER の例）
+1. CORESERVER 管理画面 →「CMSインストール」等から **WordPress をインストール**
+   （データベースは自動作成されます）。
+2. 設置先は **同一ドメインのサブディレクトリ**を推奨：
+   例）サイトが `https://misima.coresv.com/` の場合、WordPress は
+   `https://misima.coresv.com/wp/` に設置（同一ドメインなので CORS 不要）。
+
+### 2. サイトに連携先を設定する
+`js/config.js` を開き、WordPress の URL を設定します。
+```js
+window.MISIMA_WP_BASE = "https://misima.coresv.com/wp"; // 末尾スラッシュなし
+```
+- 空文字 `""` のままなら静的ニュースを表示（フォールバック）。
+- 表示件数は `MISIMA_NEWS_COUNT_TOP`（トップ）/ `MISIMA_NEWS_COUNT_LIST`（一覧）で調整可。
+
+### 3. 記事を書く
+WordPress 管理画面の「投稿」→「新規追加」で記事を作成・公開するだけ。
+- **日付**：投稿日が自動表示されます。
+- **カテゴリ**：ラベル（例：プレスリリース／お知らせ）として表示されます。
+- 記事タイトルをクリックすると、WordPress の記事ページが開きます。
+
+### 仕組み・注意
+- `js/main.js` が `（WP_BASE）/wp-json/wp/v2/posts?_embed` を取得して、`index.html` と
+  `news.html` のニュース一覧を置き換えます（取得失敗時は静的表示のまま）。
+- 別ドメイン／別サブドメインに WordPress を置く場合は、WordPress 側で **CORS 許可**（REST に
+  `Access-Control-Allow-Origin` を付与）が必要です。サブディレクトリ設置なら不要です。
+- さらに本格運用（記事ページもこのデザインで表示・問い合わせ保存等）が必要な場合は、
+  WordPress テーマ化や独自エンドポイントの追加も対応可能です。
