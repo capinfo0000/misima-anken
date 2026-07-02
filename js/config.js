@@ -6,12 +6,12 @@
    （管理画面で投稿を追加すると、サイトに反映されます）
 
    ・同一ドメインのサブディレクトリに入れるのが最も簡単です
-     例: サイトが https://misima.coresv.com/ なら
-         WordPress は https://misima.coresv.com/wp/ に設置し、
-         下記を "https://misima.coresv.com/wp" にする。
+     例: サイトが https://revenge.co.jp/ なら
+         WordPress は https://revenge.co.jp/wp/ に設置し、
+         下記を "/wp"（相対パス）にする。
    ・空文字 "" のままだと、HTMLに書かれた静的なニュースを表示します。
    ============================================================ */
-window.MISIMA_WP_BASE = "";
+window.MISIMA_WP_BASE = "/wp";
 
 /* 1ページに表示する件数（トップ＝既定4 / 一覧＝既定20）を上書きしたい場合 */
 window.MISIMA_NEWS_COUNT_TOP = 5;
