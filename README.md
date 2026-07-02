@@ -94,20 +94,12 @@ python3 -m http.server 8000
 
 ---
 
-## 公開・デプロイ（CORESERVER）
+## 公開先
 
-- 公開先：CORESERVER（アカウント `engineer` / `v2008.coreserver.jp`）。
-- webroot：`/home/engineer/domains/revenge.co.jp/public_html/`
-- ルートに静的サイト一式、`/wp` に WordPress（ニュース用）を設置するハイブリッド構成。
-- ※サーバーの管理画面操作・FTP・WordPress設定などの**ブラウザ作業はローカル環境で実施**（このリポジトリはソースの正管理）。
-- **管理者パスワード等の認証情報はリポジトリに含めません**（別管理の引き継ぎ資料 `HANDOVER.md` に記載・取扱注意）。
-
-### 公開までのチェックリスト（登記・DNS開通＝2026-07-07 以降）
-1. Value Domain でドメインを**アクティベート**（登記情報で有効化）＋ ネームサーバー/DNS が CORESERVER を向くか確認。
-2. CORESERVER で `revenge.co.jp` に**無料SSL（Let's Encrypt）発行 → https化**。
-3. WordPress（`/wp`）の仕上げ：**パーマリンクを「投稿名」に変更** → 既定投稿「Hello world!」削除 →
-   カテゴリ「お知らせ」作成 → 実ニュース「ホームページを新設しました」(2026-07-07) 投稿 → `news.html` の動的表示を確認。
-4. メール `info@revenge.co.jp` 作成＋MX 設定、WP管理者メールを info@ に変更（任意）。
+- 公開ドメイン：`revenge.co.jp`（登記・アクティベート後に公開）。ホスティングは CORESERVER。
+- ルート＝静的サイト、`/wp`＝WordPress（ニュース用）のハイブリッド構成。
+- 具体的なデプロイ手順・公開チェックリスト・サーバー/認証情報などの**運用情報は本READMEには記載しない**
+  （引き継ぎ資料 `HANDOVER.md`、および作業ログにまとめて管理）。
 
 ---
 
