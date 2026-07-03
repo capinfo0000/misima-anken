@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log_chat.py\" 2>/dev/null || true",
+            "statusMessage": "チャットログ記録中"
+          }
+        ]
+      }
+    ]
+  }
+}
