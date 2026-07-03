@@ -1,5 +1,3 @@
-# チャットログ（機微情報を含み得るためコミットしない。各環境ローカルに蓄積）
-チャットログ.md
+# 自動記録の状態ファイル・ローカル専用設定は非コミット
 .claude/hooks/.last_logged
-# ローカル専用のClaude Code設定
 .claude/settings.local.json
