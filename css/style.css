@@ -668,3 +668,59 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   .reveal{opacity:1;transform:none;}
   body::before{animation:none;background-position:0 0;}
 }
+
+/* ============================================================
+   First View（peers.jp風の自動再生ヒーロー：虹色バー＋ライン/文字リビール）
+   ※演出はすべて transform/opacity のみ。prefers-reduced-motion で無効化。
+   ============================================================ */
+.p-fv{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:#fff;padding:var(--space-8) var(--space-4);}
+/* 虹色バー（背景を横断してスイープ） */
+.p-fv__bars{position:absolute;inset:0;display:flex;flex-direction:column;z-index:0;}
+.p-fv__bar{flex:1;transform:scaleX(0);transform-origin:left;opacity:.14;}
+.p-fv__bar:nth-child(even){transform-origin:right;}
+.p-fv__bar:nth-child(1){background:#e60012;}
+.p-fv__bar:nth-child(2){background:#ed6d1f;}
+.p-fv__bar:nth-child(3){background:#f5a200;}
+.p-fv__bar:nth-child(4){background:#009944;}
+.p-fv__bar:nth-child(5){background:#41a1be;}
+.p-fv__bar:nth-child(6){background:#1d2088;}
+.p-fv__bar:nth-child(7){background:#601986;}
+.p-fv.is-play .p-fv__bar{animation:fvBar .95s cubic-bezier(.16,1,.3,1) forwards;animation-delay:calc(var(--i)*.08s);}
+@keyframes fvBar{to{transform:scaleX(1);}}
+/* テキスト */
+.p-fv__inner{position:relative;z-index:1;text-align:center;max-width:var(--container-narrow);margin-inline:auto;}
+.p-fv__en{font-family:var(--font-en);font-weight:700;letter-spacing:.35em;font-size:.8rem;color:var(--text-muted);
+  margin-bottom:var(--space-3);opacity:0;transform:translateY(10px);}
+.p-fv.is-play .p-fv__en{animation:fvFade .8s ease forwards .3s;}
+.p-fv__catch{font-family:var(--font-serif);font-weight:600;font-size:clamp(2rem,6.5vw,4.6rem);
+  line-height:1.32;letter-spacing:.04em;color:var(--text-strong);}
+.p-fv__line{display:block;overflow:hidden;}
+.p-fv__line i{display:block;font-style:normal;transform:translateY(118%);}
+.p-fv.is-play .p-fv__line i{animation:fvUp .95s cubic-bezier(.16,1,.3,1) forwards;}
+.p-fv.is-play .p-fv__line:nth-child(1) i{animation-delay:.5s;}
+.p-fv.is-play .p-fv__line:nth-child(2) i{animation-delay:.66s;}
+@keyframes fvUp{to{transform:translateY(0);}}
+.p-fv__brand{margin-top:var(--space-4);font-family:var(--font-serif);font-weight:500;
+  font-size:clamp(1.1rem,2.6vw,1.7rem);letter-spacing:.1em;color:var(--text-strong);}
+.p-fv__brand span{display:inline-block;opacity:0;transform:translateY(.5em);}
+.p-fv.is-play .p-fv__brand span{animation:fvChar .5s cubic-bezier(.2,.8,.3,1) forwards;animation-delay:calc(1s + var(--i)*.045s);}
+@keyframes fvChar{to{opacity:1;transform:none;}}
+.p-fv__lead{margin-top:var(--space-3);font-size:.95rem;line-height:1.9;color:var(--text);opacity:0;}
+.p-fv.is-play .p-fv__lead{animation:fvFade .9s ease forwards 1.6s;}
+@keyframes fvFade{to{opacity:1;transform:none;}}
+/* スクロール誘導 */
+.p-fv__scroll{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;
+  align-items:center;gap:.5em;z-index:1;opacity:0;}
+.p-fv.is-play .p-fv__scroll{animation:fvFade .8s ease forwards 1.9s;}
+.p-fv__scroll span{font-family:var(--font-en);font-size:.62rem;letter-spacing:.28em;color:var(--text-muted);}
+.p-fv__scroll-line{position:relative;width:1px;height:46px;background:rgba(0,0,0,.15);overflow:hidden;}
+.p-fv__scroll-line::after{content:"";position:absolute;left:0;top:-50%;width:100%;height:50%;
+  background:var(--text-strong);animation:fvScroll 1.8s cubic-bezier(.7,0,.3,1) infinite;}
+@keyframes fvScroll{0%{transform:translateY(-100%);}60%,100%{transform:translateY(300%);}}
+@media (prefers-reduced-motion: reduce){
+  .p-fv__bar{transform:scaleX(1);}
+  .p-fv__en,.p-fv__lead,.p-fv__scroll{opacity:1;transform:none;animation:none;}
+  .p-fv__line i,.p-fv__brand span{transform:none;opacity:1;animation:none;}
+  .p-fv__scroll-line::after{animation:none;}
+}

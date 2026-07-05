@@ -37,6 +37,31 @@
     setTimeout(hideLoader, 3500); // safety
   }
 
+  /* ---------- First View intro (peers風の自動再生ヒーロー) ---------- */
+  var fv = document.querySelector(".p-fv");
+  if (fv) {
+    var fvBrand = fv.querySelector("[data-split]");
+    if (fvBrand) {
+      var bt = fvBrand.textContent;
+      fvBrand.textContent = "";
+      Array.prototype.forEach.call(bt, function (ch, i) {
+        var s = document.createElement("span");
+        s.textContent = ch;
+        s.style.setProperty("--i", i);
+        if (ch === " ") s.style.width = "0.3em";
+        fvBrand.appendChild(s);
+      });
+    }
+    var fvReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var playFv = function () { fv.classList.add("is-play"); };
+    if (fvReduced) {
+      playFv();
+    } else {
+      window.addEventListener("load", function () { setTimeout(playFv, 450); });
+      setTimeout(playFv, 1300); // safety if load already fired
+    }
+  }
+
   /* ---------- MV romaji typing ---------- */
   var roman = document.querySelector(".p-top-mv__roman[data-text]");
   if (roman) {
