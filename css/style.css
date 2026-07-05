@@ -408,10 +408,8 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 .p-prose__closing .-tail{display:block;font-size:.6em;line-height:1.7;letter-spacing:.04em;text-wrap:balance;margin-top:.3em;}
 /* 強調はフォントで見せる：衡山毛筆（筆文字）。ピンクのマーカーは廃止 */
 .p-prose__closing .-quote em{font-style:normal;font-family:"Kouzan Mouhitu","Noto Serif JP",serif;font-weight:400;letter-spacing:.1em;line-height:1.7;}
-/* 署名ブロック：締めの中央寄せに揃える */
-.p-prose__signature{margin-top:var(--space-6);text-align:center;}
-.p-prose__signature .p-prose__sign{margin:0 0 .6rem;}
-.p-prose__signature .c-sign-img{margin-left:auto;margin-right:auto;}
+/* 締め＋署名を画面中央のカラムに（署名は元通り左寄せ） */
+.p-message__closing-wrap{max-width:var(--container-narrow);margin:0 auto;}
 @media (max-width:600px){
   .p-prose__closing{font-size:1.4rem;line-height:1.7;}
   .p-prose__closing .-quote em{letter-spacing:.02em;}
