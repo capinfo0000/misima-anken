@@ -52,15 +52,13 @@
   <section class="l-section">
     <div class="l-container">
       <form class="p-form" id="contactForm" novalidate>
-        <div class="p-form__row">
-          <label>お名前<span class="p-form__req">必須</span><input type="text" name="name" required placeholder="山田 太郎" /></label>
-          <label>会社名<input type="text" name="company" placeholder="株式会社〇〇" /></label>
-        </div>
-        <label>お問い合わせ種別
+        <label><span class="p-form__label">会社名</span><input type="text" name="company" placeholder="株式会社〇〇" /></label>
+        <label><span class="p-form__label">お名前<span class="p-form__req">必須</span></span><input type="text" name="name" required placeholder="山田 太郎" /></label>
+        <label><span class="p-form__label">お問い合わせ種別</span>
           <select name="type"><option value="promotion">セールスプロモーションについて</option><option value="bpo">BPO事業について</option><option value="training">教育・研修事業について</option><option value="other">その他</option></select>
         </label>
-        <label>メールアドレス<span class="p-form__req">必須</span><input type="email" name="email" required placeholder="example@example.com" /></label>
-        <label>お問い合わせ内容<span class="p-form__req">必須</span><textarea name="message" rows="6" required placeholder="お問い合わせ内容をご記入ください"></textarea></label>
+        <label><span class="p-form__label">メールアドレス<span class="p-form__req">必須</span></span><input type="email" name="email" required placeholder="example@example.com" /></label>
+        <label><span class="p-form__label">お問い合わせ内容<span class="p-form__req">必須</span></span><textarea name="message" rows="6" required placeholder="お問い合わせ内容をご記入ください"></textarea></label>
         <button type="submit" class="c-btn -fill -full">送信する</button>
         <p class="p-form__note" id="formNote" role="status"></p>
       </form>
