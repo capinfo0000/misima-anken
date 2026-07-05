@@ -55,33 +55,62 @@
     var heroLines = hero.querySelectorAll(".p-hero__line");
     var heroCatch = hero.querySelector(".p-hero__catch");
     var heroScroll = hero.querySelector(".p-fv__scroll");
+    var heroMorph = hero.querySelector(".p-hero__morph");
+    var heroRoulette = hero.querySelector(".p-hero__roulette");
     var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
 
+    /* ①ルーレット：語が入れ替わって最終語に収束 → ②失敗↓挑戦のモーフ表示 */
+    var spinRoulette = function () {
+      if (!heroRoulette) return;
+      var words = (heroRoulette.getAttribute("data-words") || "").split(",").filter(Boolean);
+      var finalWord = heroRoulette.getAttribute("data-final") || heroRoulette.textContent;
+      var reveal = function () { if (heroMorph) heroMorph.classList.add("is-morphed"); };
+      if (!words.length) { heroRoulette.textContent = finalWord; reveal(); return; }
+      var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
+      var spin = function () {
+        heroRoulette.textContent = words[idx % words.length];
+        idx++; ticks++;
+        if (ticks >= maxTicks) { heroRoulette.textContent = finalWord; reveal(); return; }
+        delay += (ticks > maxTicks - 6) ? 45 : 4;
+        setTimeout(spin, delay);
+      };
+      spin();
+    };
+
     if (heroReduced) {
+      if (heroMorph) heroMorph.classList.add("is-morphed");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
+      setTimeout(spinRoulette, 1150); // 虹色バー通過後に開始
       var heroDone = false;
-      var lineZone = 0.62;                 // 前半で5行を順に積み上げ（全部残す）
-      var per = lineZone / (heroLines.length || 1);
+      var morphEnd = 0.14;                 // 冒頭はモーフ（失敗↓挑戦）
+      var lineZone = 0.72;                 // 中盤で5行を1画面に積み上げ
       var onHeroScroll = function () {
         if (heroDone) return;
         var total = hero.offsetHeight - window.innerHeight;
         if (total <= 0) return;
         var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
-        if (prog >= lineZone) {
-          // 5行はすべて表示したまま、キャッチへ切替（.is-catchで5行は退場）
-          for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.add("is-show");
-          hero.classList.add("is-catch");
+        var i;
+        if (prog >= lineZone) {                    // ④最後の大キャッチ（残る）
+          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.add("is-show");
+          hero.classList.add("is-lines", "is-catch");
           if (heroCatch) heroCatch.classList.add("is-show");
           if (heroScroll) heroScroll.style.opacity = "0";
-          if (prog >= 0.99) heroDone = true; // 通過後は固定（リロードまで再生しない）
-        } else {
+          if (prog >= 0.99) heroDone = true;       // 通過後は固定
+        } else if (prog >= morphEnd) {             // ③5行を積み上げ
+          hero.classList.add("is-lines");
           hero.classList.remove("is-catch");
           if (heroCatch) heroCatch.classList.remove("is-show");
           if (heroScroll) heroScroll.style.opacity = "";
-          var cur = Math.min(heroLines.length - 1, Math.floor(prog / per));
-          for (var j = 0; j < heroLines.length; j++) heroLines[j].classList.toggle("is-show", j <= cur); // 積み上げ
+          var lp = (prog - morphEnd) / (lineZone - morphEnd);
+          var cur = Math.min(heroLines.length - 1, Math.floor(lp * heroLines.length));
+          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i <= cur);
+        } else {                                    // ②モーフ表示（初期）
+          hero.classList.remove("is-lines", "is-catch");
+          if (heroCatch) heroCatch.classList.remove("is-show");
+          if (heroScroll) heroScroll.style.opacity = "";
+          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
         }
       };
       window.addEventListener("scroll", onHeroScroll, { passive: true });
