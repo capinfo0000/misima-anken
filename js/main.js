@@ -37,47 +37,53 @@
     setTimeout(hideLoader, 3500); // safety
   }
 
-  /* ---------- First View intro (peers風の自動再生ヒーロー) ---------- */
-  var fv = document.querySelector(".p-fv");
-  if (fv) {
-    var fvBrand = fv.querySelector("[data-split]");
-    if (fvBrand) {
-      var bt = fvBrand.textContent;
-      fvBrand.textContent = "";
-      Array.prototype.forEach.call(bt, function (ch, i) {
+  /* ---------- First View：固定ヒーロー（虹色フリップ→スクロールで5行順送り→最後キャッチが残る） ---------- */
+  var hero = document.querySelector(".p-hero");
+  if (hero) {
+    var heroBrand = hero.querySelector("[data-split]");
+    if (heroBrand) {
+      var hbt = heroBrand.textContent;
+      heroBrand.textContent = "";
+      Array.prototype.forEach.call(hbt, function (ch, i) {
         var s = document.createElement("span");
         s.textContent = ch;
         s.style.setProperty("--i", i);
         if (ch === " ") s.style.width = "0.3em";
-        fvBrand.appendChild(s);
+        heroBrand.appendChild(s);
       });
     }
-    var fvReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    /* キャッチのルーレット（いま/かこ/…→人生 と入れ替わって収束） */
-    var fvRoulette = fv.querySelector(".p-fv__roulette");
-    var spinRoulette = function () {
-      if (!fvRoulette) return;
-      var words = (fvRoulette.getAttribute("data-words") || "").split(",").filter(Boolean);
-      var finalWord = fvRoulette.getAttribute("data-final") || fvRoulette.textContent;
-      if (!words.length) { fvRoulette.textContent = finalWord; fvRoulette.classList.add("is-set"); return; }
-      var idx = 0, ticks = 0, maxTicks = 20, delay = 70;
-      var spin = function () {
-        fvRoulette.textContent = words[idx % words.length];
-        idx++; ticks++;
-        if (ticks >= maxTicks) { fvRoulette.textContent = finalWord; fvRoulette.classList.add("is-set"); return; }
-        delay += (ticks > maxTicks - 6) ? 40 : 4;
-        setTimeout(spin, delay);
-      };
-      spin();
-    };
-    var playFv = function () { fv.classList.add("is-play"); };
-    if (fvReduced) {
-      playFv();
-      if (fvRoulette) { fvRoulette.textContent = fvRoulette.getAttribute("data-final") || fvRoulette.textContent; }
+    var heroLines = hero.querySelectorAll(".p-hero__line");
+    var heroCatch = hero.querySelector(".p-hero__catch");
+    var heroScroll = hero.querySelector(".p-fv__scroll");
+    var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
+
+    if (heroReduced) {
+      if (heroCatch) heroCatch.classList.add("is-show");
     } else {
-      window.addEventListener("load", function () { setTimeout(playFv, 450); });
-      setTimeout(playFv, 1300); // safety if load already fired
-      setTimeout(spinRoulette, 1150); // 虹色バー通過後にルーレット開始
+      var heroDone = false;
+      var lineZone = 0.72;                 // スクロール前半で5行を順送り
+      var per = lineZone / (heroLines.length || 1);
+      var onHeroScroll = function () {
+        if (heroDone) return;
+        var total = hero.offsetHeight - window.innerHeight;
+        if (total <= 0) return;
+        var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
+        if (prog >= lineZone) {
+          for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
+          if (heroCatch) heroCatch.classList.add("is-show");
+          if (heroScroll) heroScroll.style.opacity = "0";
+          if (prog >= 0.99) heroDone = true; // 通過後は固定（リロードまで5行は再表示しない）
+        } else {
+          if (heroCatch) heroCatch.classList.remove("is-show");
+          if (heroScroll) heroScroll.style.opacity = "";
+          var cur = Math.min(heroLines.length - 1, Math.floor(prog / per));
+          for (var j = 0; j < heroLines.length; j++) heroLines[j].classList.toggle("is-show", j === cur);
+        }
+      };
+      window.addEventListener("scroll", onHeroScroll, { passive: true });
+      window.addEventListener("resize", onHeroScroll, { passive: true });
+      onHeroScroll();
     }
   }
 
