@@ -111,6 +111,11 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .c-section-heading__title{display:inline-block;font-family:var(--font-serif);font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:500;line-height:1.5;letter-spacing:.06em;color:var(--text-strong);}
 .c-section-heading__title::after{content:"";display:block;width:100%;height:7px;border-radius:1px;margin:var(--space-3) 0 0;transform:skewX(-15deg);background:var(--accent);}
 .c-section-heading.-left .c-section-heading__title::after{margin-left:0;margin-right:auto;}
+/* 衡山毛筆フォント（青柳衡山・商用可）ローカル自蔵：MISSION用サブセット */
+@font-face{font-family:'Kouzan Mouhitu';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/kouzan-mission.woff2') format('woff2');}
+/* MISSION：筆文字風・下線なし */
+.p-mission .c-section-heading__title{font-family:"Kouzan Mouhitu","Noto Serif JP",serif;font-weight:400;font-size:clamp(1.9rem,4.8vw,3.1rem);letter-spacing:.1em;line-height:1.7;}
+.p-mission .c-section-heading__title::after{display:none;}
 
 /* ============================================================
    Component : buttons / labels
