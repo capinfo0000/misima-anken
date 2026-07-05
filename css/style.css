@@ -701,10 +701,12 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   opacity:0;transform:translateY(10px);}
 .p-hero.is-play .p-hero__en{animation:fvFade .8s ease forwards .4s;}
 /* 5行：中央で1行ずつ差し替え（色帯ワイプ→文字出現）。スクロールで順送り、最後は消える */
-.p-hero__lines{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;}
-.p-hero__line{position:absolute;max-width:min(92vw,var(--container-narrow));overflow:hidden;
-  font-family:var(--font-serif);font-weight:600;font-size:clamp(1.6rem,5vw,3rem);line-height:1.6;
-  letter-spacing:.05em;color:var(--text-strong);text-align:center;opacity:0;padding:.18em .12em;}
+.p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}
+.p-hero.is-catch .p-hero__lines{opacity:0;} /* 全行表示後、キャッチへ切替時に退場 */
+.p-hero__line{position:relative;max-width:min(92vw,var(--container-narrow));overflow:hidden;
+  font-family:var(--font-serif);font-weight:600;font-size:clamp(1.15rem,3.4vw,2.1rem);line-height:1.55;
+  letter-spacing:.05em;color:var(--text-strong);text-align:center;opacity:0;padding:.08em .12em;}
 .p-hero__line i{display:inline-block;font-style:normal;clip-path:inset(0 100% 0 0);}
 .p-hero__line::after{content:"";position:absolute;inset:0;z-index:2;transform:translateX(-101%);}
 .p-hero__line:nth-child(1)::after{background:#e60012;}

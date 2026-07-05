@@ -62,7 +62,7 @@
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
       var heroDone = false;
-      var lineZone = 0.72;                 // スクロール前半で5行を順送り
+      var lineZone = 0.62;                 // 前半で5行を順に積み上げ（全部残す）
       var per = lineZone / (heroLines.length || 1);
       var onHeroScroll = function () {
         if (heroDone) return;
@@ -70,15 +70,18 @@
         if (total <= 0) return;
         var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
         if (prog >= lineZone) {
-          for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
+          // 5行はすべて表示したまま、キャッチへ切替（.is-catchで5行は退場）
+          for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.add("is-show");
+          hero.classList.add("is-catch");
           if (heroCatch) heroCatch.classList.add("is-show");
           if (heroScroll) heroScroll.style.opacity = "0";
-          if (prog >= 0.99) heroDone = true; // 通過後は固定（リロードまで5行は再表示しない）
+          if (prog >= 0.99) heroDone = true; // 通過後は固定（リロードまで再生しない）
         } else {
+          hero.classList.remove("is-catch");
           if (heroCatch) heroCatch.classList.remove("is-show");
           if (heroScroll) heroScroll.style.opacity = "";
           var cur = Math.min(heroLines.length - 1, Math.floor(prog / per));
-          for (var j = 0; j < heroLines.length; j++) heroLines[j].classList.toggle("is-show", j === cur);
+          for (var j = 0; j < heroLines.length; j++) heroLines[j].classList.toggle("is-show", j <= cur); // 積み上げ
         }
       };
       window.addEventListener("scroll", onHeroScroll, { passive: true });
