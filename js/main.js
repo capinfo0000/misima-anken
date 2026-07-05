@@ -53,12 +53,31 @@
       });
     }
     var fvReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* キャッチのルーレット（いま/かこ/…→人生 と入れ替わって収束） */
+    var fvRoulette = fv.querySelector(".p-fv__roulette");
+    var spinRoulette = function () {
+      if (!fvRoulette) return;
+      var words = (fvRoulette.getAttribute("data-words") || "").split(",").filter(Boolean);
+      var finalWord = fvRoulette.getAttribute("data-final") || fvRoulette.textContent;
+      if (!words.length) { fvRoulette.textContent = finalWord; fvRoulette.classList.add("is-set"); return; }
+      var idx = 0, ticks = 0, maxTicks = 20, delay = 70;
+      var spin = function () {
+        fvRoulette.textContent = words[idx % words.length];
+        idx++; ticks++;
+        if (ticks >= maxTicks) { fvRoulette.textContent = finalWord; fvRoulette.classList.add("is-set"); return; }
+        delay += (ticks > maxTicks - 6) ? 40 : 4;
+        setTimeout(spin, delay);
+      };
+      spin();
+    };
     var playFv = function () { fv.classList.add("is-play"); };
     if (fvReduced) {
       playFv();
+      if (fvRoulette) { fvRoulette.textContent = fvRoulette.getAttribute("data-final") || fvRoulette.textContent; }
     } else {
       window.addEventListener("load", function () { setTimeout(playFv, 450); });
       setTimeout(playFv, 1300); // safety if load already fired
+      setTimeout(spinRoulette, 1150); // 虹色バー通過後にルーレット開始
     }
   }
 
