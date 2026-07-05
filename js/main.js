@@ -264,6 +264,15 @@
   var form = document.getElementById("contactForm");
   var note = document.getElementById("formNote");
   if (form) {
+    /* 事業詳細ページの相談ボタン（?type=…）でお問い合わせ種別を自動選択 */
+    var qType = new URLSearchParams(window.location.search).get("type");
+    if (qType) {
+      var typeSel = form.querySelector('select[name="type"]');
+      if (typeSel) {
+        var opt = Array.prototype.filter.call(typeSel.options, function (o) { return o.value === qType; })[0];
+        if (opt) { typeSel.value = qType; }
+      }
+    }
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!form.checkValidity()) {
