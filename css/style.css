@@ -116,6 +116,12 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 /* MISSION：筆文字風・下線なし */
 .p-mission .c-section-heading__title{font-family:"Kouzan Mouhitu","Noto Serif JP",serif;font-weight:400;font-size:clamp(1.9rem,4.8vw,3.1rem);letter-spacing:.1em;line-height:1.7;}
 .p-mission .c-section-heading__title::after{display:none;}
+/* 玉ねぎ楷書激（強調）を画像化して配置 */
+.c-brush-img{display:block;height:auto;max-width:100%;margin-inline:auto;}
+.c-section-heading__title.-img{line-height:0;}
+.p-mission .c-section-heading__title.-img .c-brush-img{width:min(90%,720px);}
+.p-prose__closing .-quote.-img{display:flex;flex-direction:column;align-items:center;gap:.5em;margin-bottom:var(--space-4);}
+.p-prose__closing .-quote.-img .c-brush-img{width:min(88%,520px);}
 
 /* ============================================================
    Component : buttons / labels
