@@ -740,13 +740,15 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__morph.is-stack .p-hero__stack{display:flex;}
 .p-hero__stack-top,.p-hero__stack-btm{font-family:var(--font-serif);font-weight:600;
   font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-.p-hero__stack-btm{color:var(--text-strong);}
-.p-hero__stack-arrow{display:block;line-height:0;color:var(--text-muted);margin:.15em 0;}
+.p-hero__stack-arrow{display:block;line-height:0;color:var(--text-muted);margin:.15em 0;opacity:0;}
 .p-hero__stack-arrow svg{display:block;width:clamp(34px,5vw,52px);height:auto;}
-.p-hero__stack-top{opacity:0;transition:opacity .5s ease;}
-.p-hero__morph.is-stack .p-hero__stack-top{opacity:1;}
-.p-hero__stack-arrow,.p-hero__stack-btm{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease;}
-.p-hero__morph.is-stack-full .p-hero__stack-arrow,.p-hero__morph.is-stack-full .p-hero__stack-btm{opacity:1;transform:none;}
+/* 動画3-8s再現：上段(失敗)は上からフェードイン／下段(再挑戦)は中央付近から下へ settle／両語グレー→黒。矢印↓は最後に遅れて出現 */
+.p-hero__morph.is-stack .p-hero__stack-top{animation:fvStackTop .7s cubic-bezier(.22,1,.36,1) both;}
+.p-hero__morph.is-stack .p-hero__stack-btm{animation:fvStackBtm .7s cubic-bezier(.22,1,.36,1) both;}
+.p-hero__morph.is-stack-full .p-hero__stack-arrow{animation:fvStackArrow .6s ease both;}
+@keyframes fvStackTop{0%{opacity:0;transform:translateY(-16px);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
+@keyframes fvStackBtm{0%{opacity:1;transform:translateY(-.5em);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
+@keyframes fvStackArrow{0%{opacity:0;transform:translateY(-8px);}100%{opacity:1;transform:none;}}
 /* 5行：中央に積み上げ、1行ずつ「虹色→黒」文字settleで出す */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}

@@ -95,8 +95,8 @@
     /* タイピング完了→2秒後：全消去して「失敗↓再挑戦」を積み上げフェードイン */
     var showStack = function () {
       if (!heroMorph) return;
-      heroMorph.classList.add("is-stack");                 // 失敗が出現
-      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 650); // ↓と再挑戦をフェードイン
+      heroMorph.classList.add("is-stack");                 // 下段(再挑戦)継続＋上段(失敗)フェードイン、両語グレー→黒へsettle
+      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 1600); // 落ち着いてから矢印↓を遅れて出現
     };
 
     /* タイピング風：失敗 を入力 → 消去 → 再挑戦 を入力 */
