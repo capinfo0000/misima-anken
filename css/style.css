@@ -723,7 +723,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__morph.is-stack .p-hero__stack{display:flex;}
 .p-hero__stack-top,.p-hero__stack-btm{font-family:var(--font-serif);font-weight:600;
   font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-.p-hero__stack-btm{color:#e60012;}
+.p-hero__stack-btm{color:var(--text-strong);}
 .p-hero__stack-arrow{display:block;line-height:0;color:var(--text-muted);margin:.15em 0;}
 .p-hero__stack-arrow svg{display:block;width:clamp(34px,5vw,52px);height:auto;}
 .p-hero__stack-top{opacity:0;transition:opacity .5s ease;}
