@@ -126,16 +126,22 @@
       var second = heroType.getAttribute("data-second") || "";
       var pal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
       var i = 0, j = 0;
-      var addChar = function (ch, idx) { // 打鍵ごとに虹色→黒settleするspanを追加
+      var addChar = function (ch, idx) { // 黒で1文字ずつ入力（虹色は後の波で流す）
         var s = document.createElement("span");
         s.className = "p-hero__tch";
         s.textContent = ch;
         s.style.setProperty("--lc", pal[idx % pal.length]);
+        s.style.setProperty("--k", idx);
         heroType.appendChild(s);
       };
       var typeFirst = function () {
-        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 340); } // 虹色が流れる速度をゆっくりに
-        else { setTimeout(delFirst, 900); }
+        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 340); }
+        else { setTimeout(playFirstWave, 600); } // 入力完了→少し待つ
+      };
+      var playFirstWave = function () { // 消える前に1文字ずつ虹が流れる（1回）→ 完了後に消去
+        heroType.classList.add("is-typewave");
+        var waveTime = (first.length - 1) * 200 + 800;
+        setTimeout(function () { heroType.classList.remove("is-typewave"); delFirst(); }, waveTime);
       };
       var delFirst = function () {
         if (heroType.lastChild) { heroType.removeChild(heroType.lastChild); setTimeout(delFirst, 120); }

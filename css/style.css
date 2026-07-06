@@ -726,9 +726,12 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero.is-lines .p-hero__morph,.p-hero.is-catch .p-hero__morph{opacity:0;pointer-events:none;}
 .p-hero__type{font-family:var(--font-serif);font-weight:600;
   font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-/* 打鍵ごとに 虹色→黒 へ settle */
-.p-hero__tch{display:inline-block;color:var(--lc,var(--text-strong));animation:fvTypeCh .9s ease forwards;}
-@keyframes fvTypeCh{0%{color:var(--lc,var(--text-strong));transform:translateY(.08em);}100%{color:var(--text-strong);transform:none;}}
+/* 打鍵ごとに 黒で 出現（フェードイン） */
+.p-hero__tch{display:inline-block;color:var(--text-strong);animation:fvTypeIn .3s ease forwards;}
+@keyframes fvTypeIn{0%{opacity:0;transform:translateY(.12em);}100%{opacity:1;transform:none;}}
+/* 入力完了後、消える前に1文字ずつ虹が流れる（1回・ゆっくり） */
+.p-hero__type.is-typewave .p-hero__tch{animation:fvTypeWave .7s ease forwards;animation-delay:calc(var(--k,0) * .2s);}
+@keyframes fvTypeWave{0%{color:var(--text-strong);}45%{color:var(--lc,var(--text-strong));}100%{color:var(--text-strong);}}
 /* タイピングのカーソル（点滅） */
 .p-hero__caret{display:inline-block;width:.06em;height:1em;margin-left:.08em;
   background:var(--text-strong);vertical-align:-.12em;
