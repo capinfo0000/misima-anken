@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/log_chat.py\" 2>/dev/null || true",
+            "statusMessage": "チャットログ記録中"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/on_compact.py\" 2>/dev/null || true",
+            "statusMessage": "圧縮後：チャットログ読込指示を注入"
+          }
+        ]
+      }
+    ]
+  }
+}
