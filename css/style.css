@@ -731,23 +731,17 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__morph.is-stack .p-hero__stack-top{opacity:1;}
 .p-hero__stack-arrow,.p-hero__stack-btm{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease;}
 .p-hero__morph.is-stack-full .p-hero__stack-arrow,.p-hero__morph.is-stack-full .p-hero__stack-btm{opacity:1;transform:none;}
-/* 5行：中央で1行ずつ差し替え（色帯ワイプ→文字出現）。スクロールで順送り、最後は消える */
+/* 5行：中央に積み上げ、1行ずつ「虹色→黒」文字settleで出す */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}
 .p-hero.is-catch .p-hero__lines{opacity:0;} /* 全行表示後、キャッチへ切替時に退場 */
-.p-hero__line{position:relative;max-width:min(92vw,var(--container-narrow));overflow:hidden;
+.p-hero__line{position:relative;max-width:min(92vw,var(--container-narrow));
   font-family:var(--font-serif);font-weight:600;font-size:clamp(1.15rem,3.4vw,2.1rem);line-height:1.55;
-  letter-spacing:.05em;color:var(--text-strong);text-align:center;opacity:0;padding:.08em .12em;}
-.p-hero__line i{display:inline-block;font-style:normal;clip-path:inset(0 100% 0 0);}
-.p-hero__line::after{content:"";position:absolute;inset:0;z-index:2;transform:translateX(-101%);}
-.p-hero__line:nth-child(1)::after{background:#e60012;}
-.p-hero__line:nth-child(2)::after{background:#ed6d1f;}
-.p-hero__line:nth-child(3)::after{background:#009944;}
-.p-hero__line:nth-child(4)::after{background:#41a1be;}
-.p-hero__line:nth-child(5)::after{background:#601986;}
-.p-hero__line.is-show{opacity:1;}
-.p-hero__line.is-show::after{animation:fvWipe .8s cubic-bezier(.76,0,.24,1) forwards;}
-.p-hero__line.is-show i{clip-path:inset(0 0 0 0);transition:clip-path .55s cubic-bezier(.76,0,.24,1) .34s;}
+  letter-spacing:.05em;color:var(--text-strong);text-align:center;padding:.08em .12em;}
+.p-hero__line i{font-style:normal;}
+.p-hero__lch{display:inline-block;opacity:0;transform:translateY(.35em);color:var(--lc,var(--text-strong));}
+.p-hero__line.is-show .p-hero__lch{animation:fvCatchCh .7s cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay:calc(var(--i) * .045s);}
 /* 最後に残るキャッチコピー */
 .p-hero__catch{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   z-index:2;text-align:center;opacity:0;transform:translateY(16px);

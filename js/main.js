@@ -65,6 +65,23 @@
       });
     }
     var heroLines = hero.querySelectorAll(".p-hero__line");
+    /* 5行も1文字ずつに分割し「虹色→黒」settleで出す */
+    var linePalette = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
+    Array.prototype.forEach.call(heroLines, function (line) {
+      var it = line.querySelector("i");
+      if (!it) return;
+      var txt = it.textContent;
+      it.textContent = "";
+      Array.prototype.forEach.call(txt, function (ch, k) {
+        var s = document.createElement("span");
+        s.className = "p-hero__lch";
+        s.textContent = ch;
+        if (ch === " ") s.style.width = ".3em";
+        s.style.setProperty("--i", k);
+        s.style.setProperty("--lc", linePalette[k % linePalette.length]);
+        it.appendChild(s);
+      });
+    });
     var heroCatch = hero.querySelector(".p-hero__catch");
     var heroScroll = hero.querySelector(".p-fv__scroll");
     var heroType = hero.querySelector(".p-hero__type");
