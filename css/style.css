@@ -754,8 +754,8 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 @keyframes fvStackArrow{0%{opacity:0;transform:translateY(-8px);}100%{opacity:1;transform:none;}}
 /* 矢印↓が出た後：失敗／再挑戦も1文字ずつ虹色→黒。約10秒おき／進行はキャッチよりゆっくり(.35s刻み) */
 .p-hero__sch{display:inline-block;color:inherit;}
-.p-hero__morph.is-stack-full .p-hero__sch{animation:fvStackWave 10s linear infinite;animation-delay:calc(var(--i) * .35s);}
-@keyframes fvStackWave{0%{color:var(--text-strong);}3%{color:var(--lc,var(--text-strong));}9%{color:var(--text-strong);}100%{color:var(--text-strong);}}
+.p-hero__morph.is-stack-full .p-hero__sch{animation:fvStackWave 5s linear infinite;animation-delay:calc(var(--i) * .35s);}
+@keyframes fvStackWave{0%{color:var(--text-strong);}6%{color:var(--lc,var(--text-strong));}18%{color:var(--text-strong);}100%{color:var(--text-strong);}}
 /* 5行：中央に積み上げ、1行ずつ「虹色→黒」文字settleで出す */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}
@@ -778,8 +778,8 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__catch-copy{font-family:var(--font-en);font-weight:700;font-size:clamp(2rem,8vw,5.4rem);
   line-height:1.08;letter-spacing:.01em;color:var(--text-strong);}
 .p-hero__cch{display:inline-block;color:var(--text-strong);}
-.p-hero.is-catch .p-hero__cch{animation:catchCharWave 10s linear infinite;animation-delay:calc(.4s + var(--i) * .05s);}
-@keyframes catchCharWave{0%{color:var(--text-strong);}2%{color:var(--lc,var(--text-strong));}7%{color:var(--text-strong);}100%{color:var(--text-strong);}}
+.p-hero.is-catch .p-hero__cch{animation:catchCharWave 5s linear infinite;animation-delay:calc(.4s + var(--i) * .05s);}
+@keyframes catchCharWave{0%{color:var(--text-strong);}4%{color:var(--lc,var(--text-strong));}14%{color:var(--text-strong);}100%{color:var(--text-strong);}}
 /* ヘッダー／ボタンのホバー時に文字・下線の虹色が流れ続ける（先頭色＝末尾色なのでシームレス） */
 @keyframes rainbowFlow{0%{background-position:0 0;}100%{background-position:-200% 0;}}
 /* 5行/タイピングで使う「虹色→黒」settleキーフレーム */

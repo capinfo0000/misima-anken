@@ -148,8 +148,13 @@
         else { setTimeout(typeSecond, 300); }
       };
       var typeSecond = function () {
-        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); } // 虹色が流れる速度をゆっくりに
-        else setTimeout(showStack, 2000); // 完了の2秒後に積み上げ演出へ
+        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); }
+        else { setTimeout(playSecondWave, 600); } // 入力完了→少し待つ
+      };
+      var playSecondWave = function () { // 再挑戦にも1文字ずつ虹を流してから次の挙動（積み上げ）へ
+        heroType.classList.add("is-typewave");
+        var waveTime = (second.length - 1) * 200 + 800;
+        setTimeout(function () { heroType.classList.remove("is-typewave"); setTimeout(showStack, 600); }, waveTime);
       };
       typeFirst();
     };
