@@ -105,83 +105,85 @@
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
 
     /* 入力後、上段(失敗)＋矢印を出して次の挙動へ。FLIP で下段が中央→定位置へ滑らかに移動 */
-    var showStack = function () {
-      if (!heroMorph) return;
-      if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
-      if (stackBtmEl) buildSch(stackBtmEl, stackBtmEl.getAttribute("data-second") || "再挑戦", 3); // 消去後、再挑戦を下段に生成
-      heroMorph.classList.add("is-stack");                  // 失敗(上)・再挑戦(下)がフェードイン
-      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 800); // 最後に矢印フェードイン＋波開始
+    /* ---- スクロールで進む4段階モーフ ---- */
+    var first = stackBtmEl ? (stackBtmEl.getAttribute("data-first") || "") : "";
+    var second = stackBtmEl ? (stackBtmEl.getAttribute("data-second") || "再挑戦") : "再挑戦";
+    var morphTimers = [];
+    var T = function (fn, ms) { var id = setTimeout(fn, ms); morphTimers.push(id); return id; };
+    var clearMorphTimers = function () { morphTimers.forEach(clearTimeout); morphTimers = []; };
+    var addChar = function (ch, idx) { // 黒で1文字ずつ入力（カーソルの前へ挿入）
+      var s = document.createElement("span");
+      s.className = "p-hero__tch";
+      s.textContent = ch;
+      s.style.setProperty("--lc", stackPal[idx % stackPal.length]);
+      s.style.setProperty("--k", idx);
+      if (stackCaret && stackCaret.parentNode === stackBtmEl) stackBtmEl.insertBefore(s, stackCaret);
+      else if (stackBtmEl) stackBtmEl.appendChild(s);
     };
-
-    /* タイピング：失敗を入力→虹→消去→再挑戦を入力→虹→そのまま下段として定着→1秒後にスタックへ */
-    var typeMorph = function () {
-      if (!stackBtmEl) return;
-      var first = stackBtmEl.getAttribute("data-first") || "";
-      var second = stackBtmEl.getAttribute("data-second") || "";
-      var i = 0, j = 0;
-      var addChar = function (ch, idx) { // 黒で1文字ずつ入力（カーソルの前へ挿入）
-        var s = document.createElement("span");
-        s.className = "p-hero__tch";
-        s.textContent = ch;
-        s.style.setProperty("--lc", stackPal[idx % stackPal.length]);
-        s.style.setProperty("--k", idx);
-        if (stackCaret && stackCaret.parentNode === stackBtmEl) stackBtmEl.insertBefore(s, stackCaret);
-        else stackBtmEl.appendChild(s);
-      };
-      var delLast = function () {
-        var spans = stackBtmEl.querySelectorAll(".p-hero__tch");
-        if (spans.length) { stackBtmEl.removeChild(spans[spans.length - 1]); return true; }
-        return false;
-      };
-      var typeFirst = function () {
-        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 340); }
-        else { setTimeout(playFirstWave, 600); }
-      };
-      var playFirstWave = function () { // 消える前に1文字ずつ虹（1回）→ 消去
-        heroMorph.classList.add("is-typewave");
-        setTimeout(function () { heroMorph.classList.remove("is-typewave"); delFirst(); }, (first.length - 1) * 200 + 800);
-      };
-      var delFirst = function () {
-        if (delLast()) { setTimeout(delFirst, 120); }
-        else { setTimeout(typeSecond, 300); }
-      };
-      var typeSecond = function () {
-        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); }
-        else { setTimeout(playSecondWave, 600); }
-      };
-      var playSecondWave = function () { // 再挑戦にも虹（1回）→ 1文字ずつ消去 → スタックへ
-        heroMorph.classList.add("is-typewave");
-        setTimeout(function () { heroMorph.classList.remove("is-typewave"); delSecond(); }, (second.length - 1) * 200 + 800);
-      };
-      var delSecond = function () {
-        if (delLast()) { setTimeout(delSecond, 120); }
-        else { setTimeout(showStack, 600); } // 消去後、少し待ってスタックへ
-      };
-      typeFirst();
+    var delLast = function () {
+      if (!stackBtmEl) return false;
+      var spans = stackBtmEl.querySelectorAll(".p-hero__tch");
+      if (spans.length) { stackBtmEl.removeChild(spans[spans.length - 1]); return true; }
+      return false;
+    };
+    var typeWord = function (word, cb) { var i = 0; var step = function () { if (i < word.length) { addChar(word[i], i); i++; T(step, 340); } else cb(); }; step(); };
+    var rainbowOnce = function (len, cb) { heroMorph.classList.add("is-typewave"); T(function () { heroMorph.classList.remove("is-typewave"); cb(); }, (len - 1) * 200 + 800); };
+    var clearWord = function (cb) { var step = function () { if (delLast()) T(step, 120); else cb(); }; step(); };
+    var stage1 = function (done) { // ①失敗を入力→虹
+      typeWord(first, function () { T(function () { rainbowOnce(first.length, done); }, 400); });
+    };
+    var stage2 = function (done) { // ②失敗を消去→再挑戦を入力→虹
+      clearWord(function () { T(function () { typeWord(second, function () { T(function () { rainbowOnce(second.length, done); }, 400); }); }, 250); });
+    };
+    var stage3 = function (done) { // ③再挑戦を消去→失敗・再挑戦のスタック出現
+      clearWord(function () { T(function () {
+        if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
+        if (stackBtmEl) buildSch(stackBtmEl, second, 3);
+        heroMorph.classList.add("is-stack");
+        done();
+      }, 300); });
+    };
+    var stage4 = function (done) { heroMorph.classList.add("is-stack-full"); done(); }; // ④矢印＋失敗/再挑戦に順番で虹
+    var stageFns = [stage1, stage2, stage3, stage4];
+    var wantStage = 0, curStage = 0, playing = false;
+    var runStages = function () {
+      if (playing || curStage >= wantStage || curStage >= 4) return;
+      playing = true;
+      var fn = stageFns[curStage];
+      curStage++;
+      fn(function () { playing = false; runStages(); });
+    };
+    var snapToStack = function () { // 速いスクロール等では最終状態へ即確定
+      if (curStage >= 4) return;
+      clearMorphTimers();
+      playing = true; curStage = 4; wantStage = 4;
+      heroMorph.classList.remove("is-typewave");
+      if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
+      if (stackBtmEl) buildSch(stackBtmEl, second, 3);
+      heroMorph.classList.add("is-stack", "is-stack-full");
     };
 
     if (heroReduced) {
-      if (stackBtmEl) buildSch(stackBtmEl, stackBtmEl.getAttribute("data-second") || "再挑戦", 3); // 再挑戦を即表示
+      if (stackBtmEl) buildSch(stackBtmEl, second, 3); // 再挑戦を即表示
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
-      setTimeout(typeMorph, 1150); // 虹色バー通過後に開始
-      var heroDone = false;
-      var morphEnd = 0.14;                 // 冒頭はモーフ（失敗↓挑戦）
-      var lineZone = 0.72;                 // 中盤で5行を1画面に積み上げ
+      var morphEnd = 0.50;                 // これ以降は5行
+      var lineZone = 0.80;                 // これ以降はキャッチ
+      var stageThresh = [0.05, 0.17, 0.29, 0.40]; // 各段階の開始prog（スクロールで切替）
       var onHeroScroll = function () {
-        if (heroDone) return;
         var total = hero.offsetHeight - window.innerHeight;
         if (total <= 0) return;
         var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
         var i;
-        if (prog >= lineZone) {                    // ④最後の大キャッチ（残る）
-          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); // 5行は退場
+        if (prog >= lineZone) {                    // 最後の大キャッチ（残る）
+          if (curStage < 4) snapToStack();
+          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
           hero.classList.add("is-lines", "is-catch");
           if (heroCatch) heroCatch.classList.add("is-show");
           if (heroScroll) heroScroll.style.opacity = "0";
-          if (prog >= 0.99) heroDone = true;       // 通過後は固定
-        } else if (prog >= morphEnd) {             // ③5行を積み上げ
+        } else if (prog >= morphEnd) {             // 5行を積み上げ
+          if (curStage < 4) snapToStack();
           hero.classList.add("is-lines");
           hero.classList.remove("is-catch");
           if (heroCatch) heroCatch.classList.remove("is-show");
@@ -189,11 +191,14 @@
           var lp = (prog - morphEnd) / (lineZone - morphEnd);
           var cur = Math.min(heroLines.length - 1, Math.floor(lp * heroLines.length));
           for (i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i <= cur);
-        } else {                                    // ②モーフ表示（初期）
+        } else {                                    // モーフ（スクロールで4段階に切替）
           hero.classList.remove("is-lines", "is-catch");
           if (heroCatch) heroCatch.classList.remove("is-show");
           if (heroScroll) heroScroll.style.opacity = "";
           for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
+          var w = 0;
+          for (i = 0; i < stageThresh.length; i++) if (prog >= stageThresh[i]) w = i + 1;
+          if (w > wantStage) { wantStage = w; runStages(); }
         }
       };
       window.addEventListener("scroll", onHeroScroll, { passive: true });
