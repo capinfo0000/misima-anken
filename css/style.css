@@ -776,8 +776,23 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__catch-copy{font-family:var(--font-en);font-weight:700;font-size:clamp(2rem,8vw,5.4rem);
   line-height:1.08;letter-spacing:.01em;color:var(--text-strong);}
 .p-hero__cch{display:inline-block;color:var(--text-strong);}
-.p-hero.is-catch .p-hero__cch{animation:catchCharWave 5s linear infinite;animation-delay:calc(.4s + var(--i) * .05s);}
+.p-hero.is-catch .p-hero__cch{animation:catchCharWave 5s linear infinite;animation-delay:calc(1.6s + var(--i) * .05s);} /* カーペットの後に開始 */
 @keyframes catchCharWave{0%{color:var(--text-strong);}4%{color:var(--lc,var(--text-strong));}14%{color:var(--text-strong);}100%{color:var(--text-strong);}}
+/* 黒カーペット：is-catch表示時、行ごとに黒バーが左→右にワイプ→右へ退場して文字が現れる */
+.p-hero__reveal-line{position:relative;display:inline-block;vertical-align:top;}
+.p-hero__catch-copy .p-hero__reveal-line{display:block;}
+.p-hero__reveal-text{display:inline-block;opacity:0;}
+.p-hero__reveal-line::after{content:"";position:absolute;inset:-.05em -.12em;background:var(--text-strong);
+  transform:scaleX(0);transform-origin:left;z-index:3;pointer-events:none;}
+.p-hero.is-catch .p-hero__catch{opacity:1;transform:none;transition:opacity .15s ease;} /* カーペットを白地でくっきり見せる */
+.p-hero.is-catch .p-hero__catch-jp .p-hero__reveal-line::after{animation:fvCarpet 1s cubic-bezier(.7,0,.3,1) 0s forwards;}
+.p-hero.is-catch .p-hero__catch-jp .p-hero__reveal-text{animation:fvCarpetText 1s linear 0s forwards;}
+.p-hero.is-catch .p-hero__catch-copy .p-hero__reveal-line:nth-child(1)::after{animation:fvCarpet 1s cubic-bezier(.7,0,.3,1) .22s forwards;}
+.p-hero.is-catch .p-hero__catch-copy .p-hero__reveal-line:nth-child(1) .p-hero__reveal-text{animation:fvCarpetText 1s linear .22s forwards;}
+.p-hero.is-catch .p-hero__catch-copy .p-hero__reveal-line:nth-child(2)::after{animation:fvCarpet 1s cubic-bezier(.7,0,.3,1) .44s forwards;}
+.p-hero.is-catch .p-hero__catch-copy .p-hero__reveal-line:nth-child(2) .p-hero__reveal-text{animation:fvCarpetText 1s linear .44s forwards;}
+@keyframes fvCarpet{0%{transform:scaleX(0);transform-origin:left;}45%{transform:scaleX(1);transform-origin:left;}55%{transform:scaleX(1);transform-origin:right;}100%{transform:scaleX(0);transform-origin:right;}}
+@keyframes fvCarpetText{0%,50%{opacity:0;}50.01%,100%{opacity:1;}}
 /* ヘッダー／ボタンのホバー時に文字・下線の虹色が流れ続ける（先頭色＝末尾色なのでシームレス） */
 @keyframes rainbowFlow{0%{background-position:0 0;}100%{background-position:-200% 0;}}
 /* 5行/タイピングで使う「虹色→黒」settleキーフレーム */
