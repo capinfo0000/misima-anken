@@ -126,10 +126,10 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 /* ============================================================
    Component : buttons / labels
    ============================================================ */
-.c-btn{display:inline-flex;align-items:center;justify-content:center;gap:.7em;padding:.95em 2.4em;border:1px solid var(--text-strong);border-radius:999px;font-size:.82rem;font-weight:700;letter-spacing:.1em;color:var(--text-strong);background:transparent;transition:background .25s,color .25s,border-color .25s,transform .25s;}
-.c-btn::after{content:"→";transition:transform .2s;}
-.c-btn:hover{background:var(--text-strong);color:#fff;transform:translateY(-2px);}
-.c-btn:hover::after{transform:translateX(4px);}
+.c-btn{display:inline-flex;align-items:center;justify-content:center;gap:.7em;padding:.95em 2.4em;border:1px solid var(--text-strong);border-radius:999px;font-size:.82rem;font-weight:700;letter-spacing:.1em;color:var(--text-strong);background:transparent;transition:background .3s ease,color .3s ease,border-color .3s ease,transform .4s cubic-bezier(.34,1.4,.64,1),box-shadow .3s ease;}
+.c-btn::after{content:"→";transition:transform .35s cubic-bezier(.34,1.4,.64,1);}
+.c-btn:hover{background:var(--text-strong);color:#fff;transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.14);}
+.c-btn:hover::after{transform:translateX(5px);}
 .c-btn.-fill{background:var(--text-strong);color:#fff;}
 .c-btn.-fill:hover{background:#000;}
 .c-btn.-light{background:#fff;border-color:#fff;color:var(--text-strong);}
@@ -541,8 +541,9 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 /* ============================================================
    Reveal on scroll
    ============================================================ */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease;}
-.reveal.is-visible{opacity:1;transform:translateY(0);}
+.reveal{opacity:0;transform:translateY(30px);filter:blur(6px);
+  transition:opacity 1s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1),filter 1s ease;}
+.reveal.is-visible{opacity:1;transform:translateY(0);filter:blur(0);}
 .reveal.-left{transform:translateX(-40px);}
 .reveal.-right{transform:translateX(40px);}
 .reveal.-left.is-visible,.reveal.-right.is-visible{transform:translateX(0);}
@@ -756,6 +757,15 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   letter-spacing:.08em;line-height:1.6;color:var(--text-strong);margin-bottom:clamp(1.8rem,6vh,3.5rem);}
 .p-hero__catch-copy{font-family:var(--font-en);font-weight:700;font-size:clamp(2rem,8vw,5.4rem);
   line-height:1.08;letter-spacing:.01em;color:var(--text-strong);}
+/* 英字キャッチを1文字ずつ「虹色→黒」で出す（settle） */
+.p-hero__ch{display:inline-block;opacity:0;transform:translateY(.4em);color:var(--lc,var(--text-strong));}
+.p-hero.is-catch .p-hero__ch{animation:fvCatchCh .8s cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay:calc(var(--i) * .035s);}
+@keyframes fvCatchCh{
+  0%{opacity:0;transform:translateY(.4em);color:var(--lc,var(--text-strong));}
+  45%{opacity:1;transform:translateY(0);color:var(--lc,var(--text-strong));}
+  100%{opacity:1;transform:none;color:var(--text-strong);}
+}
 /* キャッチ表示時は上部の英字ラベルを隠し、日本語＋英語のみに */
 .p-hero.is-catch .p-hero__en{animation:none;opacity:0;}
 .p-hero__brand{margin-top:var(--space-3);font-family:var(--font-serif);font-weight:500;
