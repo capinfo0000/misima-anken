@@ -14,10 +14,18 @@
   var header = document.querySelector(".l-header");
   var toTop = document.querySelector(".c-to-top");
 
+  var lastY = 0;
   function onScroll() {
     var y = window.scrollY;
-    if (header) header.classList.toggle("is-scrolled", y > 20);
+    if (header) {
+      header.classList.toggle("is-scrolled", y > 20);
+      var denom = document.documentElement.scrollHeight - window.innerHeight;
+      header.style.setProperty("--scrollp", denom > 0 ? Math.min(1, y / denom) : 0); // 進捗ライン
+      if (y > 240 && y > lastY + 4) header.classList.add("is-hidden");               // 下スクロールで隠す
+      else if (y < lastY - 4 || y < 240) header.classList.remove("is-hidden");       // 上スクロール/最上部で表示
+    }
     if (toTop) toTop.classList.toggle("is-visible", y > 600);
+    lastY = y;
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -494,6 +502,23 @@
     });
   });
 
+  /* ---------- 全ページにスクロールリビールを自動付与（トップ以外も動くHPに） ---------- */
+  (function autoReveal() {
+    var containers = document.querySelectorAll(".l-section .l-container");
+    Array.prototype.forEach.call(containers, function (container) {
+      var idx = 0;
+      Array.prototype.forEach.call(container.children, function (el) {
+        if (el.classList.contains("reveal")) return;   // 既存はそのまま
+        if (el.querySelector(".reveal")) return;        // 内部にrevealを持つ塊は二重化しない
+        var tag = el.tagName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "BR" || tag === "HR") return;
+        el.classList.add("reveal");
+        el.style.transitionDelay = (idx * 0.08) + "s";  // 塊ごとにスタッガー
+        idx++;
+      });
+    });
+  })();
+
   /* ---------- Reveal on scroll ---------- */
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window) {
@@ -509,6 +534,45 @@
   } else {
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
+
+  /* ---------- Magnetic buttons（PCのみ・reduced無効） / Count-up ---------- */
+  var fine = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (fine && !reduce) {
+    document.querySelectorAll(".c-btn").forEach(function (btn) {
+      btn.addEventListener("mousemove", function (e) {
+        var r = btn.getBoundingClientRect();
+        var x = (e.clientX - r.left - r.width / 2) * 0.28;
+        var y = (e.clientY - r.top - r.height / 2) * 0.28 - 2;
+        btn.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      });
+      btn.addEventListener("mouseleave", function () { btn.style.transform = ""; });
+    });
+  }
+  (function countUp() {
+    var nums = document.querySelectorAll("[data-countup]");
+    if (!nums.length) return;
+    var fmt = function (n) { return n.toLocaleString("ja-JP"); };
+    var run = function (el) {
+      var target = parseFloat(el.getAttribute("data-countup")) || 0;
+      var suffix = el.getAttribute("data-suffix") || "";
+      if (reduce) { el.textContent = fmt(target) + suffix; return; }
+      var dur = 1300, t0 = null;
+      var tick = function (ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(Math.round(target * e)) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    };
+    if ("IntersectionObserver" in window) {
+      var cio = new IntersectionObserver(function (es) {
+        es.forEach(function (en) { if (en.isIntersecting) { run(en.target); cio.unobserve(en.target); } });
+      }, { threshold: 0.5 });
+      nums.forEach(function (el) { cio.observe(el); });
+    } else { nums.forEach(run); }
+  })();
 
   /* ---------- Contact form (static demo) ---------- */
   var form = document.getElementById("contactForm");

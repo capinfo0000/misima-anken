@@ -581,6 +581,46 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 .p-top-news__item:nth-child(4){transition-delay:.24s;}
 
 /* ============================================================
+   Motion upgrade（サイト全体・2025トレンド・依存追加なし）
+   すべて transform/opacity 中心。prefers-reduced-motion で無効化。
+   ============================================================ */
+/* 画像ホバーズーム（カード/サービス/figure.c-zoom） */
+.c-card,.p-top-service__card,.p-top-group__item{overflow:hidden;}
+figure.c-zoom,.c-zoom{overflow:hidden;}
+.c-card img,.p-top-service__card img,.c-zoom img{transition:transform .6s cubic-bezier(.22,1,.36,1);will-change:transform;}
+.c-card:hover img,.p-top-service__card:hover img,.c-zoom:hover img,a:hover .c-zoom img{transform:scale(1.06);}
+/* 本文リンクの下線アニメ（ヘッダー/ボタン/矢印リンク以外） */
+.l-section .l-container a:not(.c-btn):not(.c-link-arrow):not(.p-top-news__link){
+  background-image:linear-gradient(currentColor,currentColor);background-size:0 1px;background-repeat:no-repeat;
+  background-position:0 100%;transition:background-size .35s ease;}
+.l-section .l-container a:not(.c-btn):not(.c-link-arrow):not(.p-top-news__link):hover{background-size:100% 1px;}
+/* セクション見出し（画像ロゴ）のマスク・リビール */
+.c-section-heading.reveal .c-section-heading__title{overflow:hidden;}
+.c-section-heading.reveal .c-section-heading__title img{display:inline-block;transform:translateY(112%);transition:transform .9s cubic-bezier(.22,1,.36,1) .12s;}
+.c-section-heading.reveal.is-visible .c-section-heading__title img{transform:none;}
+/* スクロール進捗（ヘッダー下辺に虹色ライン） */
+.l-header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--rainbow);
+  transform:scaleX(var(--scrollp,0));transform-origin:left center;}
+/* ヘッダー：下スクロールで隠れ、上で表示 */
+.l-header{transition:height .25s,background .25s,border-color .25s,transform .35s ease;}
+.l-header.is-hidden{transform:translateY(calc(-100% - 6px));}
+/* magnetic button の移動は JS が transform を付与（.c-btn は既存の transition あり） */
+
+/* クロスドキュメントのページ遷移（対応ブラウザのみ・reduced では無効） */
+@media (prefers-reduced-motion: no-preference){
+  @view-transition{ navigation: auto; }
+}
+
+/* prefers-reduced-motion：全モーションを停止/即表示 */
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1 !important;transform:none !important;filter:none !important;clip-path:none !important;transition:none !important;}
+  .c-section-heading.reveal .c-section-heading__title img{transform:none !important;transition:none !important;}
+  .c-card img,.p-top-service__card img,.c-zoom img{transition:none !important;}
+  .l-header::after{display:none !important;}
+  .l-header.is-hidden{transform:none !important;}
+}
+
+/* ============================================================
    Diagonal color band (section separator, original)
    ============================================================ */
 .c-band{position:relative;height:130px;overflow:hidden;pointer-events:none;}
