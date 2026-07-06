@@ -167,6 +167,75 @@
       if (stackBtmEl) buildSch(stackBtmEl, second, 3); // 再挑戦を即表示
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
+    } else if (window.matchMedia("(max-width: 980px)").matches) {
+      /* ===== モバイル：スワイプで1ステップずつ（スクロールロック。激しいフリックでも1個先まで） ===== */
+      var docEl = document.documentElement;
+      docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
+      hero.style.height = "100svh"; window.scrollTo(0, 0);
+      var mStep = 0, mMax = 10, mBusy = false, mActive = true;
+      var hideLines = function () { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
+      var showLines = function (cnt) { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
+      var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
+        if (!stackBtmEl) return;
+        stackBtmEl.innerHTML = "";
+        Array.prototype.forEach.call(word, function (ch, k) {
+          var s = document.createElement("span"); s.className = "p-hero__tch"; s.textContent = ch;
+          s.style.setProperty("--lc", stackPal[k % stackPal.length]); s.style.setProperty("--k", k);
+          stackBtmEl.appendChild(s);
+        });
+      };
+      var renderState = function (n) { // 戻る：状態nを即座に描画（アニメ無し）
+        clearMorphTimers();
+        heroMorph.classList.remove("is-typewave", "is-stack", "is-stack-full");
+        hero.classList.remove("is-lines", "is-catch");
+        if (heroCatch) heroCatch.classList.remove("is-show");
+        hideLines(); playing = false;
+        if (n <= 1) { setWordPlain(first); curStage = 1; wantStage = 1; }
+        else if (n === 2) { setWordPlain(second); curStage = 2; wantStage = 2; }
+        else {
+          if (stackBtmEl) { stackBtmEl.innerHTML = ""; buildSch(stackBtmEl, second, 3); }
+          heroMorph.classList.add("is-stack");
+          if (n >= 4) heroMorph.classList.add("is-stack-full");
+          curStage = 4; wantStage = 4;
+          if (n >= 5 && n <= 9) { hero.classList.add("is-lines"); showLines(n - 4); }
+          else if (n >= 10) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
+        }
+      };
+      var release = function () { // 最後まで進んだら通常スクロールへ解放
+        mActive = false;
+        docEl.style.overflow = ""; document.body.style.overflow = "";
+        window.scrollTo(0, hero.offsetHeight);
+      };
+      var goForward = function () {
+        if (mBusy) return;
+        if (mStep >= mMax) { release(); return; }
+        mBusy = true; mStep++;
+        if (mStep <= 4) {                          // ①〜④モーフ
+          hideLines(); hero.classList.remove("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
+          wantStage = mStep; runStages();
+          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 1700 : 900));
+        } else if (mStep <= 9) {                    // 5行を1行ずつ
+          if (curStage < 4) snapToStack();
+          hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
+          showLines(mStep - 4);
+          setTimeout(function () { mBusy = false; }, 700);
+        } else {                                    // ⑩キャッチ
+          if (curStage < 4) snapToStack();
+          hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
+          setTimeout(function () { mBusy = false; }, 1400);
+        }
+      };
+      var goBack = function () { if (mBusy || mStep <= 1) return; mStep--; renderState(mStep); };
+      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; runStages(); } }, 1150); // ①失敗を自動表示
+      var sY = null;
+      window.addEventListener("touchstart", function (e) { if (mActive) sY = e.touches[0].clientY; }, { passive: true });
+      window.addEventListener("touchmove", function (e) { if (mActive) e.preventDefault(); }, { passive: false });
+      window.addEventListener("touchend", function (e) {
+        if (!mActive || sY == null) return;
+        var t = e.changedTouches && e.changedTouches[0];
+        var dy = sY - (t ? t.clientY : sY); sY = null;
+        if (dy > 40) goForward(); else if (dy < -40) goBack();
+      }, { passive: true });
     } else {
       var morphEnd = 0.60;                 // これ以降は5行（モーフ領域を広くとりスマホの行き過ぎを防ぐ）
       var lineZone = 0.84;                 // これ以降はキャッチ
