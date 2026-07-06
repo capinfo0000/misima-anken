@@ -707,16 +707,16 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   opacity:0;transform:translateY(10px);}
 .p-hero.is-play .p-hero__en{animation:fvFade .8s ease forwards .4s;}
 /* 2語モーフ（ルーレット→失敗↓挑戦）。初期の見せ場。スクロールで退場 */
-.p-hero__morph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:.15em;z-index:2;transition:opacity .5s ease;}
+.p-hero__morph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:2;transition:opacity .5s ease;}
 .p-hero.is-lines .p-hero__morph,.p-hero.is-catch .p-hero__morph{opacity:0;pointer-events:none;}
-.p-hero__roulette,.p-hero__morph2{font-family:var(--font-serif);font-weight:600;
+.p-hero__type{font-family:var(--font-serif);font-weight:600;
   font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-.p-hero__roulette{display:inline-block;min-width:2.4em;text-align:center;}
-.p-hero__arrow{color:var(--text-muted);font-size:clamp(1.1rem,3vw,1.8rem);line-height:1;opacity:0;transform:translateY(6px);}
-.p-hero__morph2{color:#e60012;opacity:0;transform:translateY(8px);}
-.p-hero__morph.is-morphed .p-hero__arrow,.p-hero__morph.is-morphed .p-hero__morph2{
-  opacity:1;transform:none;transition:opacity .6s ease,transform .6s ease;}
+/* タイピングのカーソル（点滅） */
+.p-hero__caret{display:inline-block;width:.06em;height:1em;margin-left:.08em;
+  background:var(--text-strong);vertical-align:-.12em;
+  font-size:clamp(2.4rem,9vw,5.5rem);animation:fvCaret 1s step-end infinite;}
+@keyframes fvCaret{0%,100%{opacity:1;}50%{opacity:0;}}
 /* 5行：中央で1行ずつ差し替え（色帯ワイプ→文字出現）。スクロールで順送り、最後は消える */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}

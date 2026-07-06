@@ -55,34 +55,38 @@
     var heroLines = hero.querySelectorAll(".p-hero__line");
     var heroCatch = hero.querySelector(".p-hero__catch");
     var heroScroll = hero.querySelector(".p-fv__scroll");
-    var heroMorph = hero.querySelector(".p-hero__morph");
-    var heroRoulette = hero.querySelector(".p-hero__roulette");
+    var heroType = hero.querySelector(".p-hero__type");
     var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
 
-    /* ①ルーレット：語が入れ替わって最終語に収束 → ②失敗↓挑戦のモーフ表示 */
-    var spinRoulette = function () {
-      if (!heroRoulette) return;
-      var words = (heroRoulette.getAttribute("data-words") || "").split(",").filter(Boolean);
-      var finalWord = heroRoulette.getAttribute("data-final") || heroRoulette.textContent;
-      var reveal = function () { if (heroMorph) heroMorph.classList.add("is-morphed"); };
-      if (!words.length) { heroRoulette.textContent = finalWord; reveal(); return; }
-      var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
-      var spin = function () {
-        heroRoulette.textContent = words[idx % words.length];
-        idx++; ticks++;
-        if (ticks >= maxTicks) { heroRoulette.textContent = finalWord; reveal(); return; }
-        delay += (ticks > maxTicks - 6) ? 45 : 4;
-        setTimeout(spin, delay);
+    /* タイピング風：失敗 を入力 → 消去 → 再挑戦 を入力 */
+    var typeMorph = function () {
+      if (!heroType) return;
+      var first = heroType.getAttribute("data-first") || "";
+      var second = heroType.getAttribute("data-second") || "";
+      var i = 0, j = 0;
+      var typeFirst = function () {
+        heroType.textContent = first.slice(0, i);
+        if (i < first.length) { i++; setTimeout(typeFirst, 180); }
+        else { setTimeout(delFirst, 900); }
       };
-      spin();
+      var delFirst = function () {
+        var n = heroType.textContent.length;
+        if (n > 0) { heroType.textContent = first.slice(0, n - 1); setTimeout(delFirst, 120); }
+        else { setTimeout(typeSecond, 300); }
+      };
+      var typeSecond = function () {
+        j++; heroType.textContent = second.slice(0, j);
+        if (j < second.length) setTimeout(typeSecond, 190);
+      };
+      typeFirst();
     };
 
     if (heroReduced) {
-      if (heroMorph) heroMorph.classList.add("is-morphed");
+      if (heroType) heroType.textContent = heroType.getAttribute("data-second") || "";
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
-      setTimeout(spinRoulette, 1150); // 虹色バー通過後に開始
+      setTimeout(typeMorph, 1150); // 虹色バー通過後に開始
       var heroDone = false;
       var morphEnd = 0.14;                 // 冒頭はモーフ（失敗↓挑戦）
       var lineZone = 0.72;                 // 中盤で5行を1画面に積み上げ
