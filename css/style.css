@@ -752,12 +752,15 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__catch.is-show{opacity:1;transform:none;}
 .p-hero__catch-jp{font-family:var(--font-serif);font-weight:600;font-size:clamp(1.05rem,3vw,1.7rem);
   letter-spacing:.08em;line-height:1.6;color:var(--text-strong);margin-bottom:clamp(1.8rem,6vh,3.5rem);}
+/* 英字キャッチ：虹色グラデーション文字。表示後に1回流れ→以降約10秒おきに流れる */
 .p-hero__catch-copy{font-family:var(--font-en);font-weight:700;font-size:clamp(2rem,8vw,5.4rem);
-  line-height:1.08;letter-spacing:.01em;color:var(--text-strong);}
-/* 英字キャッチを1文字ずつ「虹色→黒」で出す（settle） */
-.p-hero__ch{display:inline-block;opacity:0;transform:translateY(.4em);color:var(--lc,var(--text-strong));}
-.p-hero.is-catch .p-hero__ch{animation:fvCatchCh .8s cubic-bezier(.22,1,.36,1) forwards;
-  animation-delay:calc(var(--i) * .035s);}
+  line-height:1.08;letter-spacing:.01em;
+  background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986,#e95383,#e60012);
+  background-size:200% 100%;background-position:0 0;-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;}
+.p-hero.is-catch .p-hero__catch-copy{animation:catchFlow 10s linear .4s infinite;}
+@keyframes catchFlow{0%{background-position:0 0;}22%{background-position:-200% 0;}100%{background-position:-200% 0;}}
+/* 5行/タイピングで使う「虹色→黒」settleキーフレーム */
 @keyframes fvCatchCh{
   0%{opacity:0;transform:translateY(.4em);color:var(--lc,var(--text-strong));}
   45%{opacity:1;transform:translateY(0);color:var(--lc,var(--text-strong));}
@@ -783,6 +786,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   .p-hero__lines{display:none;}
   .p-hero__en{position:static;opacity:1;transform:none;margin-bottom:var(--space-4);}
   .p-hero__catch{position:relative;opacity:1;transform:none;}
+  .p-hero__catch-copy,.p-hero.is-catch .p-hero__catch-copy{animation:none;background-position:0 0;}
   .p-fv__scroll{display:none;}
 }
 

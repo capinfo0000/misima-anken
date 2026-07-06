@@ -40,30 +40,7 @@
   /* ---------- First View：固定ヒーロー（虹色フリップ→スクロールで5行順送り→最後キャッチが残る） ---------- */
   var hero = document.querySelector(".p-hero");
   if (hero) {
-    /* 英字キャッチを1文字ずつ分割し「虹色→黒」で出す（peers風） */
-    var heroCatchCopy = hero.querySelector(".p-hero__catch-copy");
-    if (heroCatchCopy) {
-      var palette = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986"];
-      var nodes = Array.prototype.slice.call(heroCatchCopy.childNodes);
-      heroCatchCopy.textContent = "";
-      var li = 0;
-      nodes.forEach(function (node) {
-        if (node.nodeType === 3) { // テキスト → 1文字ずつspan化
-          Array.prototype.forEach.call(node.textContent, function (ch) {
-            var s = document.createElement("span");
-            s.className = "p-hero__ch";
-            s.textContent = ch;
-            if (ch === " ") { s.style.width = ".28em"; s.setAttribute("aria-hidden", "true"); }
-            s.style.setProperty("--i", li);
-            s.style.setProperty("--lc", palette[li % palette.length]);
-            heroCatchCopy.appendChild(s);
-            li++;
-          });
-        } else { // <br> などはそのまま
-          heroCatchCopy.appendChild(node.cloneNode(true));
-        }
-      });
-    }
+    /* 英字キャッチは虹色が流れ続けるグラデーション文字（CSSで実装） */
     var heroLines = hero.querySelectorAll(".p-hero__line");
     /* 5行も1文字ずつに分割し「虹色→黒」settleで出す */
     var linePalette = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
