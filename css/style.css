@@ -765,14 +765,12 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__catch.is-show{opacity:1;transform:none;}
 .p-hero__catch-jp{font-family:var(--font-serif);font-weight:600;font-size:clamp(1.05rem,3vw,1.7rem);
   letter-spacing:.08em;line-height:1.6;color:var(--text-strong);margin-bottom:clamp(1.8rem,6vh,3.5rem);}
-/* 英字キャッチ：虹色グラデーション文字。表示後に1回流れ→以降約10秒おきに流れる */
+/* 英字キャッチ：基本は黒文字。表示後＆以降約10秒おきに、1文字ずつ虹色が流れて黒へ戻る */
 .p-hero__catch-copy{font-family:var(--font-en);font-weight:700;font-size:clamp(2rem,8vw,5.4rem);
-  line-height:1.08;letter-spacing:.01em;
-  background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986,#e95383,#e60012);
-  background-size:200% 100%;background-position:0 0;-webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;color:transparent;}
-.p-hero.is-catch .p-hero__catch-copy{animation:catchFlow 10s linear .4s infinite;}
-@keyframes catchFlow{0%{background-position:0 0;}22%{background-position:-200% 0;}100%{background-position:-200% 0;}}
+  line-height:1.08;letter-spacing:.01em;color:var(--text-strong);}
+.p-hero__cch{display:inline-block;color:var(--text-strong);}
+.p-hero.is-catch .p-hero__cch{animation:catchCharWave 10s linear infinite;animation-delay:calc(.4s + var(--i) * .05s);}
+@keyframes catchCharWave{0%{color:var(--text-strong);}2%{color:var(--lc,var(--text-strong));}7%{color:var(--text-strong);}100%{color:var(--text-strong);}}
 /* ヘッダー／ボタンのホバー時に文字・下線の虹色が流れ続ける（先頭色＝末尾色なのでシームレス） */
 @keyframes rainbowFlow{0%{background-position:0 0;}100%{background-position:-200% 0;}}
 /* 5行/タイピングで使う「虹色→黒」settleキーフレーム */
@@ -801,7 +799,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   .p-hero__lines{display:none;}
   .p-hero__en{position:static;opacity:1;transform:none;margin-bottom:var(--space-4);}
   .p-hero__catch{position:relative;opacity:1;transform:none;}
-  .p-hero__catch-copy,.p-hero.is-catch .p-hero__catch-copy{animation:none;background-position:0 0;}
+  .p-hero__cch,.p-hero.is-catch .p-hero__cch{animation:none;color:var(--text-strong);}
   .p-fv__scroll{display:none;}
   /* ホバーの虹色は動かさず静止表示（可読性は維持） */
   .p-global-nav__item > a:not(.p-global-nav__cta):hover,
