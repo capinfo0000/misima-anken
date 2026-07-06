@@ -718,7 +718,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   font-size:clamp(2.4rem,9vw,5.5rem);animation:fvCaret 1s step-end infinite;}
 @keyframes fvCaret{0%,100%{opacity:1;}50%{opacity:0;}}
 /* タイピング完了→2秒後：失敗↓再挑戦 を積み上げてフェードイン */
-.p-hero__stack{display:none;flex-direction:column;align-items:center;gap:.12em;}
+.p-hero__stack{display:none;flex-direction:column;align-items:center;gap:clamp(1.5rem,5vh,3.5rem);}
 .p-hero__morph.is-stack .p-hero__type,.p-hero__morph.is-stack .p-hero__caret{display:none;}
 .p-hero__morph.is-stack .p-hero__stack{display:flex;}
 .p-hero__stack-top,.p-hero__stack-btm{font-family:var(--font-serif);font-weight:600;
