@@ -172,7 +172,7 @@
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
-      var mStep = 0, mMax = 10, mBusy = false, mActive = true;
+      var mStep = 0, mMax = 10, mBusy = false, mActive = true, mReachedCatch = false;
       var hideLines = function () { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
@@ -222,10 +222,11 @@
         } else {                                    // ⑩キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
+          mReachedCatch = true;                     // キャッチ到達＝以降は戻らない（リロードまで）
           setTimeout(function () { mBusy = false; }, 1400);
         }
       };
-      var goBack = function () { if (mBusy || mStep <= 1) return; mStep--; renderState(mStep); };
+      var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
       setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; runStages(); } }, 1150); // ①失敗を自動表示
       var sY = null;
       window.addEventListener("touchstart", function (e) { if (mActive) sY = e.touches[0].clientY; }, { passive: true });
@@ -240,7 +241,15 @@
       var morphEnd = 0.60;                 // これ以降は5行（モーフ領域を広くとりスマホの行き過ぎを防ぐ）
       var lineZone = 0.84;                 // これ以降はキャッチ
       var stageThresh = [0.06, 0.18, 0.34, 0.48]; // ①はほぼ即／②③④はスクロールで切替
+      var heroDone = false;                        // キャッチが出たら以降は前の表示に戻さない（リロードまで固定）
       var onHeroScroll = function () {
+        if (heroDone) {                            // キャッチ到達後はスクロールを戻してもキャッチのまま
+          for (var k = 0; k < heroLines.length; k++) heroLines[k].classList.remove("is-show");
+          hero.classList.add("is-lines", "is-catch");
+          if (heroCatch) heroCatch.classList.add("is-show");
+          if (heroScroll) heroScroll.style.opacity = "0";
+          return;
+        }
         var total = hero.offsetHeight - window.innerHeight;
         if (total <= 0) return;
         var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
@@ -251,6 +260,7 @@
           hero.classList.add("is-lines", "is-catch");
           if (heroCatch) heroCatch.classList.add("is-show");
           if (heroScroll) heroScroll.style.opacity = "0";
+          heroDone = true;                         // 以降ロック
         } else if (prog >= morphEnd) {             // 5行を積み上げ
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines");
