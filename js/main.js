@@ -101,20 +101,25 @@
       if (!heroType) return;
       var first = heroType.getAttribute("data-first") || "";
       var second = heroType.getAttribute("data-second") || "";
+      var pal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
       var i = 0, j = 0;
+      var addChar = function (ch, idx) { // 打鍵ごとに虹色→黒settleするspanを追加
+        var s = document.createElement("span");
+        s.className = "p-hero__tch";
+        s.textContent = ch;
+        s.style.setProperty("--lc", pal[idx % pal.length]);
+        heroType.appendChild(s);
+      };
       var typeFirst = function () {
-        heroType.textContent = first.slice(0, i);
-        if (i < first.length) { i++; setTimeout(typeFirst, 180); }
+        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 180); }
         else { setTimeout(delFirst, 900); }
       };
       var delFirst = function () {
-        var n = heroType.textContent.length;
-        if (n > 0) { heroType.textContent = first.slice(0, n - 1); setTimeout(delFirst, 120); }
+        if (heroType.lastChild) { heroType.removeChild(heroType.lastChild); setTimeout(delFirst, 120); }
         else { setTimeout(typeSecond, 300); }
       };
       var typeSecond = function () {
-        j++; heroType.textContent = second.slice(0, j);
-        if (j < second.length) setTimeout(typeSecond, 190);
+        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 190); }
         else setTimeout(showStack, 2000); // 完了の2秒後に積み上げ演出へ
       };
       typeFirst();
