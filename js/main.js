@@ -56,8 +56,16 @@
     var heroCatch = hero.querySelector(".p-hero__catch");
     var heroScroll = hero.querySelector(".p-fv__scroll");
     var heroType = hero.querySelector(".p-hero__type");
+    var heroMorph = hero.querySelector(".p-hero__morph");
     var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
+
+    /* タイピング完了→2秒後：全消去して「失敗↓再挑戦」を積み上げフェードイン */
+    var showStack = function () {
+      if (!heroMorph) return;
+      heroMorph.classList.add("is-stack");                 // 失敗が出現
+      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 650); // ↓と再挑戦をフェードイン
+    };
 
     /* タイピング風：失敗 を入力 → 消去 → 再挑戦 を入力 */
     var typeMorph = function () {
@@ -78,12 +86,13 @@
       var typeSecond = function () {
         j++; heroType.textContent = second.slice(0, j);
         if (j < second.length) setTimeout(typeSecond, 190);
+        else setTimeout(showStack, 2000); // 完了の2秒後に積み上げ演出へ
       };
       typeFirst();
     };
 
     if (heroReduced) {
-      if (heroType) heroType.textContent = heroType.getAttribute("data-second") || "";
+      if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
       setTimeout(typeMorph, 1150); // 虹色バー通過後に開始

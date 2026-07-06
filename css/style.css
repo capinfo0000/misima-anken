@@ -717,6 +717,18 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   background:var(--text-strong);vertical-align:-.12em;
   font-size:clamp(2.4rem,9vw,5.5rem);animation:fvCaret 1s step-end infinite;}
 @keyframes fvCaret{0%,100%{opacity:1;}50%{opacity:0;}}
+/* タイピング完了→2秒後：失敗↓再挑戦 を積み上げてフェードイン */
+.p-hero__stack{display:none;flex-direction:column;align-items:center;gap:.12em;}
+.p-hero__morph.is-stack .p-hero__type,.p-hero__morph.is-stack .p-hero__caret{display:none;}
+.p-hero__morph.is-stack .p-hero__stack{display:flex;}
+.p-hero__stack-top,.p-hero__stack-btm{font-family:var(--font-serif);font-weight:600;
+  font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
+.p-hero__stack-btm{color:#e60012;}
+.p-hero__stack-arrow{font-size:clamp(1.1rem,3vw,1.8rem);line-height:1;color:var(--text-muted);}
+.p-hero__stack-top{opacity:0;transition:opacity .5s ease;}
+.p-hero__morph.is-stack .p-hero__stack-top{opacity:1;}
+.p-hero__stack-arrow,.p-hero__stack-btm{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease;}
+.p-hero__morph.is-stack-full .p-hero__stack-arrow,.p-hero__morph.is-stack-full .p-hero__stack-btm{opacity:1;transform:none;}
 /* 5行：中央で1行ずつ差し替え（色帯ワイプ→文字出現）。スクロールで順送り、最後は消える */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}
