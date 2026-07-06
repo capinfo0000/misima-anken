@@ -724,35 +724,33 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__morph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   z-index:2;transition:opacity .5s ease;}
 .p-hero.is-lines .p-hero__morph,.p-hero.is-catch .p-hero__morph{opacity:0;pointer-events:none;}
-.p-hero__type{font-family:var(--font-serif);font-weight:600;
-  font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-/* 打鍵ごとに 黒で 出現（フェードイン） */
+/* 打鍵ごとに 黒で 出現（フェードイン）。タイプ先は下段(stack-btm) */
 .p-hero__tch{display:inline-block;color:var(--text-strong);animation:fvTypeIn .3s ease forwards;}
 @keyframes fvTypeIn{0%{opacity:0;transform:translateY(.12em);}100%{opacity:1;transform:none;}}
-/* 入力完了後、消える前に1文字ずつ虹が流れる（1回・ゆっくり） */
-.p-hero__type.is-typewave .p-hero__tch{animation:fvTypeWave .7s ease forwards;animation-delay:calc(var(--k,0) * .2s);}
+/* 入力完了後、次へ移る前に1文字ずつ虹が流れる（1回・ゆっくり） */
+.p-hero__morph.is-typewave .p-hero__tch{animation:fvTypeWave .7s ease forwards;animation-delay:calc(var(--k,0) * .2s);}
 @keyframes fvTypeWave{0%{color:var(--text-strong);}45%{color:var(--lc,var(--text-strong));}100%{color:var(--text-strong);}}
 /* タイピングのカーソル（点滅） */
 .p-hero__caret{display:inline-block;width:.06em;height:1em;margin-left:.08em;
   background:var(--text-strong);vertical-align:-.12em;
   font-size:clamp(2.4rem,9vw,5.5rem);animation:fvCaret 1s step-end infinite;}
 @keyframes fvCaret{0%,100%{opacity:1;}50%{opacity:0;}}
-/* タイピング完了→2秒後：失敗↓再挑戦 を積み上げてフェードイン */
-.p-hero__stack{display:none;flex-direction:column;align-items:center;gap:clamp(1.5rem,5vh,3.5rem);}
-.p-hero__morph.is-stack .p-hero__type,.p-hero__morph.is-stack .p-hero__caret{display:none;}
-.p-hero__morph.is-stack .p-hero__stack{display:flex;}
+/* 失敗↓再挑戦スタック：タイプ中は下段だけ中央表示→入力後に上段(失敗)＋矢印が現れる */
+.p-hero__stack{display:flex;flex-direction:column;align-items:center;gap:clamp(1.5rem,5vh,3.5rem);}
 .p-hero__stack-top,.p-hero__stack-btm{font-family:var(--font-serif);font-weight:600;
   font-size:clamp(2.4rem,9vw,5.5rem);line-height:1.15;letter-spacing:.08em;color:var(--text-strong);}
-.p-hero__stack-arrow{display:block;line-height:0;color:var(--text-muted);margin:.15em 0;opacity:0;}
+.p-hero__stack-top{display:none;}                                   /* タイプ中は隠す */
+.p-hero__stack-arrow{display:none;line-height:0;margin:.15em 0;opacity:0;transform:translateY(-8px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1);
+  animation:fvArrowRainbow 4.5s linear infinite;}                   /* ↓は常に虹色でフロー */
 .p-hero__stack-arrow svg{display:block;width:clamp(34px,5vw,52px);height:auto;}
-/* 動画3-8s再現：上段(失敗)は上からフェードイン／下段(再挑戦)は中央付近から下へ settle／両語グレー→黒。矢印↓は最後に遅れて出現 */
-.p-hero__morph.is-stack .p-hero__stack-top{animation:fvStackTop .7s cubic-bezier(.22,1,.36,1) both;}
-.p-hero__morph.is-stack .p-hero__stack-btm{animation:fvStackBtm .7s cubic-bezier(.22,1,.36,1) both;}
-.p-hero__morph.is-stack-full .p-hero__stack-arrow{animation:fvStackArrow .6s ease both;}
+/* 次の挙動：上段(失敗)が上からフェードイン。下段(再挑戦)はタイプ済みが継続（再登場しない） */
+.p-hero__morph.is-stack .p-hero__stack-top{display:block;animation:fvStackTop .7s cubic-bezier(.22,1,.36,1) both;}
+.p-hero__morph.is-stack .p-hero__stack-arrow{display:block;}        /* 先に場所だけ確保 */
+.p-hero__morph.is-stack-full .p-hero__stack-arrow{opacity:1;transform:none;} /* 最後に矢印をフェードイン */
 @keyframes fvStackTop{0%{opacity:0;transform:translateY(-16px);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
-@keyframes fvStackBtm{0%{opacity:1;transform:translateY(-.5em);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
-@keyframes fvStackArrow{0%{opacity:0;transform:translateY(-8px);}100%{opacity:1;transform:none;}}
-/* 矢印↓が出た後：失敗／再挑戦も1文字ずつ虹色→黒。約10秒おき／進行はキャッチよりゆっくり(.35s刻み) */
+@keyframes fvArrowRainbow{0%{color:#e60012;}14%{color:#ed6d1f;}28%{color:#f5a200;}42%{color:#009944;}57%{color:#41a1be;}71%{color:#1d2088;}85%{color:#601986;}100%{color:#e60012;}}
+/* スタックの文字も1文字ずつ虹色→黒。5秒おき／進行はゆっくり(.35s刻み) */
 .p-hero__sch{display:inline-block;color:inherit;}
 .p-hero__morph.is-stack-full .p-hero__sch{animation:fvStackWave 5s linear infinite;animation-delay:calc(var(--i) * .35s);}
 @keyframes fvStackWave{0%{color:var(--text-strong);}6%{color:var(--lc,var(--text-strong));}18%{color:var(--text-strong);}100%{color:var(--text-strong);}}

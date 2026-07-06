@@ -87,79 +87,103 @@
     });
     var heroCatch = hero.querySelector(".p-hero__catch");
     var heroScroll = hero.querySelector(".p-fv__scroll");
-    var heroType = hero.querySelector(".p-hero__type");
     var heroMorph = hero.querySelector(".p-hero__morph");
-    /* 失敗／再挑戦を1文字ずつspan化：矢印表示後に「1文字ずつ虹色→黒」を約10秒おきに流す（CSS） */
+    var stackEl = hero.querySelector(".p-hero__stack");
+    var stackTopEl = hero.querySelector(".p-hero__stack-top");
+    var stackBtmEl = hero.querySelector(".p-hero__stack-btm");
+    var stackCaret = stackBtmEl ? stackBtmEl.querySelector(".p-hero__caret") : null;
     var stackPal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
-    var splitStackWord = function (el, start) {
-      if (!el) return start;
-      var txt = el.textContent;
+    /* 語を1文字ずつ p-hero__sch にして --i/--lc を付与（矢印分は index を1つ空ける） */
+    var buildSch = function (el, txt, start) {
+      if (!el) return;
       el.textContent = "";
-      Array.prototype.forEach.call(txt, function (ch) {
+      Array.prototype.forEach.call(txt, function (ch, k) {
         var s = document.createElement("span");
         s.className = "p-hero__sch";
         s.textContent = ch;
-        s.style.setProperty("--i", start);
-        s.style.setProperty("--lc", stackPal[start % stackPal.length]);
+        s.style.setProperty("--i", start + k);
+        s.style.setProperty("--lc", stackPal[(start + k) % stackPal.length]);
         el.appendChild(s);
-        start++;
       });
-      return start;
     };
-    var stackIdx = splitStackWord(hero.querySelector(".p-hero__stack-top"), 0);
-    stackIdx++; // 矢印のぶんインデックスを1つ空け、波を矢印位置で一拍おく
-    splitStackWord(hero.querySelector(".p-hero__stack-btm"), stackIdx);
+    if (stackTopEl) buildSch(stackTopEl, stackTopEl.textContent, 0); // 失敗 = 0,1
     var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
 
-    /* タイピング完了→2秒後：全消去して「失敗↓再挑戦」を積み上げフェードイン */
+    /* 入力後、上段(失敗)＋矢印を出して次の挙動へ。FLIP で下段が中央→定位置へ滑らかに移動 */
     var showStack = function () {
       if (!heroMorph) return;
-      heroMorph.classList.add("is-stack");                 // 下段(再挑戦)継続＋上段(失敗)フェードイン、両語グレー→黒へsettle
-      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 1600); // 落ち着いてから矢印↓を遅れて出現
+      var beforeTop = stackBtmEl ? stackBtmEl.getBoundingClientRect().top : 0;
+      heroMorph.classList.add("is-stack");                  // 上段(失敗)＋矢印の場所が出現→下段が下へ
+      if (stackEl && stackBtmEl && !heroReduced) {
+        var dy = stackBtmEl.getBoundingClientRect().top - beforeTop; // 下段の移動量
+        if (dy) {
+          stackEl.style.transition = "none";
+          stackEl.style.transform = "translateY(" + (-dy) + "px)"; // いったん元位置へ戻して
+          requestAnimationFrame(function () {
+            stackEl.style.transition = "transform .6s cubic-bezier(.22,1,.36,1)";
+            stackEl.style.transform = "translateY(0)";           // 滑らかに定位置へ
+          });
+        }
+      }
+      setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 800); // 最後に矢印フェードイン＋波開始
     };
 
-    /* タイピング風：失敗 を入力 → 消去 → 再挑戦 を入力 */
+    /* タイピング：失敗を入力→虹→消去→再挑戦を入力→虹→そのまま下段として定着→1秒後にスタックへ */
     var typeMorph = function () {
-      if (!heroType) return;
-      var first = heroType.getAttribute("data-first") || "";
-      var second = heroType.getAttribute("data-second") || "";
-      var pal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
+      if (!stackBtmEl) return;
+      var first = stackBtmEl.getAttribute("data-first") || "";
+      var second = stackBtmEl.getAttribute("data-second") || "";
       var i = 0, j = 0;
-      var addChar = function (ch, idx) { // 黒で1文字ずつ入力（虹色は後の波で流す）
+      var addChar = function (ch, idx) { // 黒で1文字ずつ入力（カーソルの前へ挿入）
         var s = document.createElement("span");
         s.className = "p-hero__tch";
         s.textContent = ch;
-        s.style.setProperty("--lc", pal[idx % pal.length]);
+        s.style.setProperty("--lc", stackPal[idx % stackPal.length]);
         s.style.setProperty("--k", idx);
-        heroType.appendChild(s);
+        if (stackCaret && stackCaret.parentNode === stackBtmEl) stackBtmEl.insertBefore(s, stackCaret);
+        else stackBtmEl.appendChild(s);
+      };
+      var delLast = function () {
+        var spans = stackBtmEl.querySelectorAll(".p-hero__tch");
+        if (spans.length) { stackBtmEl.removeChild(spans[spans.length - 1]); return true; }
+        return false;
       };
       var typeFirst = function () {
         if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 340); }
-        else { setTimeout(playFirstWave, 600); } // 入力完了→少し待つ
+        else { setTimeout(playFirstWave, 600); }
       };
-      var playFirstWave = function () { // 消える前に1文字ずつ虹が流れる（1回）→ 完了後に消去
-        heroType.classList.add("is-typewave");
-        var waveTime = (first.length - 1) * 200 + 800;
-        setTimeout(function () { heroType.classList.remove("is-typewave"); delFirst(); }, waveTime);
+      var playFirstWave = function () { // 消える前に1文字ずつ虹（1回）→ 消去
+        heroMorph.classList.add("is-typewave");
+        setTimeout(function () { heroMorph.classList.remove("is-typewave"); delFirst(); }, (first.length - 1) * 200 + 800);
       };
       var delFirst = function () {
-        if (heroType.lastChild) { heroType.removeChild(heroType.lastChild); setTimeout(delFirst, 120); }
+        if (delLast()) { setTimeout(delFirst, 120); }
         else { setTimeout(typeSecond, 300); }
       };
       var typeSecond = function () {
         if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); }
-        else { setTimeout(playSecondWave, 600); } // 入力完了→少し待つ
+        else { setTimeout(playSecondWave, 600); }
       };
-      var playSecondWave = function () { // 再挑戦にも1文字ずつ虹を流してから次の挙動（積み上げ）へ
-        heroType.classList.add("is-typewave");
-        var waveTime = (second.length - 1) * 200 + 800;
-        setTimeout(function () { heroType.classList.remove("is-typewave"); setTimeout(showStack, 600); }, waveTime);
+      var playSecondWave = function () { // 再挑戦にも虹（1回）→ tch を sch に変換して下段に定着 → 1秒後にスタックへ
+        heroMorph.classList.add("is-typewave");
+        setTimeout(function () {
+          heroMorph.classList.remove("is-typewave");
+          if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
+          var tchs = stackBtmEl.querySelectorAll(".p-hero__tch"); // 同じ要素を sch へ（再=3,挑=4,戦=5：index2は矢印分）
+          Array.prototype.forEach.call(tchs, function (s, k) {
+            s.className = "p-hero__sch";
+            s.style.setProperty("--i", 3 + k);
+            s.style.setProperty("--lc", stackPal[(3 + k) % stackPal.length]);
+          });
+          setTimeout(showStack, 1000); // 虹の後1秒で次の挙動へ
+        }, (second.length - 1) * 200 + 800);
       };
       typeFirst();
     };
 
     if (heroReduced) {
+      if (stackBtmEl) buildSch(stackBtmEl, stackBtmEl.getAttribute("data-second") || "再挑戦", 3); // 再挑戦を即表示
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
