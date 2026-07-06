@@ -168,9 +168,9 @@
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
-      var morphEnd = 0.50;                 // これ以降は5行
-      var lineZone = 0.80;                 // これ以降はキャッチ
-      var stageThresh = [0.05, 0.17, 0.29, 0.40]; // 各段階の開始prog（スクロールで切替）
+      var morphEnd = 0.60;                 // これ以降は5行（モーフ領域を広くとりスマホの行き過ぎを防ぐ）
+      var lineZone = 0.84;                 // これ以降はキャッチ
+      var stageThresh = [0.06, 0.18, 0.34, 0.48]; // ①はほぼ即／②③④はスクロールで切替
       var onHeroScroll = function () {
         var total = hero.offsetHeight - window.innerHeight;
         if (total <= 0) return;
@@ -204,6 +204,7 @@
       window.addEventListener("scroll", onHeroScroll, { passive: true });
       window.addEventListener("resize", onHeroScroll, { passive: true });
       onHeroScroll();
+      setTimeout(function () { if (wantStage < 1) { wantStage = 1; runStages(); } }, 1150); // ①失敗はスクロール無しで自動表示（虹色バー通過後）
     }
   }
 

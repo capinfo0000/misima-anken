@@ -693,7 +693,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
    First View（peers.jp風の自動再生ヒーロー：虹色バー＋ライン/文字リビール）
    ※演出はすべて transform/opacity のみ。prefers-reduced-motion で無効化。
    ============================================================ */
-.p-hero{position:relative;height:480vh;background:#fff;}
+.p-hero{position:relative;height:720vh;background:#fff;}
 .p-hero__sticky{position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center;
   overflow:hidden;background:#fff;padding:var(--space-8) var(--space-4);}
 /* 虹色バー：ロード時に各行を色帯が横断（フリップ）→白地に戻る */
