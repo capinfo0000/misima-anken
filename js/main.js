@@ -134,7 +134,7 @@
         heroType.appendChild(s);
       };
       var typeFirst = function () {
-        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 180); }
+        if (i < first.length) { addChar(first[i], i); i++; setTimeout(typeFirst, 340); } // 虹色が流れる速度をゆっくりに
         else { setTimeout(delFirst, 900); }
       };
       var delFirst = function () {
@@ -142,7 +142,7 @@
         else { setTimeout(typeSecond, 300); }
       };
       var typeSecond = function () {
-        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 190); }
+        if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); } // 虹色が流れる速度をゆっくりに
         else setTimeout(showStack, 2000); // 完了の2秒後に積み上げ演出へ
       };
       typeFirst();
