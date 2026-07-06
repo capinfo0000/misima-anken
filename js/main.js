@@ -107,19 +107,9 @@
     /* 入力後、上段(失敗)＋矢印を出して次の挙動へ。FLIP で下段が中央→定位置へ滑らかに移動 */
     var showStack = function () {
       if (!heroMorph) return;
-      var beforeTop = stackBtmEl ? stackBtmEl.getBoundingClientRect().top : 0;
-      heroMorph.classList.add("is-stack");                  // 上段(失敗)＋矢印の場所が出現→下段が下へ
-      if (stackEl && stackBtmEl && !heroReduced) {
-        var dy = stackBtmEl.getBoundingClientRect().top - beforeTop; // 下段の移動量
-        if (dy) {
-          stackEl.style.transition = "none";
-          stackEl.style.transform = "translateY(" + (-dy) + "px)"; // いったん元位置へ戻して
-          requestAnimationFrame(function () {
-            stackEl.style.transition = "transform .6s cubic-bezier(.22,1,.36,1)";
-            stackEl.style.transform = "translateY(0)";           // 滑らかに定位置へ
-          });
-        }
-      }
+      if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
+      if (stackBtmEl) buildSch(stackBtmEl, stackBtmEl.getAttribute("data-second") || "再挑戦", 3); // 消去後、再挑戦を下段に生成
+      heroMorph.classList.add("is-stack");                  // 失敗(上)・再挑戦(下)がフェードイン
       setTimeout(function () { heroMorph.classList.add("is-stack-full"); }, 800); // 最後に矢印フェードイン＋波開始
     };
 
@@ -159,19 +149,13 @@
         if (j < second.length) { addChar(second[j], j); j++; setTimeout(typeSecond, 340); }
         else { setTimeout(playSecondWave, 600); }
       };
-      var playSecondWave = function () { // 再挑戦にも虹（1回）→ tch を sch に変換して下段に定着 → 1秒後にスタックへ
+      var playSecondWave = function () { // 再挑戦にも虹（1回）→ 1文字ずつ消去 → スタックへ
         heroMorph.classList.add("is-typewave");
-        setTimeout(function () {
-          heroMorph.classList.remove("is-typewave");
-          if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
-          var tchs = stackBtmEl.querySelectorAll(".p-hero__tch"); // 同じ要素を sch へ（再=3,挑=4,戦=5：index2は矢印分）
-          Array.prototype.forEach.call(tchs, function (s, k) {
-            s.className = "p-hero__sch";
-            s.style.setProperty("--i", 3 + k);
-            s.style.setProperty("--lc", stackPal[(3 + k) % stackPal.length]);
-          });
-          setTimeout(showStack, 1000); // 虹の後1秒で次の挙動へ
-        }, (second.length - 1) * 200 + 800);
+        setTimeout(function () { heroMorph.classList.remove("is-typewave"); delSecond(); }, (second.length - 1) * 200 + 800);
+      };
+      var delSecond = function () {
+        if (delLast()) { setTimeout(delSecond, 120); }
+        else { setTimeout(showStack, 600); } // 消去後、少し待ってスタックへ
       };
       typeFirst();
     };

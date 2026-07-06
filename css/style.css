@@ -746,9 +746,11 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .p-hero__stack-arrow svg{display:block;width:clamp(34px,5vw,52px);height:auto;}
 /* 次の挙動：上段(失敗)が上からフェードイン。下段(再挑戦)はタイプ済みが継続（再登場しない） */
 .p-hero__morph.is-stack .p-hero__stack-top{display:block;animation:fvStackTop .7s cubic-bezier(.22,1,.36,1) both;}
+.p-hero__morph.is-stack .p-hero__stack-btm{animation:fvStackBtm .7s cubic-bezier(.22,1,.36,1) both;} /* 消去後に再登場：グレー→黒でフェードイン */
 .p-hero__morph.is-stack .p-hero__stack-arrow{display:block;}        /* 先に場所だけ確保 */
 .p-hero__morph.is-stack-full .p-hero__stack-arrow{opacity:1;transform:none;} /* 最後に矢印をフェードイン */
 @keyframes fvStackTop{0%{opacity:0;transform:translateY(-16px);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
+@keyframes fvStackBtm{0%{opacity:0;transform:translateY(14px);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
 @keyframes fvArrowRainbow{0%{color:#e60012;}14%{color:#ed6d1f;}28%{color:#f5a200;}42%{color:#009944;}57%{color:#41a1be;}71%{color:#1d2088;}85%{color:#601986;}100%{color:#e60012;}}
 /* スタックの文字も1文字ずつ虹色→黒。5秒おき／進行はゆっくり(.35s刻み) */
 .p-hero__sch{display:inline-block;color:inherit;}
