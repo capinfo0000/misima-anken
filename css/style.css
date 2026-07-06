@@ -749,6 +749,10 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 @keyframes fvStackTop{0%{opacity:0;transform:translateY(-16px);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
 @keyframes fvStackBtm{0%{opacity:1;transform:translateY(-.5em);color:var(--text-muted);}100%{opacity:1;transform:none;color:var(--text-strong);}}
 @keyframes fvStackArrow{0%{opacity:0;transform:translateY(-8px);}100%{opacity:1;transform:none;}}
+/* 矢印↓が出た後：失敗／再挑戦も1文字ずつ虹色→黒。約10秒おき／進行はキャッチよりゆっくり(.35s刻み) */
+.p-hero__sch{display:inline-block;color:inherit;}
+.p-hero__morph.is-stack-full .p-hero__sch{animation:fvStackWave 10s linear infinite;animation-delay:calc(var(--i) * .35s);}
+@keyframes fvStackWave{0%{color:var(--text-strong);}3%{color:var(--lc,var(--text-strong));}9%{color:var(--text-strong);}100%{color:var(--text-strong);}}
 /* 5行：中央に積み上げ、1行ずつ「虹色→黒」文字settleで出す */
 .p-hero__lines{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:clamp(.5rem,2.4vh,1.5rem);z-index:2;transition:opacity .5s ease;}

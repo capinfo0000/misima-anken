@@ -89,6 +89,26 @@
     var heroScroll = hero.querySelector(".p-fv__scroll");
     var heroType = hero.querySelector(".p-hero__type");
     var heroMorph = hero.querySelector(".p-hero__morph");
+    /* 失敗／再挑戦を1文字ずつspan化：矢印表示後に「1文字ずつ虹色→黒」を約10秒おきに流す（CSS） */
+    var stackPal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
+    var splitStackWord = function (el, start) {
+      if (!el) return start;
+      var txt = el.textContent;
+      el.textContent = "";
+      Array.prototype.forEach.call(txt, function (ch) {
+        var s = document.createElement("span");
+        s.className = "p-hero__sch";
+        s.textContent = ch;
+        s.style.setProperty("--i", start);
+        s.style.setProperty("--lc", stackPal[start % stackPal.length]);
+        el.appendChild(s);
+        start++;
+      });
+      return start;
+    };
+    var stackIdx = splitStackWord(hero.querySelector(".p-hero__stack-top"), 0);
+    stackIdx++; // 矢印のぶんインデックスを1つ空け、波を矢印位置で一拍おく
+    splitStackWord(hero.querySelector(".p-hero__stack-btm"), stackIdx);
     var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
 
