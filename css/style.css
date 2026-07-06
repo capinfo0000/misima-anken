@@ -20,6 +20,8 @@
   --c-blue:#41a1be; --c-navy:#1d2088; --c-purple:#601986; --c-pink:#e95383;
   --accent:#e95383;
   --rainbow: linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986);
+  /* 流れる虹色用（先頭色を末尾にも置き、200%サイズでシームレスにループ） */
+  --rainbow-flow: linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986,#e95383,#e60012);
 
   --font-gothic:"YuGothic","Yu Gothic","Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",Meiryo,sans-serif;
   --font-serif:"Noto Serif JP","Yu Mincho","YuMincho",serif;
@@ -128,10 +130,10 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
    ============================================================ */
 .c-btn{display:inline-flex;align-items:center;justify-content:center;gap:.7em;padding:.95em 2.4em;border:1px solid var(--text-strong);border-radius:999px;font-size:.82rem;font-weight:700;letter-spacing:.1em;color:var(--text-strong);background:transparent;transition:background .3s ease,color .3s ease,border-color .3s ease,transform .4s cubic-bezier(.34,1.4,.64,1),box-shadow .3s ease;}
 .c-btn::after{content:"→";transition:transform .35s cubic-bezier(.34,1.4,.64,1);}
-.c-btn:hover{background:var(--text-strong);color:#fff;transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.14);}
-.c-btn:hover::after{transform:translateX(5px);}
+/* ボタン：ホバーで文字が虹色に流れる（塗りは外し、枠線＋浮きは維持） */
+.c-btn:hover,.c-btn.-fill:hover,.c-btn.-light:hover{background:var(--rainbow-flow);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.14);animation:rainbowFlow 2.4s linear infinite;}
+.c-btn:hover::after{transform:translateX(5px);-webkit-text-fill-color:#e60012;color:#e60012;}
 .c-btn.-fill{background:var(--text-strong);color:#fff;}
-.c-btn.-fill:hover{background:#000;}
 .c-btn.-light{background:#fff;border-color:#fff;color:var(--text-strong);}
 .c-btn.-full{width:100%;}
 .c-btn-wrap{display:flex;flex-wrap:wrap;gap:var(--space-2);justify-content:center;margin-top:var(--space-8);}
@@ -218,10 +220,21 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
    ============================================================ */
 .p-global-nav__list{display:flex;align-items:center;gap:var(--space-4);}
 .p-global-nav__item > a,.p-global-nav__parent{font-size:.9rem;font-weight:500;color:var(--text-strong);letter-spacing:.04em;}
-.p-global-nav__item > a:hover{color:var(--accent);}
 .p-global-nav__item > a.is-current,.p-global-nav__item.has-sub.is-current .p-global-nav__parent{color:var(--accent);}
+/* ヘッダーのリンク類：ホバーで文字が虹色に流れる */
+.p-global-nav__item > a:not(.p-global-nav__cta):hover,
+.p-global-nav__item.has-sub:hover .p-global-nav__parent,
+.p-global-nav__parent:hover{
+  background:var(--rainbow-flow);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:rainbowFlow 2.4s linear infinite;
+}
+/* 文字を透過にすると currentColor のシェブロンが消えるため色を明示 */
+.p-global-nav__parent:hover::after,
+.p-global-nav__item.has-sub:hover .p-global-nav__parent::after{border-color:var(--text-strong);}
 .p-global-nav__cta{background:var(--text-strong);color:#fff !important;padding:.6em 1.5em;border-radius:999px;font-weight:600;}
-.p-global-nav__cta:hover{background:#000;}
+.p-global-nav__cta:hover{background:var(--rainbow-flow);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;box-shadow:inset 0 0 0 1.5px var(--text-strong);animation:rainbowFlow 2.4s linear infinite;}
 .p-global-nav__item.has-sub{position:relative;}
 .p-global-nav__parent{display:inline-flex;align-items:center;gap:.4em;background:none;border:none;padding:0;}
 .p-global-nav__parent::after{content:"";width:.42em;height:.42em;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .25s;}
@@ -231,7 +244,7 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-global-nav__item.has-sub:hover .p-global-nav__sub,.p-global-nav__item.has-sub:focus-within .p-global-nav__sub{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0);}
 .p-global-nav__item.has-sub:hover .p-global-nav__parent::after{transform:rotate(225deg) translateY(2px);}
 .p-global-nav__sub a{display:block;padding:.7em 1.1em;border-radius:var(--radius-sm);font-size:.85rem;white-space:nowrap;color:var(--text);}
-.p-global-nav__sub a:hover{background:var(--bg-soft);color:var(--accent);}
+.p-global-nav__sub a:hover{background:var(--rainbow-flow);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:rainbowFlow 2.4s linear infinite;}
 
 @media (max-width:980px){
   .c-hamburger-btn{display:flex;}
@@ -616,8 +629,8 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 
 /* nav: animated underline */
 .p-global-nav__item > a{position:relative;}
-.p-global-nav__item > a::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:right;transition:transform .3s ease;}
-.p-global-nav__item > a:not(.p-global-nav__cta):hover::after{transform:scaleX(1);transform-origin:left;}
+.p-global-nav__item > a::after{content:"";position:absolute;left:0;bottom:-4px;width:100%;height:2px;background:var(--rainbow-flow);background-size:200% 100%;transform:scaleX(0);transform-origin:right;transition:transform .3s ease;}
+.p-global-nav__item > a:not(.p-global-nav__cta):hover::after{transform:scaleX(1);transform-origin:left;animation:rainbowFlow 2.4s linear infinite;}
 
 /* buttons: sheen sweep */
 .c-btn{position:relative;overflow:hidden;}
@@ -760,6 +773,8 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   -webkit-text-fill-color:transparent;color:transparent;}
 .p-hero.is-catch .p-hero__catch-copy{animation:catchFlow 10s linear .4s infinite;}
 @keyframes catchFlow{0%{background-position:0 0;}22%{background-position:-200% 0;}100%{background-position:-200% 0;}}
+/* ヘッダー／ボタンのホバー時に文字・下線の虹色が流れ続ける（先頭色＝末尾色なのでシームレス） */
+@keyframes rainbowFlow{0%{background-position:0 0;}100%{background-position:-200% 0;}}
 /* 5行/タイピングで使う「虹色→黒」settleキーフレーム */
 @keyframes fvCatchCh{
   0%{opacity:0;transform:translateY(.4em);color:var(--lc,var(--text-strong));}
@@ -788,6 +803,12 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   .p-hero__catch{position:relative;opacity:1;transform:none;}
   .p-hero__catch-copy,.p-hero.is-catch .p-hero__catch-copy{animation:none;background-position:0 0;}
   .p-fv__scroll{display:none;}
+  /* ホバーの虹色は動かさず静止表示（可読性は維持） */
+  .p-global-nav__item > a:not(.p-global-nav__cta):hover,
+  .p-global-nav__parent:hover,.p-global-nav__item.has-sub:hover .p-global-nav__parent,
+  .p-global-nav__sub a:hover,.p-global-nav__cta:hover,
+  .c-btn:hover,.c-btn.-fill:hover,.c-btn.-light:hover,
+  .p-global-nav__item > a:not(.p-global-nav__cta):hover::after{animation:none;background-position:0 0;}
 }
 
 @media (prefers-reduced-motion: reduce){
