@@ -93,7 +93,7 @@
         var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
         var i;
         if (prog >= lineZone) {                    // ④最後の大キャッチ（残る）
-          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.add("is-show");
+          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); // 5行は退場
           hero.classList.add("is-lines", "is-catch");
           if (heroCatch) heroCatch.classList.add("is-show");
           if (heroScroll) heroScroll.style.opacity = "0";
