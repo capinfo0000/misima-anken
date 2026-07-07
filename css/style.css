@@ -768,8 +768,9 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 /* 打鍵は黒で逐次表示（基底にanimationを持たせない＝虹(is-typewave)解除時のちらつき防止） */
 .p-hero__tch{display:inline-block;color:var(--text-strong);}
 /* 入力完了後、次へ移る前に1文字ずつ虹が流れる（1回・ゆっくり） */
-.p-hero__morph.is-typewave .p-hero__tch{animation:fvTypeWave .7s ease forwards;animation-delay:calc(var(--k,0) * .2s);}
-@keyframes fvTypeWave{0%{color:var(--text-strong);}45%{color:var(--lc,var(--text-strong));}100%{color:var(--text-strong);}}
+/* 失敗/再挑戦：入力後は黒。5秒後から1文字ずつ虹が流れ、以降5秒おきに繰り返す */
+.p-hero__morph.is-typewave .p-hero__tch{animation:fvTypeWave 5s linear infinite;animation-delay:calc(5s + var(--k,0) * .12s);}
+@keyframes fvTypeWave{0%{color:var(--text-strong);}3%{color:var(--lc,var(--text-strong));}10%{color:var(--text-strong);}100%{color:var(--text-strong);}}
 /* タイピングのカーソル（点滅） */
 .p-hero__caret{display:inline-block;width:.06em;height:1em;margin-left:.08em;
   background:var(--text-strong);vertical-align:-.12em;

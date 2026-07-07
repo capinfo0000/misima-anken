@@ -137,13 +137,16 @@
     var typeWord = function (word, cb) { var i = 0; var step = function () { if (i < word.length) { addChar(word[i], i); i++; T(step, 340); } else cb(); }; step(); };
     var rainbowOnce = function (len, cb) { heroMorph.classList.add("is-typewave"); T(function () { heroMorph.classList.remove("is-typewave"); cb(); }, (len - 1) * 200 + 800); };
     var clearWord = function (cb) { var step = function () { if (delLast()) T(step, 120); else cb(); }; step(); };
-    var stage1 = function (done) { // ①失敗を入力→虹
-      typeWord(first, function () { T(function () { rainbowOnce(first.length, done); }, 400); });
+    var stage1 = function (done) { // ①失敗を入力（黒）→5秒後から虹が流れ続ける
+      heroMorph.classList.remove("is-typewave");
+      typeWord(first, function () { heroMorph.classList.add("is-typewave"); done(); });
     };
-    var stage2 = function (done) { // ②失敗を消去→再挑戦を入力→虹
-      clearWord(function () { T(function () { typeWord(second, function () { T(function () { rainbowOnce(second.length, done); }, 400); }); }, 250); });
+    var stage2 = function (done) { // ②失敗を消去→再挑戦を入力（黒）→5秒後から虹が流れ続ける
+      heroMorph.classList.remove("is-typewave"); // 失敗の虹を止める
+      clearWord(function () { typeWord(second, function () { heroMorph.classList.add("is-typewave"); done(); }); });
     };
     var stage3 = function (done) { // ③再挑戦を消去→失敗・再挑戦のスタック出現
+      heroMorph.classList.remove("is-typewave");
       clearWord(function () { T(function () {
         if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
         if (stackBtmEl) buildSch(stackBtmEl, second, 3);
