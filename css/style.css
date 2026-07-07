@@ -733,7 +733,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
    First View（peers.jp風の自動再生ヒーロー：虹色バー＋ライン/文字リビール）
    ※演出はすべて transform/opacity のみ。prefers-reduced-motion で無効化。
    ============================================================ */
-.p-hero{position:relative;height:720vh;background:#fff;}
+.p-hero{position:relative;height:360vh;background:#fff;}
 .p-hero__sticky{position:sticky;top:0;height:100svh;display:flex;align-items:center;justify-content:center;
   overflow:hidden;background:#fff;padding:var(--space-8) var(--space-4);}
 /* 虹色バー：ロード時に各行を色帯が横断（フリップ）→白地に戻る */
@@ -765,8 +765,8 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   z-index:2;transition:opacity .5s ease;}
 .p-hero.is-lines .p-hero__morph,.p-hero.is-catch .p-hero__morph{opacity:0;pointer-events:none;}
 /* 打鍵ごとに 黒で 出現（フェードイン）。タイプ先は下段(stack-btm) */
-.p-hero__tch{display:inline-block;color:var(--text-strong);animation:fvTypeIn .3s ease forwards;}
-@keyframes fvTypeIn{0%{opacity:0;transform:translateY(.12em);}100%{opacity:1;transform:none;}}
+/* 打鍵は黒で逐次表示（基底にanimationを持たせない＝虹(is-typewave)解除時のちらつき防止） */
+.p-hero__tch{display:inline-block;color:var(--text-strong);}
 /* 入力完了後、次へ移る前に1文字ずつ虹が流れる（1回・ゆっくり） */
 .p-hero__morph.is-typewave .p-hero__tch{animation:fvTypeWave .7s ease forwards;animation-delay:calc(var(--k,0) * .2s);}
 @keyframes fvTypeWave{0%{color:var(--text-strong);}45%{color:var(--lc,var(--text-strong));}100%{color:var(--text-strong);}}
