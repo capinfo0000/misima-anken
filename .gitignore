@@ -5,3 +5,5 @@ revenge-site.zip
 
 # WordPress一式（実認証情報を含むためGitには入れない。配布ZIPには同梱する）
 /wp/
+*.zip
+revenge-full.zip.part*
