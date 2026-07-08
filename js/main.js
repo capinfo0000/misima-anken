@@ -178,8 +178,8 @@
       if (stackBtmEl) buildSch(stackBtmEl, second, 3); // 再挑戦を即表示
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
-    } else if (window.matchMedia("(max-width: 980px)").matches) {
-      /* ===== モバイル：スワイプで1ステップずつ（スクロールロック。激しいフリックでも1個先まで） ===== */
+    } else {
+      /* ===== PC/スマホ共通：1ジェスチャ＝1ステップ（スクロールロック。激しいスクロール/フリックでも1つだけ進む） ===== */
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
@@ -248,53 +248,23 @@
         var dy = sY - (t ? t.clientY : sY); sY = null;
         if (dy > 40) goForward(); else if (dy < -40) goBack();
       }, { passive: true });
-    } else {
-      var morphEnd = 0.60;                 // これ以降は5行（モーフ領域を広くとりスマホの行き過ぎを防ぐ）
-      var lineZone = 0.84;                 // これ以降はキャッチ
-      var stageThresh = [0.06, 0.18, 0.34, 0.48]; // ①はほぼ即／②③④はスクロールで切替
-      var heroDone = false;                        // キャッチが出たら以降は前の表示に戻さない（リロードまで固定）
-      var onHeroScroll = function () {
-        if (heroDone) {                            // キャッチ到達後はスクロールを戻してもキャッチのまま
-          for (var k = 0; k < heroLines.length; k++) heroLines[k].classList.remove("is-show");
-          hero.classList.add("is-lines", "is-catch");
-          if (heroCatch) heroCatch.classList.add("is-show");
-          if (heroScroll) heroScroll.style.opacity = "0";
-          return;
-        }
-        var total = hero.offsetHeight - window.innerHeight;
-        if (total <= 0) return;
-        var prog = Math.min(1, Math.max(0, -hero.getBoundingClientRect().top / total));
-        var i;
-        if (prog >= lineZone) {                    // 最後の大キャッチ（残る）
-          if (curStage < 4) snapToStack();
-          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
-          hero.classList.add("is-lines", "is-catch");
-          if (heroCatch) heroCatch.classList.add("is-show");
-          if (heroScroll) heroScroll.style.opacity = "0";
-          heroDone = true;                         // 以降ロック
-        } else if (prog >= morphEnd) {             // 5行を積み上げ
-          if (curStage < 4) snapToStack();
-          hero.classList.add("is-lines");
-          hero.classList.remove("is-catch");
-          if (heroCatch) heroCatch.classList.remove("is-show");
-          if (heroScroll) heroScroll.style.opacity = "";
-          var lp = (prog - morphEnd) / (lineZone - morphEnd);
-          var cur = Math.min(heroLines.length - 1, Math.floor(lp * heroLines.length));
-          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i <= cur);
-        } else {                                    // モーフ（スクロールで4段階に切替）
-          hero.classList.remove("is-lines", "is-catch");
-          if (heroCatch) heroCatch.classList.remove("is-show");
-          if (heroScroll) heroScroll.style.opacity = "";
-          for (i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show");
-          var w = 0;
-          for (i = 0; i < stageThresh.length; i++) if (prog >= stageThresh[i]) w = i + 1;
-          if (w > wantStage) { wantStage = w; runStages(); }
-        }
-      };
-      window.addEventListener("scroll", onHeroScroll, { passive: true });
-      window.addEventListener("resize", onHeroScroll, { passive: true });
-      onHeroScroll();
-      setTimeout(function () { if (wantStage < 1) { wantStage = 1; runStages(); } }, 1150); // ①失敗はスクロール無しで自動表示（虹色バー通過後）
+      /* PC：ホイール/トラックパッドは1ジェスチャ＝1ステップ（惰性でも進みすぎない） */
+      var wheelLock = false, wheelTimer = null;
+      var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
+      window.addEventListener("wheel", function (e) {
+        if (!mActive) return;
+        e.preventDefault();                       // ページスクロールを止めて1ステップ制御
+        if (wheelLock || mBusy) { relockWheel(); return; } // ジェスチャ継続中/再生中は無視
+        wheelLock = true;
+        if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
+        relockWheel();
+      }, { passive: false });
+      /* キーボード操作（アクセシビリティ） */
+      window.addEventListener("keydown", function (e) {
+        if (!mActive || mBusy) return;
+        if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); goForward(); }
+        else if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); goBack(); }
+      });
     }
   }
 
