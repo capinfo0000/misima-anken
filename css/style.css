@@ -164,13 +164,13 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 @keyframes spin{to{transform:rotate(360deg);}}
 /* ロゴの花びらを右回りに1枚ずつ消すローダー（白いくさびを時計回りに重ねる） */
 @property --petalErase{syntax:"<angle>";inherits:false;initial-value:0deg;}
-.c-loader__logo{position:relative;width:clamp(96px,18vw,140px);aspect-ratio:1;
-  background:url(../assets/img/logo-flower.webp) center/contain no-repeat;}
-.c-loader__logo::after{content:"";position:absolute;inset:0;
-  background:conic-gradient(from -112.5deg,#fff 0 var(--petalErase,0deg),transparent var(--petalErase,0deg));
+.c-loader__logo{width:clamp(96px,18vw,140px);aspect-ratio:1;
+  background:url(../assets/img/logo-flower.webp) center/contain no-repeat;
+  -webkit-mask:conic-gradient(from -112.5deg,transparent 0 var(--petalErase,0deg),#000 var(--petalErase,0deg));
+  mask:conic-gradient(from -112.5deg,transparent 0 var(--petalErase,0deg),#000 var(--petalErase,0deg));
   animation:petalErase 1.8s steps(8) infinite;}
 @keyframes petalErase{to{--petalErase:360deg;}}
-@media (prefers-reduced-motion: reduce){ .c-loader__logo::after{animation:none;background:none;} }
+@media (prefers-reduced-motion: reduce){ .c-loader__logo{-webkit-mask:none;mask:none;animation:none;} }
 
 .c-to-top{position:fixed;right:var(--space-3);bottom:var(--space-3);z-index:90;width:46px;height:46px;border-radius:50%;background:var(--text-strong);color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .3s,visibility .3s,transform .3s,background .2s;}
 .c-to-top.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
