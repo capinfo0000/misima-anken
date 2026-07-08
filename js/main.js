@@ -184,6 +184,10 @@
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
       var mStep = 0, mMax = 10, mBusy = false, mActive = true, mReachedCatch = false;
+      var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
+        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step <= 9 ? "lines" : "";
+        if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
+      };
       var hideLines = function () { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
@@ -200,7 +204,7 @@
         heroMorph.classList.remove("is-typewave", "is-stack", "is-stack-full");
         hero.classList.remove("is-lines", "is-catch");
         if (heroCatch) heroCatch.classList.remove("is-show");
-        hideLines(); playing = false;
+        hideLines(); playing = false; setBg(n);
         if (n <= 1) { setWordPlain(first); curStage = 1; wantStage = 1; }
         else if (n === 2) { setWordPlain(second); curStage = 2; wantStage = 2; }
         else {
@@ -220,11 +224,11 @@
       var goForward = function () {
         if (mBusy) return;
         if (mStep >= mMax) { release(); return; }
-        mBusy = true; mStep++;
+        mBusy = true; mStep++; setBg(mStep);
         if (mStep <= 4) {                          // ①〜④モーフ
           hideLines(); hero.classList.remove("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           wantStage = mStep; runStages();
-          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 1700 : 900));
+          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 2100 : 900));
         } else if (mStep <= 9) {                    // 5行を1行ずつ
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
@@ -238,7 +242,7 @@
         }
       };
       var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
-      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; runStages(); } }, 1150); // ①失敗を自動表示
+      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); } }, 1150); // ①失敗を自動表示（背景も）
       var sY = null;
       window.addEventListener("touchstart", function (e) { if (mActive) sY = e.touches[0].clientY; }, { passive: true });
       window.addEventListener("touchmove", function (e) { if (mActive) e.preventDefault(); }, { passive: false });
