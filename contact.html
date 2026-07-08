@@ -51,7 +51,8 @@
 
   <section class="l-section">
     <div class="l-container">
-      <form class="p-form" id="contactForm" novalidate>
+      <form class="p-form" id="contactForm" action="contact.php" method="post" novalidate>
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden"><label>サイト（未記入）<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
         <label><span class="p-form__label">会社名</span><input type="text" name="company" placeholder="株式会社〇〇" /></label>
         <label><span class="p-form__label">お名前<span class="p-form__req">必須</span></span><input type="text" name="name" required placeholder="山田 太郎" /></label>
         <label><span class="p-form__label">お問い合わせ種別</span>

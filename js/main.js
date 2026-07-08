@@ -547,7 +547,7 @@
     } else { nums.forEach(run); }
   })();
 
-  /* ---------- Contact form (static demo) ---------- */
+  /* ---------- Contact form（contact.php へ実送信 / info@revenge.co.jp） ---------- */
   var form = document.getElementById("contactForm");
   var note = document.getElementById("formNote");
   if (form) {
@@ -568,9 +568,28 @@
         form.reportValidity();
         return;
       }
-      note.textContent = "お問い合わせありがとうございます。内容を送信しました（デモ）。";
-      note.className = "p-form__note is-ok";
-      form.reset();
+      var btn = form.querySelector('[type="submit"]');
+      note.textContent = "送信中…"; note.className = "p-form__note";
+      if (btn) btn.disabled = true;
+      var action = form.getAttribute("action") || "contact.php";
+      if (!window.fetch) { form.submit(); return; } // fetch非対応は通常POSTにフォールバック
+      fetch(action, { method: "POST", body: new FormData(form), headers: { "X-Requested-With": "fetch" } })
+        .then(function (r) { return r.json().catch(function () { return { ok: r.ok }; }); })
+        .then(function (d) {
+          if (d && d.ok) {
+            note.textContent = "お問い合わせありがとうございます。内容を送信しました。";
+            note.className = "p-form__note is-ok";
+            form.reset();
+          } else {
+            note.textContent = (d && d.msg) ? d.msg : "送信に失敗しました。お手数ですが info@revenge.co.jp までご連絡ください。";
+            note.className = "p-form__note is-err";
+          }
+        })
+        .catch(function () {
+          note.textContent = "送信に失敗しました。お手数ですが info@revenge.co.jp までご連絡ください。";
+          note.className = "p-form__note is-err";
+        })
+        .then(function () { if (btn) btn.disabled = false; });
     });
   }
 
