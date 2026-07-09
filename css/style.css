@@ -528,6 +528,26 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 .p-form__note.is-ok{color:var(--c-green);}
 .p-form__note.is-err{color:var(--c-red);}
 
+/* ---------- 送信完了ポップアップ（モーダル） ---------- */
+.c-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:var(--space-4);}
+.c-modal[hidden]{display:none;}
+.c-modal__backdrop{position:absolute;inset:0;background:rgba(20,20,22,.5);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);opacity:0;transition:opacity .3s ease;}
+.c-modal__panel{position:relative;width:min(440px,100%);background:#fff;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.28);padding:var(--space-6) var(--space-5) var(--space-5);text-align:center;transform:translateY(14px) scale(.96);opacity:0;transition:transform .45s cubic-bezier(.34,1.4,.64,1),opacity .3s ease;}
+.c-modal__panel::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;border-radius:14px 14px 0 0;background:var(--rainbow-flow);background-size:200% 100%;}
+.c-modal.is-open .c-modal__backdrop{opacity:1;}
+.c-modal.is-open .c-modal__panel{transform:none;opacity:1;}
+.c-modal__icon{width:62px;height:62px;margin:0 auto var(--space-3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;line-height:1;color:#fff;background:var(--c-green);}
+.c-modal.-err .c-modal__icon{background:var(--c-red);}
+.c-modal__title{font-family:var(--font-serif);font-size:1.3rem;font-weight:600;color:var(--text-strong);margin-bottom:var(--space-2);letter-spacing:.04em;}
+.c-modal__text{font-size:.92rem;line-height:1.9;color:var(--text);margin-bottom:var(--space-5);}
+.c-modal__text a{color:var(--accent);text-decoration:underline;}
+.c-modal__close{min-width:170px;}
+@media (prefers-reduced-motion: reduce){
+  .c-modal__backdrop,.c-modal__panel{transition:none;}
+  .c-modal__panel{transform:none;}
+  .c-modal__panel::before{background:var(--accent);}
+}
+
 /* ============================================================
    Project : Page hero (sub pages) / prose
    ============================================================ */

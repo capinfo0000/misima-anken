@@ -555,6 +555,64 @@
   var form = document.getElementById("contactForm");
   var note = document.getElementById("formNote");
   if (form) {
+    /* 送信結果ポップアップ（モーダル）。DOMに1つ生成して使い回す */
+    var modal = null, modalLastFocus = null;
+    function buildModal() {
+      var m = document.createElement("div");
+      m.className = "c-modal";
+      m.id = "formModal";
+      m.setAttribute("role", "dialog");
+      m.setAttribute("aria-modal", "true");
+      m.setAttribute("aria-labelledby", "formModalTitle");
+      m.hidden = true;
+      m.innerHTML =
+        '<div class="c-modal__backdrop" data-close></div>' +
+        '<div class="c-modal__panel" role="document">' +
+        '<div class="c-modal__icon" aria-hidden="true"></div>' +
+        '<h2 class="c-modal__title" id="formModalTitle"></h2>' +
+        '<p class="c-modal__text"></p>' +
+        '<button type="button" class="c-btn -fill c-modal__close" data-close>閉じる</button>' +
+        '</div>';
+      document.body.appendChild(m);
+      m.addEventListener("click", function (ev) {
+        if (ev.target.hasAttribute("data-close")) closeModal();
+      });
+      document.addEventListener("keydown", function (ev) {
+        if (!modal || modal.hidden) return;
+        if (ev.key === "Escape") closeModal();
+      });
+      return m;
+    }
+    function showModal(ok, title, text) {
+      if (!modal) modal = buildModal();
+      modal.classList.toggle("-err", !ok);
+      modal.querySelector(".c-modal__icon").textContent = ok ? "✓" : "!";
+      modal.querySelector(".c-modal__title").textContent = title;
+      modal.querySelector(".c-modal__text").innerHTML = text;
+      modalLastFocus = document.activeElement;
+      modal.hidden = false;
+      /* reflow → クラス付与でトランジション発火 */
+      void modal.offsetWidth;
+      modal.classList.add("is-open");
+      var closeBtn = modal.querySelector(".c-modal__close");
+      if (closeBtn) closeBtn.focus();
+    }
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.remove("is-open");
+      var hide = function () { modal.hidden = true; };
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        hide();
+      } else {
+        var p = modal.querySelector(".c-modal__panel");
+        var done = false;
+        var fin = function () { if (done) return; done = true; hide(); };
+        p.addEventListener("transitionend", fin, { once: true });
+        setTimeout(fin, 500);
+      }
+      if (modalLastFocus && modalLastFocus.focus) { try { modalLastFocus.focus(); } catch (e) {} }
+    }
+
     /* 事業詳細ページの相談ボタン（?type=…）でお問い合わせ種別を自動選択 */
     var qType = new URLSearchParams(window.location.search).get("type");
     if (qType) {
@@ -581,17 +639,38 @@
         .then(function (r) { return r.json().catch(function () { return { ok: r.ok }; }); })
         .then(function (d) {
           if (d && d.ok) {
-            note.textContent = "お問い合わせありがとうございます。内容を送信しました。";
-            note.className = "p-form__note is-ok";
+            note.textContent = "";
+            note.className = "p-form__note";
             form.reset();
+            showModal(
+              true,
+              "送信を承りました",
+              "この度はお問い合わせいただき、誠にありがとうございます。<br>" +
+              "内容を確認のうえ、担当者より順次ご連絡を差し上げます。<br>" +
+              "今しばらくご返信をお待ちくださいますようお願い申し上げます。"
+            );
           } else {
-            note.textContent = (d && d.msg) ? d.msg : "送信に失敗しました。お手数ですが info@revenge.co.jp までご連絡ください。";
-            note.className = "p-form__note is-err";
+            note.textContent = "";
+            note.className = "p-form__note";
+            showModal(
+              false,
+              "送信できませんでした",
+              (d && d.msg ? d.msg + "<br>" : "誠に恐れ入りますが、送信を完了できませんでした。<br>") +
+              "お手数ですが、時間をおいて再度お試しいただくか、<br>" +
+              "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで直接ご連絡ください。"
+            );
           }
         })
         .catch(function () {
-          note.textContent = "送信に失敗しました。お手数ですが info@revenge.co.jp までご連絡ください。";
-          note.className = "p-form__note is-err";
+          note.textContent = "";
+          note.className = "p-form__note";
+          showModal(
+            false,
+            "送信できませんでした",
+            "通信エラーにより送信を完了できませんでした。<br>" +
+            "お手数ですが、時間をおいて再度お試しいただくか、<br>" +
+            "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで直接ご連絡ください。"
+          );
         })
         .then(function () { if (btn) btn.disabled = false; });
     });
