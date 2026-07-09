@@ -80,11 +80,23 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
   max-width:var(--container);margin-inline:auto;padding-inline:var(--space-4);}
 .l-header__logo{margin:0;}
 .l-header__logo a{display:inline-flex;align-items:center;gap:.5em;text-decoration:none;}
-.l-header__mark{flex:none;width:34px;height:34px;background:url(../assets/img/logo-mark.webp) center/contain no-repeat;transform-origin:50% 50%;animation:markSpin 9s linear infinite;transition:width .25s,height .25s;}
+/* ヘッダーの花マーク：8枚レイヤーで花びらが1枚ずつ欠けながら巡回（ローダーと同方式） */
+.l-header__mark{position:relative;flex:none;width:34px;height:34px;transition:width .25s,height .25s;}
 .l-header.is-scrolled .l-header__mark{width:28px;height:28px;}
+.l-header__petal{position:absolute;inset:0;background:center/contain no-repeat;
+  --dur:2.4s; --step:.3s;
+  animation:petalDip var(--dur) ease-in-out infinite;
+  animation-delay:calc((var(--i) - 7) * var(--step));}
+.l-header__petal:nth-child(1){background-image:url(../assets/img/loader/petal-0.webp);}
+.l-header__petal:nth-child(2){background-image:url(../assets/img/loader/petal-1.webp);}
+.l-header__petal:nth-child(3){background-image:url(../assets/img/loader/petal-2.webp);}
+.l-header__petal:nth-child(4){background-image:url(../assets/img/loader/petal-3.webp);}
+.l-header__petal:nth-child(5){background-image:url(../assets/img/loader/petal-4.webp);}
+.l-header__petal:nth-child(6){background-image:url(../assets/img/loader/petal-5.webp);}
+.l-header__petal:nth-child(7){background-image:url(../assets/img/loader/petal-6.webp);}
+.l-header__petal:nth-child(8){background-image:url(../assets/img/loader/petal-7.webp);}
 .l-header__word{font-family:var(--font-en);font-weight:600;font-size:1.2rem;letter-spacing:.02em;color:var(--text-strong);line-height:1;}
-@keyframes markSpin{to{transform:rotate(360deg);}}
-@media (prefers-reduced-motion: reduce){ .l-header__mark{animation:none;} }
+@media (prefers-reduced-motion: reduce){ .l-header__petal{animation:none;opacity:1;} }
 
 .l-footer{background:#fff;border-top:1px solid var(--line);padding-top:var(--space-10);}
 .l-footer__inner{display:grid;gap:var(--space-6);padding-bottom:var(--space-6);}
