@@ -540,7 +540,7 @@ html.is-intro-lock,body.is-intro-lock{overflow:hidden!important;height:100%;touc
 .c-modal.-err .c-modal__icon{background:var(--c-red);}
 .c-modal__title{font-family:var(--font-serif);font-size:1.3rem;font-weight:600;color:var(--text-strong);margin-bottom:var(--space-2);letter-spacing:.04em;}
 .c-modal__text{font-size:.92rem;line-height:1.9;color:var(--text);margin-bottom:var(--space-5);}
-.c-modal__text a{color:var(--accent);text-decoration:underline;}
+.c-modal__text a{color:var(--accent);text-decoration:underline;white-space:nowrap;}
 .c-modal__close{min-width:170px;}
 @media (prefers-reduced-motion: reduce){
   .c-modal__backdrop,.c-modal__panel{transition:none;}

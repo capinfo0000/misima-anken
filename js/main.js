@@ -645,9 +645,12 @@
             showModal(
               true,
               "送信を承りました",
-              "この度はお問い合わせいただき、誠にありがとうございます。<br>" +
-              "内容を確認のうえ、担当者より順次ご連絡を差し上げます。<br>" +
-              "今しばらくご返信をお待ちくださいますようお願い申し上げます。"
+              "この度はお問い合わせいただき、<br>" +
+              "誠にありがとうございます。<br>" +
+              "内容を確認のうえ、担当者より<br>" +
+              "順次ご連絡を差し上げます。<br>" +
+              "恐れ入りますが今しばらく<br>" +
+              "ご返信をお待ちください。"
             );
           } else {
             note.textContent = "";
@@ -655,9 +658,11 @@
             showModal(
               false,
               "送信できませんでした",
-              (d && d.msg ? d.msg + "<br>" : "誠に恐れ入りますが、送信を完了できませんでした。<br>") +
-              "お手数ですが、時間をおいて再度お試しいただくか、<br>" +
-              "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで直接ご連絡ください。"
+              (d && d.msg ? d.msg + "<br>" : "誠に恐れ入りますが、<br>送信を完了できませんでした。<br>") +
+              "お手数ですが時間をおいて<br>" +
+              "再度お試しいただくか、<br>" +
+              "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで<br>" +
+              "直接ご連絡ください。"
             );
           }
         })
@@ -667,9 +672,12 @@
           showModal(
             false,
             "送信できませんでした",
-            "通信エラーにより送信を完了できませんでした。<br>" +
-            "お手数ですが、時間をおいて再度お試しいただくか、<br>" +
-            "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで直接ご連絡ください。"
+            "通信エラーにより<br>" +
+            "送信を完了できませんでした。<br>" +
+            "お手数ですが時間をおいて<br>" +
+            "再度お試しいただくか、<br>" +
+            "<a href=\"mailto:info@revenge.co.jp\">info@revenge.co.jp</a> まで<br>" +
+            "直接ご連絡ください。"
           );
         })
         .then(function () { if (btn) btn.disabled = false; });
