@@ -162,15 +162,23 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .c-loader.is-loaded{opacity:0;visibility:hidden;pointer-events:none;}
 .c-loader__ring{width:56px;height:56px;border-radius:50%;background:conic-gradient(from 0deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986,#e95383,#e60012);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 0);animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-/* ロゴの花びらを右回りに1枚ずつ消すローダー（白いくさびを時計回りに重ねる） */
-@property --petalErase{syntax:"<angle>";inherits:false;initial-value:0deg;}
-.c-loader__logo{width:clamp(96px,18vw,140px);aspect-ratio:1;
-  background:url(../assets/img/logo-flower.webp) center/contain no-repeat;
-  -webkit-mask:conic-gradient(from -112.5deg,transparent 0 var(--petalErase,0deg),#000 var(--petalErase,0deg));
-  mask:conic-gradient(from -112.5deg,transparent 0 var(--petalErase,0deg),#000 var(--petalErase,0deg));
-  animation:petalErase 1.8s steps(8) infinite;}
-@keyframes petalErase{to{--petalErase:360deg;}}
-@media (prefers-reduced-motion: reduce){ .c-loader__logo{-webkit-mask:none;mask:none;animation:none;} }
+/* ロゴの花びらを1枚ずつ順番に欠けさせて時計回りに巡回するローダー（8枚レイヤー） */
+.c-loader__flower{position:relative;width:clamp(104px,20vw,150px);aspect-ratio:1;}
+.c-loader__petal{position:absolute;inset:0;background:center/contain no-repeat;
+  --dur:2.4s; --step:.3s;             /* --step = --dur / 8 */
+  will-change:opacity;
+  animation:petalDip var(--dur) ease-in-out infinite;
+  animation-delay:calc((var(--i) - 7) * var(--step));}
+.c-loader__petal:nth-child(1){background-image:url(../assets/img/loader/petal-0.webp);}
+.c-loader__petal:nth-child(2){background-image:url(../assets/img/loader/petal-1.webp);}
+.c-loader__petal:nth-child(3){background-image:url(../assets/img/loader/petal-2.webp);}
+.c-loader__petal:nth-child(4){background-image:url(../assets/img/loader/petal-3.webp);}
+.c-loader__petal:nth-child(5){background-image:url(../assets/img/loader/petal-4.webp);}
+.c-loader__petal:nth-child(6){background-image:url(../assets/img/loader/petal-5.webp);}
+.c-loader__petal:nth-child(7){background-image:url(../assets/img/loader/petal-6.webp);}
+.c-loader__petal:nth-child(8){background-image:url(../assets/img/loader/petal-7.webp);}
+@keyframes petalDip{0%{opacity:1;}8%{opacity:.05;}16%{opacity:1;}100%{opacity:1;}}
+@media (prefers-reduced-motion: reduce){ .c-loader__petal{animation:none;opacity:1;} }
 
 .c-to-top{position:fixed;right:var(--space-3);bottom:var(--space-3);z-index:90;width:46px;height:46px;border-radius:50%;background:var(--text-strong);color:#fff;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .3s,visibility .3s,transform .3s,background .2s;}
 .c-to-top.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
