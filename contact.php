@@ -69,7 +69,8 @@ $typeMap = array(
 );
 $typeLabel = isset($typeMap[$type]) ? $typeMap[$type] : 'その他';
 
-if (function_exists('mb_language')) { mb_language('Japanese'); }
+/* 全体をUTF-8で統一。mb_send_mail + mb_language('Japanese') は本文をISO-2022-JPへ
+   再変換してしまい、UTF-8宣言のヘッダーと矛盾して文字化けするため使用しない。 */
 if (function_exists('mb_internal_encoding')) { mb_internal_encoding('UTF-8'); }
 
 $subject = '【お問い合わせ】' . $typeLabel . ' / ' . ($company !== '' ? $company : $name);
@@ -84,17 +85,20 @@ $body =
   "送信日時： " . date('Y-m-d H:i:s') . "\n" .
   "IP　　　： " . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '') . "\n";
 
-$replyName = function_exists('mb_encode_mimeheader') ? mb_encode_mimeheader($name) : $name;
-$fromName  = function_exists('mb_encode_mimeheader') ? mb_encode_mimeheader($SITE) : $SITE;
+/* 件名・送信者名は UTF-8 のMIMEヘッダーとしてエンコード（=?UTF-8?B?...?=） */
+$encSubject = function_exists('mb_encode_mimeheader') ? mb_encode_mimeheader($subject, 'UTF-8', 'B') : $subject;
+$replyName  = function_exists('mb_encode_mimeheader') ? mb_encode_mimeheader($name, 'UTF-8', 'B') : $name;
+$fromName   = function_exists('mb_encode_mimeheader') ? mb_encode_mimeheader($SITE, 'UTF-8', 'B') : $SITE;
 $headers =
   'From: ' . $fromName . ' <' . $FROM . ">\r\n" .
   'Reply-To: ' . $replyName . ' <' . $email . ">\r\n" .
+  "MIME-Version: 1.0\r\n" .
   "Content-Type: text/plain; charset=UTF-8\r\n" .
+  "Content-Transfer-Encoding: 8bit\r\n" .
   "X-Mailer: PHP/" . phpversion();
 
-$sent = function_exists('mb_send_mail')
-  ? mb_send_mail($TO, $subject, $body, $headers)
-  : mail($TO, $subject, $body, $headers);
+/* 本文はUTF-8のまま送信（mb_send_mailは使わない） */
+$sent = mail($TO, $encSubject, $body, $headers);
 
 if ($sent) {
   respond(true, 'お問い合わせありがとうございます。内容を送信しました。担当者より折り返しご連絡いたします。', $wantsJson);
