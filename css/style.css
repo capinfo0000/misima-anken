@@ -86,11 +86,11 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .l-header.is-scrolled .l-header__mark{width:28px;height:28px;}
 @keyframes markSpin{to{transform:rotate(360deg);}}
 .l-header__petal{position:absolute;inset:0;background:center/contain no-repeat;
-  --dur:9.5s; --step:.5s;
+  --dur:7.2s; --step:.9s;   /* --step = --dur / 8 */
   animation:petalGlow var(--dur) linear infinite;
   animation-delay:calc((var(--i) - 7) * var(--step));}
-/* 花びらが1枚ずつ「ふわっと現れて」一周 → 完成形を約5秒維持 → 繰り返し（常に欠けは1枚だけ） */
-@keyframes petalGlow{0%{opacity:0;}10%{opacity:1;}100%{opacity:1;}}
+/* 花びらが1枚ずつ、ふわっと消えて→戻る、を時計回りに連続で（完成形の維持なし・常に欠けは1枚） */
+@keyframes petalGlow{0%{opacity:1;}6.25%{opacity:0;}12.5%{opacity:1;}100%{opacity:1;}}
 .l-header__petal:nth-child(1){background-image:url(../assets/img/loader/petal-0.webp);}
 .l-header__petal:nth-child(2){background-image:url(../assets/img/loader/petal-1.webp);}
 .l-header__petal:nth-child(3){background-image:url(../assets/img/loader/petal-2.webp);}
