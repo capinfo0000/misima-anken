@@ -183,12 +183,14 @@
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
-      var mStep = 0, mMax = 10, mBusy = false, mActive = true, mReachedCatch = false;
+      var mStep = 0, mMax = 6, mBusy = false, mActive = true, mReachedCatch = false;
       var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
-        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step <= 9 ? "lines" : "";
+        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step === 5 ? "lines" : "";
         if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
       };
       var lineTimers = [];
+      var autoCatchTimer = null;
+      var clearAutoCatch = function () { if (autoCatchTimer) { clearTimeout(autoCatchTimer); autoCatchTimer = null; } };
       var clearLineTimers = function () { for (var i = 0; i < lineTimers.length; i++) clearTimeout(lineTimers[i]); lineTimers = []; };
       var hideLines = function () { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
@@ -196,7 +198,7 @@
       var revealLinesStaggered = function () {
         clearLineTimers();
         for (var i = 0; i < heroLines.length; i++) {
-          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 240)); })(i);
+          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 500)); })(i);
         }
       };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
@@ -209,7 +211,7 @@
         });
       };
       var renderState = function (n) { // 戻る：状態nを即座に描画（アニメ無し）
-        clearMorphTimers();
+        clearMorphTimers(); clearAutoCatch();
         heroMorph.classList.remove("is-typewave", "is-stack", "is-stack-full");
         hero.classList.remove("is-lines", "is-catch");
         if (heroCatch) heroCatch.classList.remove("is-show");
@@ -221,8 +223,8 @@
           heroMorph.classList.add("is-stack");
           if (n >= 4) heroMorph.classList.add("is-stack-full");
           curStage = 4; wantStage = 4;
-          if (n >= 5 && n <= 9) { hero.classList.add("is-lines"); showLines(n - 4); }   // 5行を1行ずつ
-          else if (n >= 10) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
+          if (n === 5) { hero.classList.add("is-lines"); showLines(heroLines.length); }   // 戻る時は5行すべて表示
+          else if (n >= 6) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
         }
       };
       var release = function () { // 最後まで進んだら通常スクロールへ解放
@@ -239,12 +241,17 @@
           wantStage = mStep; runStages();
           /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は緩ゾーンなので短め＝連続スクロールで流れる */
           setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
-        } else if (mStep <= 9) {                    // ⑤〜⑨ 5行を1行ずつ（純粋に長さ基準：時間ゲートなし）
+        } else if (mStep === 5) {                   // ⑤5行を時間差で1行ずつ自動表示 → 完成の2秒後に自動でキャッチ
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
-          showLines(mStep - 4);
-          mBusy = false;                            // 時間で縛らず、累積スクロール量だけで進める
-        } else {                                    // ⑩キャッチ
+          clearAutoCatch();
+          revealLinesStaggered();
+          var revealDone = (heroLines.length - 1) * 500 + 700; // 最後の行＋カスケードが出そろうまで
+          setTimeout(function () { mBusy = false; }, revealDone);
+          autoCatchTimer = setTimeout(function () {  // 5行完成の2秒後に自動でキャッチへ
+            if (mActive && mStep === 5 && !mReachedCatch) { mBusy = false; goForward(); }
+          }, revealDone + 2000);
+        } else {                                    // ⑥キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
           mReachedCatch = true;                     // キャッチ到達＝以降は戻らない（リロードまで）
@@ -275,22 +282,10 @@
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
       var accum = 0, STEP_LEN = 90;               // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)：小さなスクロールでも進む
-      var LINE_LEN = 200;                          // 5行を1行ずつ出す部分は少し長め
-      var CATCH_LEN = 500;                         // 5行表示後→キャッチは長めの余白（5行を読める間）
-      var needFor = function () {                  // 次のステップに進むのに必要なスクロール量
-        if (mStep >= 4 && mStep <= 8) return LINE_LEN;  // 次が5行(step5..9)
-        if (mStep === 9) return CATCH_LEN;               // 5行表示後→キャッチ
-        return STEP_LEN;
-      };
-      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・時間で縛らない）
-        var moved = false;
-        while (!mBusy) {                           // 進む：溜まった長さの分だけ（複数行でも）進める
-          if (mStep === 9 && moved) break;         // 同じ操作で5行とキャッチを一気に飛ばさない
-          if (accum >= needFor()) { accum -= needFor(); goForward(); moved = true; } else break;
-        }
-        while (!mBusy) {                           // 戻る
-          if (accum <= -needFor()) { accum += needFor(); goBack(); } else break;
-        }
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
+        if (mBusy) return;
+        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }
+        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
