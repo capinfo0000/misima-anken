@@ -105,7 +105,9 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .l-footer{background:#fff;border-top:1px solid var(--line);padding-top:var(--space-10);}
 .l-footer__inner{display:grid;gap:var(--space-6);padding-bottom:var(--space-6);}
 @media (min-width:860px){.l-footer__inner{grid-template-columns:1fr 2fr;align-items:start;}}
-.l-footer__logo img{height:30px;margin-bottom:var(--space-3);}
+.l-footer__logo{display:inline-flex;align-items:center;gap:.5em;margin-bottom:var(--space-3);}
+.l-footer__mark{flex:none;width:34px;height:34px;background:url(../assets/img/logo-mark.webp) center/contain no-repeat;}
+.l-footer__word{font-family:var(--font-en);font-weight:600;font-size:1.2rem;letter-spacing:.02em;color:var(--text-strong);line-height:1;}
 .l-footer__address{font-size:.8rem;color:var(--text-muted);line-height:1.9;}
 .l-footer__cols{display:grid;gap:var(--space-4);grid-template-columns:repeat(2,1fr);}
 .l-footer__group{display:grid;gap:var(--space-4);align-content:start;}
