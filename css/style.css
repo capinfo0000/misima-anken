@@ -80,9 +80,11 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
   max-width:var(--container);margin-inline:auto;padding-inline:var(--space-4);}
 .l-header__logo{margin:0;}
 .l-header__logo a{display:inline-flex;align-items:center;gap:.5em;text-decoration:none;}
-/* ヘッダーの花マーク：8枚レイヤーで花びらが1枚ずつ欠けながら巡回（ローダーと同方式） */
-.l-header__mark{position:relative;flex:none;width:34px;height:34px;transition:width .25s,height .25s;}
+/* ヘッダーの花マーク：8枚レイヤーで花びらが1枚ずつ欠けながら、花全体はゆっくり回転 */
+.l-header__mark{position:relative;flex:none;width:34px;height:34px;transition:width .25s,height .25s;
+  animation:markSpin 12s linear infinite;transform-origin:50% 50%;}
 .l-header.is-scrolled .l-header__mark{width:28px;height:28px;}
+@keyframes markSpin{to{transform:rotate(360deg);}}
 .l-header__petal{position:absolute;inset:0;background:center/contain no-repeat;
   --dur:9.5s; --step:.5s;
   animation:petalGlow var(--dur) linear infinite;
@@ -98,7 +100,7 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .l-header__petal:nth-child(7){background-image:url(../assets/img/loader/petal-6.webp);}
 .l-header__petal:nth-child(8){background-image:url(../assets/img/loader/petal-7.webp);}
 .l-header__word{font-family:var(--font-en);font-weight:600;font-size:1.2rem;letter-spacing:.02em;color:var(--text-strong);line-height:1;}
-@media (prefers-reduced-motion: reduce){ .l-header__petal{animation:none;opacity:1;} }
+@media (prefers-reduced-motion: reduce){ .l-header__mark{animation:none;} .l-header__petal{animation:none;opacity:1;} }
 
 .l-footer{background:#fff;border-top:1px solid var(--line);padding-top:var(--space-10);}
 .l-footer__inner{display:grid;gap:var(--space-6);padding-bottom:var(--space-6);}
