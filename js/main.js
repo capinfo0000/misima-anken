@@ -253,14 +253,25 @@
       };
       var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
       setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); } }, 1150); // ①失敗を自動表示（背景も）
-      var sY = null;
-      window.addEventListener("touchstart", function (e) { if (mActive) sY = e.touches[0].clientY; }, { passive: true });
-      window.addEventListener("touchmove", function (e) { if (mActive) e.preventDefault(); }, { passive: false });
+      var sY = null, lastY = null;
+      window.addEventListener("touchstart", function (e) { if (mActive) { sY = lastY = e.touches[0].clientY; } }, { passive: true });
+      window.addEventListener("touchmove", function (e) {
+        if (!mActive) return;
+        e.preventDefault();
+        if (mStep < 2 || lastY == null) return;   // 失敗→再挑戦は touchend で1スワイプ＝1ステップ
+        var y = e.touches[0].clientY;
+        accum += (lastY - y);                      // 指を上へ動かす＝進む。ドラッグ量(長さ)を累積
+        lastY = y;
+        if (mBusy) return;
+        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }
+        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
+      }, { passive: false });
       window.addEventListener("touchend", function (e) {
         if (!mActive || sY == null) return;
         var t = e.changedTouches && e.changedTouches[0];
-        var dy = sY - (t ? t.clientY : sY); sY = null;
-        if (dy > 40) goForward(); else if (dy < -40) goBack();
+        var dy = sY - (t ? t.clientY : sY);
+        if (mStep < 2) { if (dy > 40) goForward(); else if (dy < -40) goBack(); } // 失敗→再挑戦：強制1ステップ
+        sY = lastY = null;
       }, { passive: true });
       /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
