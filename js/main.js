@@ -183,24 +183,25 @@
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
-      var mStep = 0, mMax = 6, mBusy = false, mActive = true, mReachedCatch = false;
+      /* 段階：①失敗(1) ②再挑戦(2) ③複合(3) ④矢印(4) ⑤5行=1行目(5)〜(4+N) ⑥キャッチ(5+N) */
+      var NLINE = heroLines.length;                 // 通常5行
+      var LINE_END = 4 + NLINE;                     // 最終行のステップ
+      var CATCH_STEP = LINE_END + 1;                // キャッチのステップ
+      var mStep = 0, mMax = CATCH_STEP, mBusy = false, mActive = true, mReachedCatch = false;
       var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
-        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step === 5 ? "lines" : "";
+        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : (step >= 5 && step <= LINE_END) ? "lines" : "";
         if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
       };
+      var busyTimer = null, autoArrowTimer = null;
+      var clearBusyTimer = function () { if (busyTimer) { clearTimeout(busyTimer); busyTimer = null; } };
+      var clearAutoArrow = function () { if (autoArrowTimer) { clearTimeout(autoArrowTimer); autoArrowTimer = null; } };
+      /* SCROLL↓：操作待ち（遷移中でも自動待ちでもない）ときだけ表示 */
+      var syncHint = function () { if (hero) hero.classList.toggle("is-scrollhint", mActive && !mBusy); };
+      var setBusyFalseAfter = function (ms) { clearBusyTimer(); busyTimer = setTimeout(function () { mBusy = false; syncHint(); }, ms); };
       var lineTimers = [];
-      var autoCatchTimer = null;
-      var clearAutoCatch = function () { if (autoCatchTimer) { clearTimeout(autoCatchTimer); autoCatchTimer = null; } };
       var clearLineTimers = function () { for (var i = 0; i < lineTimers.length; i++) clearTimeout(lineTimers[i]); lineTimers = []; };
       var hideLines = function () { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
-      /* 5行を時間差で一括表示（行ごとに少しずつ遅らせて出す） */
-      var revealLinesStaggered = function () {
-        clearLineTimers();
-        for (var i = 0; i < heroLines.length; i++) {
-          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 500)); })(i);
-        }
-      };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
         if (!stackBtmEl) return;
         stackBtmEl.innerHTML = "";
@@ -211,7 +212,7 @@
         });
       };
       var renderState = function (n) { // 戻る：状態nを即座に描画（アニメ無し）
-        clearMorphTimers(); clearAutoCatch();
+        clearMorphTimers(); clearAutoArrow(); clearBusyTimer();
         heroMorph.classList.remove("is-typewave", "is-stack", "is-stack-full");
         hero.classList.remove("is-lines", "is-catch");
         if (heroCatch) heroCatch.classList.remove("is-show");
@@ -223,97 +224,96 @@
           heroMorph.classList.add("is-stack");
           if (n >= 4) heroMorph.classList.add("is-stack-full");
           curStage = 4; wantStage = 4;
-          if (n === 5) { hero.classList.add("is-lines"); showLines(heroLines.length); }   // 戻る時は5行すべて表示
-          else if (n >= 6) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
+          if (n >= 5 && n <= LINE_END) { hero.classList.add("is-lines"); showLines(n - 4); }  // 戻る時はその行数まで表示
+          else if (n >= CATCH_STEP) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
         }
+        syncHint();
       };
       var release = function () { // 最後まで進んだら通常スクロールへ解放
-        mActive = false;
+        mActive = false; syncHint();
         docEl.style.overflow = ""; document.body.style.overflow = "";
         window.scrollTo(0, hero.offsetHeight);
       };
       var goForward = function () {
         if (mBusy) return;
         if (mStep >= mMax) { release(); return; }
-        mBusy = true; mStep++; setBg(mStep);
+        clearAutoArrow();
+        mBusy = true; syncHint(); mStep++; setBg(mStep);
         if (mStep <= 4) {                          // ①〜④モーフ
           hideLines(); hero.classList.remove("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           wantStage = mStep; runStages();
-          /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は緩ゾーンなので短め＝連続スクロールで流れる */
-          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
-        } else if (mStep === 5) {                   // ⑤5行を時間差で1行ずつ自動表示 → 完成の2秒後に自動でキャッチ
+          /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は短め */
+          setBusyFalseAfter(mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
+          if (mStep === 3) {                        // ③複合が出た0.5秒後に④矢印を自動表示
+            autoArrowTimer = setTimeout(function () {
+              if (mActive && mStep === 3) { clearBusyTimer(); mBusy = false; goForward(); }
+            }, 500);
+          }
+        } else if (mStep >= 5 && mStep <= LINE_END) { // ⑤5行：スクロールで1行ずつ表示（時間差自動なし）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
-          clearAutoCatch();
-          revealLinesStaggered();
-          var revealDone = (heroLines.length - 1) * 500 + 700; // 最後の行＋カスケードが出そろうまで（0.5秒間隔）
-          setTimeout(function () { mBusy = false; }, revealDone);
-          autoCatchTimer = setTimeout(function () {  // 5行完成の2秒後に自動でキャッチへ
-            if (mActive && mStep === 5 && !mReachedCatch) { mBusy = false; goForward(); }
-          }, revealDone + 2000);
+          showLines(mStep - 4);                     // その行まで表示（1本ずつ増える）
+          setBusyFalseAfter(360);                   // 1行の出現アニメの猶予
         } else {                                    // ⑥キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
           mReachedCatch = true;                     // キャッチ到達＝以降は戻らない（リロードまで）
-          setTimeout(function () { mBusy = false; }, 900);
+          setBusyFalseAfter(900);
         }
       };
       var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
-      /* ---- 全自動再生：失敗→再挑戦→複合→矢印→5行（→自動キャッチ） ---- */
-      var autoTimer = null;
-      var clearAuto = function () { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } };
-      var AUTO_READ = 500;                          // 各段階を見せてから次へ進むまでの間（0.5秒）
-      var autoLoop = function () {
-        if (!mActive || mReachedCatch || mStep >= 5) return; // 5行以降はステップ内の自動に任せる
-        if (mBusy) { autoTimer = setTimeout(autoLoop, 120); return; } // アニメ中は待つ
-        autoTimer = setTimeout(function () {        // 少し見せてから次へ
-          if (!mActive || mReachedCatch || mStep >= 5) return;
-          if (mBusy) { autoTimer = setTimeout(autoLoop, 120); return; }
-          goForward();
-          autoTimer = setTimeout(autoLoop, 120);
-        }, AUTO_READ);
-      };
-      setTimeout(function () {                       // ①失敗を自動表示 → 以降も自動で進行
-        if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); }
-        autoTimer = setTimeout(autoLoop, 2000);      // 失敗を見せてから自動進行開始
-      }, 1150);
-
-      /* ---- スクロール/スワイプ：再生中は最後まで一気にスキップ、キャッチ後は本編へ ---- */
-      var skipToCatch = function () {                // 演出を早送りして THE NEXT STAGE を表示
-        clearAuto(); clearMorphTimers(); clearAutoCatch(); clearLineTimers();
-        mBusy = false; mStep = 6; playing = false;
-        heroMorph.classList.remove("is-typewave");
-        if (stackBtmEl) { stackBtmEl.innerHTML = ""; buildSch(stackBtmEl, second, 3); }
-        heroMorph.classList.add("is-stack", "is-stack-full");
-        curStage = 4; wantStage = 4;
-        hideLines();
-        hero.classList.add("is-lines", "is-catch");
-        if (heroCatch) heroCatch.classList.add("is-show");
-        mReachedCatch = true; setBg(6);
-      };
-      var onForward = function () {                   // 下方向の操作
+      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); syncHint(); } }, 1150); // ①失敗を自動表示（背景も）
+      var sY = null, lastY = null;
+      window.addEventListener("touchstart", function (e) { if (mActive) { sY = lastY = e.touches[0].clientY; } }, { passive: true });
+      window.addEventListener("touchmove", function (e) {
         if (!mActive) return;
-        if (mReachedCatch) { release(); return; }     // キャッチ表示後：本編へ解放
-        if (mStep >= 5) { skipToCatch(); return; }    // 5行表示中：THE NEXT STAGEまでスキップ可
-        /* 5行より前（失敗→再挑戦→複合→矢印）はスクロール厳禁：自動再生に任せて何もしない */
-      };
-      window.addEventListener("wheel", function (e) {
-        if (!mActive) return;
-        e.preventDefault();                           // ページスクロールを止めて制御
-        if (e.deltaY > 0) onForward();                // 下スクロール＝スキップ/解放
+        e.preventDefault();
+        if (mStep < 2 || lastY == null) return;   // 失敗→再挑戦は touchend で1スワイプ＝1ステップ
+        var y = e.touches[0].clientY;
+        accum += (lastY - y);                      // 指を上へ動かす＝進む。ドラッグ量(長さ)を累積
+        lastY = y;
+        advanceByAccum();
       }, { passive: false });
-      var sY = null;
-      window.addEventListener("touchstart", function (e) { if (mActive) sY = e.touches[0].clientY; }, { passive: true });
-      window.addEventListener("touchmove", function (e) { if (mActive) e.preventDefault(); }, { passive: false });
       window.addEventListener("touchend", function (e) {
         if (!mActive || sY == null) return;
         var t = e.changedTouches && e.changedTouches[0];
-        var dy = sY - (t ? t.clientY : sY); sY = null;
-        if (dy > 30) onForward();                     // 上へスワイプ＝スキップ/解放
+        var dy = sY - (t ? t.clientY : sY);
+        if (mStep < 2) { if (dy > 40) goForward(); else if (dy < -40) goBack(); } // 失敗→再挑戦：強制1ステップ
+        sY = lastY = null;
       }, { passive: true });
-      window.addEventListener("keydown", function (e) {
+      /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
+      var wheelLock = false, wheelTimer = null;
+      var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
+      var accum = 0, STEP_LEN = 90, BIG_LEN = 420; // 普通=90px。行送り（矢印→各行）は多め=420px
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
+        if (mBusy) return;
+        /* 行送り（mStep 4→5 … (LINE_END-1)→LINE_END）は多め。再挑戦→複合・最終行→キャッチは普通 */
+        var thr = (mStep >= 4 && mStep <= LINE_END - 1) ? BIG_LEN : STEP_LEN;
+        if (accum >= thr) { accum -= thr; goForward(); }
+        else if (accum <= -thr) { accum += thr; goBack(); }
+      };
+      window.addEventListener("wheel", function (e) {
         if (!mActive) return;
-        if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); onForward(); }
+        e.preventDefault();                       // ページスクロールを止めて制御
+        var strict = (mStep < 2);                 // 失敗→再挑戦までは強制1スクロール＝1ステップ
+        if (strict) {
+          accum = 0;
+          if (mBusy) { relockWheel(); return; }
+          if (wheelLock) { relockWheel(); return; } // 惰性でも1ステップに制限
+          wheelLock = true;
+          if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
+          relockWheel();
+          return;
+        }
+        /* 再挑戦以降：スクロール量を溜めて、一定の「長さ」でステップを進める */
+        accum += e.deltaY;
+        advanceByAccum();                         // 余りは持ち越し＝スクロール分を無駄にしない
+      }, { passive: false });
+      /* キーボード操作（アクセシビリティ） */
+      window.addEventListener("keydown", function (e) {
+        if (!mActive || mBusy) return;
+        if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); goForward(); }
+        else if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); goBack(); }
       });
     }
   }

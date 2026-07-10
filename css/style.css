@@ -78,7 +78,7 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .l-header.is-scrolled{height:64px;border-bottom-color:var(--line);background:rgba(255,255,255,.96);}
 .l-header__inner{display:flex;align-items:center;justify-content:space-between;height:100%;
   max-width:var(--container);margin-inline:auto;padding-inline:var(--space-4);}
-.l-header__logo{margin:0;}
+.l-header__logo{margin:0;transform:translateX(-12px);}
 .l-header__logo a{display:inline-flex;align-items:center;gap:.5em;text-decoration:none;}
 /* ヘッダーの花マーク（静止・新ロゴ） */
 .l-header__mark{flex:none;width:34px;height:34px;background:url(../assets/img/logo-mark.webp) center/contain no-repeat;transition:width .25s,height .25s;}
@@ -910,7 +910,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 /* スクロール誘導（ドットが下降） */
 .p-fv__scroll{position:absolute;bottom:26px;left:0;right:0;display:flex;flex-direction:column;
   align-items:center;gap:.8em;z-index:2;opacity:0;color:var(--text-muted);transition:opacity .5s ease;}
-.p-hero.is-catch .p-fv__scroll{opacity:1;}   /* スクロールが必要な所（キャッチ表示後→本編へ）だけ表示 */
+.p-hero.is-scrollhint .p-fv__scroll{opacity:1;}   /* スクロールが必要な（操作待ちの）時だけ表示 */
 .p-fv__scroll-label{font-family:var(--font-en);font-size:.62rem;letter-spacing:.28em;text-indent:.28em;}
 .p-fv__scroll-arrow{display:block;color:var(--text-muted);animation:fvArrow 1.6s ease-in-out infinite,fvArrowRainbow 4.5s linear infinite;} /* 上下バウンス＋常に虹色フロー */
 @keyframes fvArrow{0%{transform:translateY(-4px);opacity:.3;}50%{transform:translateY(6px);opacity:1;}100%{transform:translateY(-4px);opacity:.3;}}
