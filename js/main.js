@@ -198,7 +198,7 @@
       var revealLinesStaggered = function () {
         clearLineTimers();
         for (var i = 0; i < heroLines.length; i++) {
-          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 500)); })(i);
+          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 1000)); })(i);
         }
       };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
@@ -246,7 +246,7 @@
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           clearAutoCatch();
           revealLinesStaggered();
-          var revealDone = (heroLines.length - 1) * 500 + 700; // 最後の行＋カスケードが出そろうまで
+          var revealDone = (heroLines.length - 1) * 1000 + 700; // 最後の行＋カスケードが出そろうまで（1秒間隔）
           setTimeout(function () { mBusy = false; }, revealDone);
           autoCatchTimer = setTimeout(function () {  // 5行完成の2秒後に自動でキャッチへ
             if (mActive && mStep === 5 && !mReachedCatch) { mBusy = false; goForward(); }
