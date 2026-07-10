@@ -198,7 +198,7 @@
       var revealLinesStaggered = function () {
         clearLineTimers();
         for (var i = 0; i < heroLines.length; i++) {
-          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 1000)); })(i);
+          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * 500)); })(i);
         }
       };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
@@ -246,7 +246,7 @@
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           clearAutoCatch();
           revealLinesStaggered();
-          var revealDone = (heroLines.length - 1) * 1000 + 700; // 最後の行＋カスケードが出そろうまで（1秒間隔）
+          var revealDone = (heroLines.length - 1) * 500 + 700; // 最後の行＋カスケードが出そろうまで（0.5秒間隔）
           setTimeout(function () { mBusy = false; }, revealDone);
           autoCatchTimer = setTimeout(function () {  // 5行完成の2秒後に自動でキャッチへ
             if (mActive && mStep === 5 && !mReachedCatch) { mBusy = false; goForward(); }
@@ -262,7 +262,7 @@
       /* ---- 全自動再生：失敗→再挑戦→複合→矢印→5行（→自動キャッチ） ---- */
       var autoTimer = null;
       var clearAuto = function () { if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; } };
-      var AUTO_READ = 600;                          // 各段階を見せてから次へ進むまでの間
+      var AUTO_READ = 500;                          // 各段階を見せてから次へ進むまでの間（0.5秒）
       var autoLoop = function () {
         if (!mActive || mReachedCatch || mStep >= 5) return; // 5行以降はステップ内の自動に任せる
         if (mBusy) { autoTimer = setTimeout(autoLoop, 120); return; } // アニメ中は待つ
