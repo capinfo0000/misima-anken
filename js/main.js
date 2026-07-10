@@ -239,11 +239,11 @@
           wantStage = mStep; runStages();
           /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は緩ゾーンなので短め＝連続スクロールで流れる */
           setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
-        } else if (mStep <= 9) {                    // ⑤〜⑨ 5行を1行ずつ（長さ基準で1行ずつ表示）
+        } else if (mStep <= 9) {                    // ⑤〜⑨ 5行を1行ずつ（純粋に長さ基準：時間ゲートなし）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           showLines(mStep - 4);
-          setTimeout(function () { mBusy = false; }, 260);
+          mBusy = false;                            // 時間で縛らず、累積スクロール量だけで進める
         } else {                                    // ⑩キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
@@ -276,11 +276,16 @@
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
       var accum = 0, STEP_LEN = 90;               // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)：小さなスクロールでも進む
       var LINE_LEN = 200;                          // 5行を1行ずつ出す部分は少し長め
-      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
-        if (mBusy) return;
-        var need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN; // 次が5行のときは長め
-        if (accum >= need) { accum -= need; goForward(); }
-        else if (accum <= -need) { accum += need; goBack(); }
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・時間で縛らない）
+        var need;
+        while (!mBusy) {                           // 進む：溜まった長さの分だけ（複数行でも）進める
+          need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN; // 次が5行のときは長め
+          if (accum >= need) { accum -= need; goForward(); } else break;
+        }
+        while (!mBusy) {                           // 戻る
+          need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN;
+          if (accum <= -need) { accum += need; goBack(); } else break;
+        }
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
