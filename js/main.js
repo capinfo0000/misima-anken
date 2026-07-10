@@ -183,13 +183,12 @@
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
-      /* 段階：①失敗(1) ②再挑戦(2) ③複合(3) ④矢印(4) ⑤5行=1行目(5)〜(4+N) ⑥キャッチ(5+N) */
-      var NLINE = heroLines.length;                 // 通常5行
-      var LINE_END = 4 + NLINE;                     // 最終行のステップ
-      var CATCH_STEP = LINE_END + 1;                // キャッチのステップ
-      var mStep = 0, mMax = CATCH_STEP, mBusy = false, mActive = true, mReachedCatch = false;
+      /* 段階：①失敗(1) ②再挑戦(2) ③複合(3) ④矢印(4) ⑤5行(5) ⑥キャッチ(6) */
+      var NLINE = heroLines.length;                 // 自動表示する行数（通常5行）
+      var LINE_GAP = 700;                           // 5行を1行ずつ出す間隔(ms)
+      var mStep = 0, mMax = 6, mBusy = false, mActive = true, mReachedCatch = false;
       var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
-        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : (step >= 5 && step <= LINE_END) ? "lines" : "";
+        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step === 5 ? "lines" : "";
         if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
       };
       var busyTimer = null, autoArrowTimer = null;
@@ -202,6 +201,12 @@
       var clearLineTimers = function () { for (var i = 0; i < lineTimers.length; i++) clearTimeout(lineTimers[i]); lineTimers = []; };
       var hideLines = function () { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
+      var revealLinesStaggered = function () {      // 5行を1行ずつ時間差で自動表示
+        clearLineTimers();
+        for (var i = 0; i < heroLines.length; i++) {
+          (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * LINE_GAP)); })(i);
+        }
+      };
       var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
         if (!stackBtmEl) return;
         stackBtmEl.innerHTML = "";
@@ -224,8 +229,8 @@
           heroMorph.classList.add("is-stack");
           if (n >= 4) heroMorph.classList.add("is-stack-full");
           curStage = 4; wantStage = 4;
-          if (n >= 5 && n <= LINE_END) { hero.classList.add("is-lines"); showLines(n - 4); }  // 戻る時はその行数まで表示
-          else if (n >= CATCH_STEP) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
+          if (n === 5) { hero.classList.add("is-lines"); showLines(NLINE); }   // 戻る時は5行すべて表示
+          else if (n >= 6) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
         }
         syncHint();
       };
@@ -251,11 +256,13 @@
             /* 失敗→再挑戦(②)は強制1ステップなので長め。矢印(④)は短め */
             setBusyFalseAfter(mStep === 2 ? 2600 : 480);
           }
-        } else if (mStep >= 5 && mStep <= LINE_END) { // ⑤5行：スクロール量に比例して表示（ロックせず連続で送れる）
+        } else if (mStep === 5) {                   // ⑤5行：1行ずつ自動で流れる（出そろうまでスクロール遷移をロック）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
-          showLines(mStep - 4);                     // その行まで表示（1本ずつ増える）
-          clearBusyTimer(); mBusy = false; syncHint(); // ロックしない＝大きくスクロールすれば複数行まとめて送れる
+          revealLinesStaggered();
+          var revealDone = (NLINE - 1) * LINE_GAP + 900; // 全行＋最終行アニメが出そろうまで
+          clearBusyTimer();                          // revealDoneまで mBusy=true を維持＝自動表示中のスクロールは無視
+          busyTimer = setTimeout(function () { mBusy = false; accum = 0; syncHint(); }, revealDone);
         } else {                                    // ⑥キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
@@ -286,17 +293,11 @@
       /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
-      var accum = 0, STEP_LEN = 90, BIG_LEN = 220; // 普通=90px。行送り（矢印→各行）は多め=220px
-      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・比例）
-        /* 溜まった量を閾値ぶんずつ連続で消費＝大きくスクロールすれば複数行まとめて進む。余りは持ち越し */
-        var guard = 0;
-        while (!mBusy && guard++ < 20) {
-          /* 行送り（mStep 4→5 … (LINE_END-1)→LINE_END）は多め。再挑戦→複合・最終行→キャッチは普通 */
-          var thr = (mStep >= 4 && mStep <= LINE_END - 1) ? BIG_LEN : STEP_LEN;
-          if (accum >= thr) { accum -= thr; goForward(); }
-          else if (accum <= -thr) { accum += thr; goBack(); }
-          else break;
-        }
+      var accum = 0, STEP_LEN = 90;               // 1ステップ進むのに必要なスクロール量(px)
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
+        if (mBusy) return;                          // ←5行の自動表示中はここで弾かれ、キャッチへ遷移しない
+        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }
+        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
