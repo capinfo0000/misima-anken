@@ -41,8 +41,8 @@
   var loader = document.querySelector(".c-loader");
   if (loader) {
     var hideLoader = function () { loader.classList.add("is-loaded"); };
-    /* リロードのたびに回転アニメが見えるよう、約1.8秒表示してから隠す */
-    setTimeout(hideLoader, 1800);
+    /* 花が1回転(=0.8秒)し終わったらサイトを表示 */
+    setTimeout(hideLoader, 850);
   }
 
   /* ---------- First View：固定ヒーロー（虹色フリップ→スクロールで5行順送り→最後キャッチが残る） ---------- */
@@ -228,17 +228,18 @@
         if (mStep <= 4) {                          // ①〜④モーフ
           hideLines(); hero.classList.remove("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           wantStage = mStep; runStages();
-          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 2100 : 900));
-        } else if (mStep <= 9) {                    // 5行を1行ずつ
+          /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は緩ゾーンなので短め＝連続スクロールで流れる */
+          setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
+        } else if (mStep <= 9) {                    // 5行を1行ずつ（連続スクロールでも流れるよう短め）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           showLines(mStep - 4);
-          setTimeout(function () { mBusy = false; }, 700);
+          setTimeout(function () { mBusy = false; }, 360);
         } else {                                    // ⑩キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
           mReachedCatch = true;                     // キャッチ到達＝以降は戻らない（リロードまで）
-          setTimeout(function () { mBusy = false; }, 1400);
+          setTimeout(function () { mBusy = false; }, 900);
         }
       };
       var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
@@ -257,11 +258,17 @@
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
-        e.preventDefault();                       // ページスクロールを止めて1ステップ制御
-        if (wheelLock || mBusy) { relockWheel(); return; } // ジェスチャ継続中/再生中は無視
-        wheelLock = true;
-        if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
-        relockWheel();
+        e.preventDefault();                       // ページスクロールを止めて制御
+        var strict = (mStep < 2);                 // 失敗→再挑戦までは強制1スクロール＝1ステップ
+        if (mBusy) { if (strict) relockWheel(); return; }
+        if (strict) {
+          if (wheelLock) { relockWheel(); return; } // 惰性でも1ステップに制限
+          wheelLock = true;
+          if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
+          relockWheel();
+        } else {                                  // 再挑戦以降はゆるめ：弱=1、連続スクロールで通り抜け可
+          if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
+        }
       }, { passive: false });
       /* キーボード操作（アクセシビリティ） */
       window.addEventListener("keydown", function (e) {

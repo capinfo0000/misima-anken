@@ -164,15 +164,15 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 /* ============================================================
    Component : loader / to-top / card
    ============================================================ */
-.c-loader{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s ease;}
+.c-loader{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .5s ease,visibility .5s ease;}
 .c-loader.is-loaded{opacity:0;visibility:hidden;pointer-events:none;}
 .c-loader__ring{width:56px;height:56px;border-radius:50%;background:conic-gradient(from 0deg,#e60012,#ed6d1f,#f5a200,#009944,#41a1be,#1d2088,#601986,#e95383,#e60012);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 0);animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-/* リロード時のローダー：花全体が回転しつつ、花びらが1枚ずつ消える（8枚レイヤー） */
+/* リロード時のローダー：花全体を素早く1回転させつつ、花びらが1巡だけ消える（8枚レイヤー） */
 .c-loader__flower{position:relative;width:clamp(104px,20vw,150px);aspect-ratio:1;
-  animation:spin 12s linear infinite;transform-origin:50% 50%;}
+  animation:spin .8s linear infinite;transform-origin:50% 50%;}
 .c-loader__petal{position:absolute;inset:0;background:center/contain no-repeat;
-  --dur:7.2s; --step:.9s;             /* --step = --dur / 8 */
+  --dur:.8s; --step:.1s;              /* 1回転(=0.8s)の中で花びらが1巡消える */
   will-change:opacity;
   animation:petalGlow var(--dur) linear infinite;
   animation-delay:calc((var(--i) - 7) * var(--step));}
