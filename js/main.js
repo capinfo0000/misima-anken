@@ -196,7 +196,7 @@
       var clearBusyTimer = function () { if (busyTimer) { clearTimeout(busyTimer); busyTimer = null; } };
       var clearAutoArrow = function () { if (autoArrowTimer) { clearTimeout(autoArrowTimer); autoArrowTimer = null; } };
       /* SCROLL↓：操作待ち（遷移中でも自動待ちでもない）ときだけ表示 */
-      var syncHint = function () { if (hero) hero.classList.toggle("is-scrollhint", mActive && !mBusy); };
+      var syncHint = function () { if (hero) hero.classList.toggle("is-scrollhint", mActive && !mBusy && !autoArrowTimer); };
       var setBusyFalseAfter = function (ms) { clearBusyTimer(); busyTimer = setTimeout(function () { mBusy = false; syncHint(); }, ms); };
       var lineTimers = [];
       var clearLineTimers = function () { for (var i = 0; i < lineTimers.length; i++) clearTimeout(lineTimers[i]); lineTimers = []; };
@@ -242,18 +242,20 @@
         if (mStep <= 4) {                          // ①〜④モーフ
           hideLines(); hero.classList.remove("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           wantStage = mStep; runStages();
-          /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は短め */
-          setBusyFalseAfter(mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
-          if (mStep === 3) {                        // ③複合が出た0.5秒後に④矢印を自動表示
+          if (mStep === 3) {                        // ③複合：出現アニメ(組み立て~0.7s＋fvStackBtm~1.55s)完了の0.5秒後に④矢印
+            setBusyFalseAfter(2250);                // 複合が出そろうまでロック（この間ヒントも消える）
             autoArrowTimer = setTimeout(function () {
-              if (mActive && mStep === 3) { clearBusyTimer(); mBusy = false; goForward(); }
-            }, 500);
+              if (mActive && mStep === 3) goForward();   // スクロール不要で自動表示
+            }, 2750);
+          } else {
+            /* 失敗→再挑戦(②)は強制1ステップなので長め。矢印(④)は短め */
+            setBusyFalseAfter(mStep === 2 ? 2600 : 480);
           }
-        } else if (mStep >= 5 && mStep <= LINE_END) { // ⑤5行：スクロールで1行ずつ表示（時間差自動なし）
+        } else if (mStep >= 5 && mStep <= LINE_END) { // ⑤5行：スクロール量に比例して表示（ロックせず連続で送れる）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
           showLines(mStep - 4);                     // その行まで表示（1本ずつ増える）
-          setBusyFalseAfter(360);                   // 1行の出現アニメの猶予
+          clearBusyTimer(); mBusy = false; syncHint(); // ロックしない＝大きくスクロールすれば複数行まとめて送れる
         } else {                                    // ⑥キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
@@ -284,13 +286,17 @@
       /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
-      var accum = 0, STEP_LEN = 90, BIG_LEN = 420; // 普通=90px。行送り（矢印→各行）は多め=420px
-      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
-        if (mBusy) return;
-        /* 行送り（mStep 4→5 … (LINE_END-1)→LINE_END）は多め。再挑戦→複合・最終行→キャッチは普通 */
-        var thr = (mStep >= 4 && mStep <= LINE_END - 1) ? BIG_LEN : STEP_LEN;
-        if (accum >= thr) { accum -= thr; goForward(); }
-        else if (accum <= -thr) { accum += thr; goBack(); }
+      var accum = 0, STEP_LEN = 90, BIG_LEN = 600; // 普通=90px。行送り（矢印→各行）は多め=600px
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・比例）
+        /* 溜まった量を閾値ぶんずつ連続で消費＝大きくスクロールすれば複数行まとめて進む。余りは持ち越し */
+        var guard = 0;
+        while (!mBusy && guard++ < 20) {
+          /* 行送り（mStep 4→5 … (LINE_END-1)→LINE_END）は多め。再挑戦→複合・最終行→キャッチは普通 */
+          var thr = (mStep >= 4 && mStep <= LINE_END - 1) ? BIG_LEN : STEP_LEN;
+          if (accum >= thr) { accum -= thr; goForward(); }
+          else if (accum <= -thr) { accum += thr; goBack(); }
+          else break;
+        }
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
