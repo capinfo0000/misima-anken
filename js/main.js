@@ -293,8 +293,9 @@
       };
       var onForward = function () {                   // 下方向の操作
         if (!mActive) return;
-        if (mReachedCatch) { release(); }             // キャッチ表示後：本編へ解放
-        else { skipToCatch(); }                       // 再生中：最後まで一気にスキップ
+        if (mReachedCatch) { release(); return; }     // キャッチ表示後：本編へ解放
+        if (mStep >= 5) { skipToCatch(); return; }    // 5行表示中：THE NEXT STAGEまでスキップ可
+        /* 5行より前（失敗→再挑戦→複合→矢印）はスクロール厳禁：自動再生に任せて何もしない */
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
