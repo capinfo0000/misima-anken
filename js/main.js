@@ -41,8 +41,8 @@
   var loader = document.querySelector(".c-loader");
   if (loader) {
     var hideLoader = function () { loader.classList.add("is-loaded"); };
-    window.addEventListener("load", function () { setTimeout(hideLoader, 600); });
-    setTimeout(hideLoader, 3500); // safety
+    /* リロードのたびに回転アニメが見えるよう、約1.8秒表示してから隠す */
+    setTimeout(hideLoader, 1800);
   }
 
   /* ---------- First View：固定ヒーロー（虹色フリップ→スクロールで5行順送り→最後キャッチが残る） ---------- */
