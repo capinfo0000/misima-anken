@@ -276,15 +276,20 @@
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
       var accum = 0, STEP_LEN = 90;               // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)：小さなスクロールでも進む
       var LINE_LEN = 200;                          // 5行を1行ずつ出す部分は少し長め
+      var CATCH_LEN = 500;                         // 5行表示後→キャッチは長めの余白（5行を読める間）
+      var needFor = function () {                  // 次のステップに進むのに必要なスクロール量
+        if (mStep >= 4 && mStep <= 8) return LINE_LEN;  // 次が5行(step5..9)
+        if (mStep === 9) return CATCH_LEN;               // 5行表示後→キャッチ
+        return STEP_LEN;
+      };
       var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・時間で縛らない）
-        var need;
+        var moved = false;
         while (!mBusy) {                           // 進む：溜まった長さの分だけ（複数行でも）進める
-          need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN; // 次が5行のときは長め
-          if (accum >= need) { accum -= need; goForward(); } else break;
+          if (mStep === 9 && moved) break;         // 同じ操作で5行とキャッチを一気に飛ばさない
+          if (accum >= needFor()) { accum -= needFor(); goForward(); moved = true; } else break;
         }
         while (!mBusy) {                           // 戻る
-          need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN;
-          if (accum <= -need) { accum += need; goBack(); } else break;
+          if (accum <= -needFor()) { accum += needFor(); goBack(); } else break;
         }
       };
       window.addEventListener("wheel", function (e) {
