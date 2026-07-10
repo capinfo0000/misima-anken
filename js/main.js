@@ -265,7 +265,7 @@
       /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
-      var accum = 0, STEP_LEN = 380;              // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)
+      var accum = 0, STEP_LEN = 90;               // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)：小さなスクロールでも進む
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
         e.preventDefault();                       // ページスクロールを止めて制御
@@ -282,8 +282,8 @@
         /* 再挑戦以降：スクロール量を溜めて、一定の「長さ」でステップを進める */
         accum += e.deltaY;
         if (mBusy) return;                        // アニメ再生中は発火保留（accumは維持）
-        if (accum >= STEP_LEN) { accum = 0; goForward(); }
-        else if (accum <= -STEP_LEN) { accum = 0; goBack(); }
+        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }   // 余りは持ち越し＝スクロール分を無駄にしない
+        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
       }, { passive: false });
       /* キーボード操作（アクセシビリティ） */
       window.addEventListener("keydown", function (e) {
