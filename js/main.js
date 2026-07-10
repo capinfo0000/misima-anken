@@ -286,7 +286,7 @@
       /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
-      var accum = 0, STEP_LEN = 90, BIG_LEN = 350; // 普通=90px。行送り（矢印→各行）は多め=350px
+      var accum = 0, STEP_LEN = 90, BIG_LEN = 220; // 普通=90px。行送り（矢印→各行）は多め=220px
       var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準・比例）
         /* 溜まった量を閾値ぶんずつ連続で消費＝大きくスクロールすれば複数行まとめて進む。余りは持ち越し */
         var guard = 0;
