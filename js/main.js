@@ -262,22 +262,28 @@
         var dy = sY - (t ? t.clientY : sY); sY = null;
         if (dy > 40) goForward(); else if (dy < -40) goBack();
       }, { passive: true });
-      /* PC：ホイール/トラックパッドは1ジェスチャ＝1ステップ（惰性でも進みすぎない） */
+      /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
+      var accum = 0, STEP_LEN = 380;              // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
         e.preventDefault();                       // ページスクロールを止めて制御
         var strict = (mStep < 2);                 // 失敗→再挑戦までは強制1スクロール＝1ステップ
-        if (mBusy) { if (strict) relockWheel(); return; }
         if (strict) {
+          accum = 0;
+          if (mBusy) { relockWheel(); return; }
           if (wheelLock) { relockWheel(); return; } // 惰性でも1ステップに制限
           wheelLock = true;
           if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
           relockWheel();
-        } else {                                  // 再挑戦以降はゆるめ：弱=1、連続スクロールで通り抜け可
-          if (e.deltaY > 0) goForward(); else if (e.deltaY < 0) goBack();
+          return;
         }
+        /* 再挑戦以降：スクロール量を溜めて、一定の「長さ」でステップを進める */
+        accum += e.deltaY;
+        if (mBusy) return;                        // アニメ再生中は発火保留（accumは維持）
+        if (accum >= STEP_LEN) { accum = 0; goForward(); }
+        else if (accum <= -STEP_LEN) { accum = 0; goBack(); }
       }, { passive: false });
       /* キーボード操作（アクセシビリティ） */
       window.addEventListener("keydown", function (e) {
