@@ -183,9 +183,9 @@
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
-      var mStep = 0, mMax = 6, mBusy = false, mActive = true, mReachedCatch = false;
+      var mStep = 0, mMax = 10, mBusy = false, mActive = true, mReachedCatch = false;
       var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
-        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step === 5 ? "lines" : "";
+        var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step <= 9 ? "lines" : "";
         if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
       };
       var lineTimers = [];
@@ -221,8 +221,8 @@
           heroMorph.classList.add("is-stack");
           if (n >= 4) heroMorph.classList.add("is-stack-full");
           curStage = 4; wantStage = 4;
-          if (n === 5) { hero.classList.add("is-lines"); showLines(heroLines.length); }   // 5行すべて表示
-          else if (n >= 6) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
+          if (n >= 5 && n <= 9) { hero.classList.add("is-lines"); showLines(n - 4); }   // 5行を1行ずつ
+          else if (n >= 10) { hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show"); }
         }
       };
       var release = function () { // 最後まで進んだら通常スクロールへ解放
@@ -239,12 +239,12 @@
           wantStage = mStep; runStages();
           /* 失敗→再挑戦(②)は強制1ステップなので長め。複合(③)・矢印(④)は緩ゾーンなので短め＝連続スクロールで流れる */
           setTimeout(function () { mBusy = false; }, mStep === 2 ? 2600 : (mStep === 3 ? 700 : 480));
-        } else if (mStep === 5) {                   // ⑤5行を時間差で一括表示（1スクロールで全部）
+        } else if (mStep <= 9) {                    // ⑤〜⑨ 5行を1行ずつ（長さ基準で1行ずつ表示）
           if (curStage < 4) snapToStack();
           hero.classList.add("is-lines"); hero.classList.remove("is-catch"); if (heroCatch) heroCatch.classList.remove("is-show");
-          revealLinesStaggered();
-          setTimeout(function () { mBusy = false; }, 1500); // 全行の時間差表示が見える程度
-        } else {                                    // ⑥キャッチ
+          showLines(mStep - 4);
+          setTimeout(function () { mBusy = false; }, 260);
+        } else {                                    // ⑩キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
           mReachedCatch = true;                     // キャッチ到達＝以降は戻らない（リロードまで）
@@ -262,9 +262,7 @@
         var y = e.touches[0].clientY;
         accum += (lastY - y);                      // 指を上へ動かす＝進む。ドラッグ量(長さ)を累積
         lastY = y;
-        if (mBusy) return;
-        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }
-        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
+        advanceByAccum();
       }, { passive: false });
       window.addEventListener("touchend", function (e) {
         if (!mActive || sY == null) return;
@@ -277,6 +275,13 @@
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
       var accum = 0, STEP_LEN = 90;               // 緩ゾーンで1ステップ進むのに必要なスクロール量(px)：小さなスクロールでも進む
+      var LINE_LEN = 200;                          // 5行を1行ずつ出す部分は少し長め
+      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
+        if (mBusy) return;
+        var need = (mStep >= 4 && mStep <= 8) ? LINE_LEN : STEP_LEN; // 次が5行のときは長め
+        if (accum >= need) { accum -= need; goForward(); }
+        else if (accum <= -need) { accum += need; goBack(); }
+      };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
         e.preventDefault();                       // ページスクロールを止めて制御
@@ -292,9 +297,7 @@
         }
         /* 再挑戦以降：スクロール量を溜めて、一定の「長さ」でステップを進める */
         accum += e.deltaY;
-        if (mBusy) return;                        // アニメ再生中は発火保留（accumは維持）
-        if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }   // 余りは持ち越し＝スクロール分を無駄にしない
-        else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
+        advanceByAccum();                         // 余りは持ち越し＝スクロール分を無駄にしない
       }, { passive: false });
       /* キーボード操作（アクセシビリティ） */
       window.addEventListener("keydown", function (e) {
