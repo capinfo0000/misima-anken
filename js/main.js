@@ -1,58 +1,120 @@
 /* ============================================================
-   株式会社ミシマ — Site interactions (FLOCSS)
+   株式会社Revenge — サイトの動き（インタラクション）全部入り
+   ------------------------------------------------------------
+   このファイルは全ページ共通で読み込まれます。
+   各機能は「対象の要素がページに在るときだけ動く」よう、
+   先頭で querySelector して if で存在チェックしてから処理します。
+   （例：ヒーローは index だけ、問い合わせフォームは contact だけ）
+
+   ■ 主な機能（上から順に登場）
+     1. 読み込み時は必ずページ最上部から始める
+     2. ヘッダーの縮小／スクロールで隠す／ページトップへ戻る
+     3. ローダー（花のくるくる）を一定時間で消す
+     4. トップの固定ヒーロー演出（失敗→再挑戦→複合→矢印→5行→キャッチ）
+     5. スマホのナビ開閉／会社情報ドロップダウン
+     6. スクロールで要素をふわっと表示（reveal）＋数値カウントアップ
+     7. 問い合わせフォーム送信＋結果モーダル
+     8. WordPress（任意）からニュースを差し込む
+
+   ※ 全体を即時関数(IIFE)で包み、"use strict" で安全に。
+     変数がグローバルに漏れないようにするための定番の書き方です。
    ============================================================ */
 (function () {
   "use strict";
 
-  /* ---------- Always start at the very top on (re)load ---------- */
+  /* ============================================================
+     1. 再読み込み時は必ず最上部から
+     ------------------------------------------------------------
+     ブラウザは前回のスクロール位置を復元することがあるので、
+     それを止めて (0,0) に固定する。ヒーロー演出が途中から
+     始まってしまうのを防ぐ。
+     ============================================================ */
   if ("scrollRestoration" in history) { try { history.scrollRestoration = "manual"; } catch (e) {} }
   window.scrollTo(0, 0);
   window.addEventListener("load", function () { window.scrollTo(0, 0); });
   window.addEventListener("pageshow", function () { window.scrollTo(0, 0); });
 
-  /* ---------- Header shrink on scroll + to-top ---------- */
+  /* ============================================================
+     2. ヘッダー：スクロールで縮小／下スクロールで隠す／トップへ戻る
+     ------------------------------------------------------------
+     header … 固定ヘッダー要素（全ページに在る）
+     toTop  … 「↑ページトップ」ボタン（全ページに在る）
+     lastY  … 直前のスクロール位置。今回との差で「上/下どちらへ動いたか」を判定
+     ============================================================ */
   var header = document.querySelector(".l-header");
   var toTop = document.querySelector(".c-to-top");
 
-  var lastY = 0;
+  var lastY = 0;                                   // 直前のスクロールY（onScroll で更新）
   function onScroll() {
-    var y = window.scrollY;
+    var y = window.scrollY;                         // 今のスクロール位置
     if (header) {
-      header.classList.toggle("is-scrolled", y > 20);
-      var denom = document.documentElement.scrollHeight - window.innerHeight;
-      header.style.setProperty("--scrollp", denom > 0 ? Math.min(1, y / denom) : 0); // 進捗ライン
-      if (y > 240 && y > lastY + 4) header.classList.add("is-hidden");               // 下スクロールで隠す
-      else if (y < lastY - 4 || y < 240) header.classList.remove("is-hidden");       // 上スクロール/最上部で表示
+      header.classList.toggle("is-scrolled", y > 20);                 // 少し下げたらヘッダーを縮小
+      var denom = document.documentElement.scrollHeight - window.innerHeight; // スクロール可能な総量
+      header.style.setProperty("--scrollp", denom > 0 ? Math.min(1, y / denom) : 0); // 進捗ライン(0〜1)
+      if (y > 240 && y > lastY + 4) header.classList.add("is-hidden");        // 下へ動いた→隠す
+      else if (y < lastY - 4 || y < 240) header.classList.remove("is-hidden"); // 上へ動いた/最上部→表示
     }
-    if (toTop) toTop.classList.toggle("is-visible", y > 600);
-    lastY = y;
+    if (toTop) toTop.classList.toggle("is-visible", y > 600);         // 600px超で「↑」を出す
+    lastY = y;                                                        // 次回比較用に記録
   }
   window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  onScroll();                                       // 初期状態を反映
 
   if (toTop) {
     toTop.addEventListener("click", function (e) {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });   // 「↑」でなめらかに最上部へ
     });
   }
 
-  /* ---------- Loader ---------- */
+  /* ============================================================
+     3. ローダー（花のくるくる）
+     ------------------------------------------------------------
+     loader … 全画面のローディング要素（index のヒーロー時のみDOMに在る）
+     花が1回転（=0.8秒）し終わる少しあと(850ms)に is-loaded を付けて消す。
+     ============================================================ */
   var loader = document.querySelector(".c-loader");
   if (loader) {
     var hideLoader = function () { loader.classList.add("is-loaded"); };
-    /* 花が1回転(=0.8秒)し終わったらサイトを表示 */
     setTimeout(hideLoader, 850);
   }
 
-  /* ---------- First View：固定ヒーロー（虹色フリップ→スクロールで5行順送り→最後キャッチが残る） ---------- */
+  /* ============================================================
+     4. トップの固定ヒーロー演出（index だけ）
+     ------------------------------------------------------------
+     ページを開くと画面を固定し、下記の段階を順に見せる：
+       ①失敗 →(スクロール)→ ②再挑戦 →(スクロール)→ ③複合
+       →(0.5秒後に自動)→ ④矢印 →(スクロール)→ ⑤5行が自動で流れる
+       →(出そろってからスクロール)→ ⑥キャッチ →(スクロール)→ 本編へ解放
+     5行の自動表示中はスクロールしても遷移しない（出そろうまでロック）。
+
+     ■ ヒーローで使う主な変数（この if ブロック内で定義）
+       hero        … 固定ヒーロー要素（この機能の入口）
+       heroLines   … 5行の各行要素（自動表示する対象）
+       heroCatch   … 最後の「THE NEXT STAGE」キャッチ要素
+       heroMorph   … 失敗/再挑戦/複合/矢印を描くモーフ領域
+       stackBtmEl  … モーフ下段（文字を入力/消去する箱）
+       first/second… 下段に打つ語（data属性から取得。既定は "再挑戦"）
+       ── 非 reduced-motion 時のスクロール制御（L『state』以降で定義）──
+       mStep       … 今の段階（0=未開始, 1=失敗 … 6=キャッチ）
+       mMax        … 最終段階の番号（=6）
+       mBusy       … 遷移アニメ中/ロック中は true（true の間は入力を無視）
+       mActive     … ヒーロー制御が有効か（解放後は false）
+       mReachedCatch… キャッチ到達済みか（以降は戻さない）
+       accum       … 溜めたスクロール量(px)。STEP_LEN 超で1段進む
+       STEP_LEN    … 1段進むのに必要なスクロール量(px)
+       NLINE       … 自動表示する行数（= heroLines の数, 通常5）
+       LINE_GAP    … 5行を1行ずつ出す間隔(ms)
+     ============================================================ */
   var hero = document.querySelector(".p-hero");
   if (hero) {
-    /* 英字キャッチ：各行(reveal-text)を1文字ずつspan化。CSSで黒カーペット→文字表示＆約5秒おきに虹色の波 */
+    /* --- (4-1) 英字キャッチを1文字ずつ span 化 ---
+       CSSで「黒いカーペットから文字が現れ、数秒おきに虹色の波」を出すため、
+       文字ごとに span(.p-hero__cch) を作り、--i(順番)と --lc(色) を付ける。 */
     var catchTexts = hero.querySelectorAll(".p-hero__catch-copy .p-hero__reveal-text");
     if (catchTexts.length) {
       var catchPal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
-      var ci = 0;
+      var ci = 0;                                   // 文字の通し番号（--i に使う）
       Array.prototype.forEach.call(catchTexts, function (rt) {
         var txt = rt.textContent;
         rt.textContent = "";
@@ -66,11 +128,12 @@
           rt.appendChild(s);
           ci++;
         });
-        ci++; // 行間もインデックスを1つ空けて波を連続的に
+        ci++; // 行間もインデックスを1つ空けて、波を連続的に見せる
       });
     }
-    var heroLines = hero.querySelectorAll(".p-hero__line");
-    /* 5行も1文字ずつに分割し「虹色→黒」settleで出す */
+
+    /* --- (4-2) 5行のコピーも1文字ずつ span 化（虹色→黒の settle 表示用） --- */
+    var heroLines = hero.querySelectorAll(".p-hero__line");   // 5行の各行（自動表示の対象）
     var linePalette = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
     Array.prototype.forEach.call(heroLines, function (line) {
       var it = line.querySelector("i");
@@ -87,15 +150,16 @@
         it.appendChild(s);
       });
     });
-    var heroCatch = hero.querySelector(".p-hero__catch");
-    var heroScroll = hero.querySelector(".p-fv__scroll");
-    var heroMorph = hero.querySelector(".p-hero__morph");
-    var stackEl = hero.querySelector(".p-hero__stack");
-    var stackTopEl = hero.querySelector(".p-hero__stack-top");
-    var stackBtmEl = hero.querySelector(".p-hero__stack-btm");
-    var stackCaret = stackBtmEl ? stackBtmEl.querySelector(".p-hero__caret") : null;
+
+    /* --- (4-3) ヒーロー内の主要要素を取得 --- */
+    var heroCatch = hero.querySelector(".p-hero__catch");        // 最後のキャッチ
+    var heroMorph = hero.querySelector(".p-hero__morph");        // 失敗/再挑戦/複合/矢印の描画領域
+    var stackTopEl = hero.querySelector(".p-hero__stack-top");   // スタック上段（失敗）
+    var stackBtmEl = hero.querySelector(".p-hero__stack-btm");   // スタック下段（文字を打つ箱）
+    var stackCaret = stackBtmEl ? stackBtmEl.querySelector(".p-hero__caret") : null; // 入力カーソル
     var stackPal = ["#e60012", "#ed6d1f", "#f5a200", "#009944", "#41a1be", "#1d2088", "#601986", "#e95383"];
-    /* 語を1文字ずつ p-hero__sch にして --i/--lc を付与（矢印分は index を1つ空ける） */
+
+    /* 語を1文字ずつ .p-hero__sch にして --i/--lc を付与（矢印ぶん index を1つ空ける） */
     var buildSch = function (el, txt, start) {
       if (!el) return;
       el.textContent = "";
@@ -108,18 +172,24 @@
         el.appendChild(s);
       });
     };
-    if (stackTopEl) buildSch(stackTopEl, stackTopEl.textContent, 0); // 失敗 = 0,1
-    var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    hero.classList.add("is-play"); // 虹色バーのフリップをロード時に再生
+    if (stackTopEl) buildSch(stackTopEl, stackTopEl.textContent, 0); // 上段「失敗」= index 0,1
 
-    /* 入力後、上段(失敗)＋矢印を出して次の挙動へ。FLIP で下段が中央→定位置へ滑らかに移動 */
-    /* ---- スクロールで進む4段階モーフ ---- */
+    var heroReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; // 動きを減らす設定か
+    hero.classList.add("is-play"); // 読み込み時に虹色バーのフリップを再生
+
+    /* --- (4-4) モーフ演出の部品（①〜④を作る関数群） ---
+       first/second … 下段に打つ語（HTMLの data-first/data-second。既定は "再挑戦"）
+       morphTimers   … このブロックで使う全 setTimeout の id 置き場（まとめて中止できる）
+       T()           … タイマーを登録しつつ id を morphTimers に記録するヘルパ
+       clearMorphTimers() … 登録済みタイマーを全部止める */
     var first = stackBtmEl ? (stackBtmEl.getAttribute("data-first") || "") : "";
     var second = stackBtmEl ? (stackBtmEl.getAttribute("data-second") || "再挑戦") : "再挑戦";
     var morphTimers = [];
     var T = function (fn, ms) { var id = setTimeout(fn, ms); morphTimers.push(id); return id; };
     var clearMorphTimers = function () { morphTimers.forEach(clearTimeout); morphTimers = []; };
-    var addChar = function (ch, idx) { // 黒で1文字ずつ入力（カーソルの前へ挿入）
+
+    // 下段に文字を1つ挿入（黒文字。カーソルの前へ）
+    var addChar = function (ch, idx) {
       var s = document.createElement("span");
       s.className = "p-hero__tch";
       s.textContent = ch;
@@ -128,24 +198,46 @@
       if (stackCaret && stackCaret.parentNode === stackBtmEl) stackBtmEl.insertBefore(s, stackCaret);
       else if (stackBtmEl) stackBtmEl.appendChild(s);
     };
+    // 下段の最後の1文字を消す（あれば true）
     var delLast = function () {
       if (!stackBtmEl) return false;
       var spans = stackBtmEl.querySelectorAll(".p-hero__tch");
       if (spans.length) { stackBtmEl.removeChild(spans[spans.length - 1]); return true; }
       return false;
     };
-    var typeWord = function (word, cb) { var i = 0; var step = function () { if (i < word.length) { addChar(word[i], i); i++; T(step, 340); } else cb(); }; step(); };
-    var rainbowOnce = function (len, cb) { heroMorph.classList.add("is-typewave"); T(function () { heroMorph.classList.remove("is-typewave"); cb(); }, (len - 1) * 200 + 800); };
-    var clearWord = function (cb) { var step = function () { if (delLast()) T(step, 120); else cb(); }; step(); };
-    var stage1 = function (done) { // ①失敗を入力（黒）→5秒後から虹が流れ続ける
+    // 語を1文字ずつ「入力」する（340ms間隔）。打ち終わったら cb()
+    var typeWord = function (word, cb) {
+      var i = 0;
+      var step = function () {
+        if (i < word.length) {
+          addChar(word[i], i);
+          i++;
+          T(step, 340);
+        } else {
+          cb();
+        }
+      };
+      step();
+    };
+    // 入力済みの文字を後ろから1つずつ消す（120ms間隔）。消し終わったら cb()
+    var clearWord = function (cb) {
+      var step = function () {
+        if (delLast()) T(step, 120);
+        else cb();
+      };
+      step();
+    };
+
+    /* 段階の中身を作る4つの関数（done を呼ぶと「その段階の完成」を通知） */
+    var stage1 = function (done) {                 // ①「失敗」を入力→虹の波を流し続ける
       heroMorph.classList.remove("is-typewave");
       typeWord(first, function () { heroMorph.classList.add("is-typewave"); done(); });
     };
-    var stage2 = function (done) { // ②失敗を消去→再挑戦を入力（黒）→5秒後から虹が流れ続ける
-      heroMorph.classList.remove("is-typewave"); // 失敗の虹を止める
+    var stage2 = function (done) {                 // ②「失敗」を消去→「再挑戦」を入力→虹の波
+      heroMorph.classList.remove("is-typewave");
       clearWord(function () { typeWord(second, function () { heroMorph.classList.add("is-typewave"); done(); }); });
     };
-    var stage3 = function (done) { // ③再挑戦を消去→失敗・再挑戦のスタック出現
+    var stage3 = function (done) {                 // ③「再挑戦」を消去→失敗/再挑戦のスタック出現
       heroMorph.classList.remove("is-typewave");
       clearWord(function () { T(function () {
         if (stackCaret && stackCaret.parentNode) stackCaret.parentNode.removeChild(stackCaret);
@@ -154,7 +246,12 @@
         done();
       }, 300); });
     };
-    var stage4 = function (done) { heroMorph.classList.add("is-stack-full"); done(); }; // ④矢印＋失敗/再挑戦に順番で虹
+    var stage4 = function (done) { heroMorph.classList.add("is-stack-full"); done(); }; // ④矢印を出す
+
+    /* runStages：curStage を wantStage まで順に進める（1つ完成したら次へ）
+       wantStage … どの段階まで見せたいか（goForward が設定）
+       curStage  … 今どの段階まで完成しているか
+       playing   … 段階アニメの実行中フラグ（多重起動を防ぐ） */
     var stageFns = [stage1, stage2, stage3, stage4];
     var wantStage = 0, curStage = 0, playing = false;
     var runStages = function () {
@@ -164,7 +261,8 @@
       curStage++;
       fn(function () { playing = false; runStages(); });
     };
-    var snapToStack = function () { // 速いスクロール等では最終状態へ即確定
+    // 速いスクロール等で途中を飛ばす場合、④まで即確定する
+    var snapToStack = function () {
       if (curStage >= 4) return;
       clearMorphTimers();
       playing = true; curStage = 4; wantStage = 4;
@@ -175,39 +273,65 @@
     };
 
     if (heroReduced) {
-      if (stackBtmEl) buildSch(stackBtmEl, second, 3); // 再挑戦を即表示
+      /* --- 動きを減らす設定：演出せず、最終形（スタック＋キャッチ）を即表示 --- */
+      if (stackBtmEl) buildSch(stackBtmEl, second, 3);
       if (heroMorph) heroMorph.classList.add("is-stack", "is-stack-full");
       if (heroCatch) heroCatch.classList.add("is-show");
     } else {
-      /* ===== PC/スマホ共通：1ジェスチャ＝1ステップ（スクロールロック。激しいスクロール/フリックでも1つだけ進む） ===== */
+      /* ========================================================
+         (4-5) スクロール制御（通常時）
+         --------------------------------------------------------
+         画面を固定（overflow:hidden）して、スクロール/スワイプ/キーで
+         段階を1つずつ進める。5行だけは到達後に自動で流れる。
+         ======================================================== */
       var docEl = document.documentElement;
       docEl.style.overflow = "hidden"; document.body.style.overflow = "hidden";
       hero.style.height = "100svh"; window.scrollTo(0, 0);
+
       /* 段階：①失敗(1) ②再挑戦(2) ③複合(3) ④矢印(4) ⑤5行(5) ⑥キャッチ(6) */
       var NLINE = heroLines.length;                 // 自動表示する行数（通常5行）
       var LINE_GAP = 700;                           // 5行を1行ずつ出す間隔(ms)
-      var mStep = 0, mMax = 6, mBusy = false, mActive = true, mReachedCatch = false;
-      var setBg = function (step) { // 段階に合わせた背景（キャッチは背景なし）
+      var mStep = 0;                                // 今の段階（0=未開始〜6=キャッチ）
+      var mMax = 6;                                 // 最終段階の番号
+      var mBusy = false;                            // true の間は入力を無視（遷移中/5行の自動表示中）
+      var mActive = true;                           // ヒーロー制御が有効か（解放後 false）
+      var mReachedCatch = false;                    // キャッチ到達済みか（以降は戻さない）
+
+      // 段階に合わせて背景を切り替える（data-bg。キャッチは背景なし）
+      var setBg = function (step) {
         var v = step <= 1 ? "fail" : step === 2 ? "retry" : step <= 4 ? "stack" : step === 5 ? "lines" : "";
         if (v) hero.setAttribute("data-bg", v); else hero.removeAttribute("data-bg");
       };
+
+      /* タイマー類：
+         busyTimer     … 「一定時間後に mBusy を false に戻す」用
+         autoArrowTimer… ③複合の完成後に④矢印を自動表示する用 */
       var busyTimer = null, autoArrowTimer = null;
       var clearBusyTimer = function () { if (busyTimer) { clearTimeout(busyTimer); busyTimer = null; } };
       var clearAutoArrow = function () { if (autoArrowTimer) { clearTimeout(autoArrowTimer); autoArrowTimer = null; } };
-      /* SCROLL↓：操作待ち（遷移中でも自動待ちでもない）ときだけ表示 */
+
+      // SCROLL↓インジケーター：操作待ち（遷移中でも自動待ちでもない）ときだけ表示
       var syncHint = function () { if (hero) hero.classList.toggle("is-scrollhint", mActive && !mBusy && !autoArrowTimer); };
+      // ms 後に mBusy を解除して SCROLL↓ を出す（＝遷移アニメが終わるまでロック）
       var setBusyFalseAfter = function (ms) { clearBusyTimer(); busyTimer = setTimeout(function () { mBusy = false; syncHint(); }, ms); };
+
+      /* 5行の表示ヘルパ：
+         lineTimers            … 5行を出す setTimeout の置き場
+         showLines(cnt)        … 先頭 cnt 行を即表示（戻る用）
+         revealLinesStaggered()… 1行ずつ時間差で自動表示（本番用） */
       var lineTimers = [];
       var clearLineTimers = function () { for (var i = 0; i < lineTimers.length; i++) clearTimeout(lineTimers[i]); lineTimers = []; };
       var hideLines = function () { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.remove("is-show"); };
       var showLines = function (cnt) { clearLineTimers(); for (var i = 0; i < heroLines.length; i++) heroLines[i].classList.toggle("is-show", i < cnt); };
-      var revealLinesStaggered = function () {      // 5行を1行ずつ時間差で自動表示
+      var revealLinesStaggered = function () {
         clearLineTimers();
         for (var i = 0; i < heroLines.length; i++) {
           (function (idx) { lineTimers.push(setTimeout(function () { heroLines[idx].classList.add("is-show"); }, idx * LINE_GAP)); })(i);
         }
       };
-      var setWordPlain = function (word) { // 戻る用に語を黒で即描画（tchクラス＝後で消去アニメも効く）
+
+      // 戻る操作用：下段の語を黒文字で即描画（アニメ無し）
+      var setWordPlain = function (word) {
         if (!stackBtmEl) return;
         stackBtmEl.innerHTML = "";
         Array.prototype.forEach.call(word, function (ch, k) {
@@ -216,7 +340,9 @@
           stackBtmEl.appendChild(s);
         });
       };
-      var renderState = function (n) { // 戻る：状態nを即座に描画（アニメ無し）
+
+      // 戻る：段階 n の見た目をアニメ無しで即座に作り直す
+      var renderState = function (n) {
         clearMorphTimers(); clearAutoArrow(); clearBusyTimer();
         heroMorph.classList.remove("is-typewave", "is-stack", "is-stack-full");
         hero.classList.remove("is-lines", "is-catch");
@@ -234,11 +360,20 @@
         }
         syncHint();
       };
-      var release = function () { // 最後まで進んだら通常スクロールへ解放
+
+      // 最後まで進んだら固定を解除して通常スクロール（本編）へ
+      var release = function () {
         mActive = false; syncHint();
         docEl.style.overflow = ""; document.body.style.overflow = "";
         window.scrollTo(0, hero.offsetHeight);
       };
+
+      /* goForward：1段進める本体（下方向の入力で呼ばれる）
+         - mBusy 中は無視
+         - 最終段まで来ていたら release()
+         - ①〜④はモーフ（③到達で④矢印を0.5秒後に自動表示）
+         - ⑤は5行を自動カスケード（出そろうまで mBusy=true でロック）
+         - ⑥はキャッチ表示（以降は戻さない） */
       var goForward = function () {
         if (mBusy) return;
         if (mStep >= mMax) { release(); return; }
@@ -253,7 +388,7 @@
               if (mActive && mStep === 3) goForward();   // スクロール不要で自動表示
             }, 2750);
           } else {
-            /* 失敗→再挑戦(②)は強制1ステップなので長め。矢印(④)は短め */
+            /* 失敗→再挑戦(②)は入力アニメが長いので長め。矢印(④)は短め */
             setBusyFalseAfter(mStep === 2 ? 2600 : 480);
           }
         } else if (mStep === 5) {                   // ⑤5行：1行ずつ自動で流れる（出そろうまでスクロール遷移をロック）
@@ -262,7 +397,7 @@
           revealLinesStaggered();
           var revealDone = (NLINE - 1) * LINE_GAP + 900; // 全行＋最終行アニメが出そろうまで
           clearBusyTimer();                          // revealDoneまで mBusy=true を維持＝自動表示中のスクロールは無視
-          busyTimer = setTimeout(function () { mBusy = false; accum = 0; syncHint(); }, revealDone);
+          busyTimer = setTimeout(function () { mBusy = false; accum = 0; syncHint(); }, revealDone); // accum=下で定義
         } else {                                    // ⑥キャッチ
           if (curStage < 4) snapToStack();
           hideLines(); hero.classList.add("is-lines", "is-catch"); if (heroCatch) heroCatch.classList.add("is-show");
@@ -270,8 +405,15 @@
           setBusyFalseAfter(900);
         }
       };
+      // goBack：1段戻す（キャッチ到達後や①より前へは戻さない）
       var goBack = function () { if (mBusy || mStep <= 1 || mReachedCatch) return; mStep--; renderState(mStep); };
-      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); syncHint(); } }, 1150); // ①失敗を自動表示（背景も）
+
+      // ページ表示から少し置いて①失敗を自動表示（演出のスタート地点）
+      setTimeout(function () { if (mStep === 0) { mStep = 1; wantStage = 1; setBg(1); runStages(); syncHint(); } }, 1150);
+
+      /* --- 入力：タッチ（スマホ） ---
+         sY … スワイプ開始Y、lastY … 直前Y（差分を accum に足していく）
+         ※ lastY は上部(L『onScroll』)の lastY と同名だが、ここは触っている間だけ使う */
       var sY = null, lastY = null;
       window.addEventListener("touchstart", function (e) { if (mActive) { sY = lastY = e.touches[0].clientY; } }, { passive: true });
       window.addEventListener("touchmove", function (e) {
@@ -290,18 +432,24 @@
         if (mStep < 2) { if (dy > 40) goForward(); else if (dy < -40) goBack(); } // 失敗→再挑戦：強制1ステップ
         sY = lastY = null;
       }, { passive: true });
-      /* PC：失敗→再挑戦は1ジェスチャ＝1ステップ。再挑戦以降はスクロール量（長さ）で進む */
+
+      /* --- 入力：ホイール（PC） ---
+         失敗→再挑戦(mStep<2)までは「1スクロール＝1ステップ」に制限（wheelLock）。
+         再挑戦以降はスクロール量を accum に溜め、STEP_LEN 超えるごとに1段。
+         wheelLock … 惰性スクロールで一気に進まないためのロック
+         accum     … 溜めたスクロール量(px)
+         STEP_LEN  … 1段進むのに必要な量(px) */
       var wheelLock = false, wheelTimer = null;
       var relockWheel = function () { clearTimeout(wheelTimer); wheelTimer = setTimeout(function () { wheelLock = false; }, 220); };
-      var accum = 0, STEP_LEN = 90;               // 1ステップ進むのに必要なスクロール量(px)
-      var advanceByAccum = function () {           // 累積スクロール量でステップ進行（長さ基準）
-        if (mBusy) return;                          // ←5行の自動表示中はここで弾かれ、キャッチへ遷移しない
+      var accum = 0, STEP_LEN = 90;
+      var advanceByAccum = function () {           // 溜めた量で1段進める（5行の自動表示中は mBusy で弾かれる）
+        if (mBusy) return;
         if (accum >= STEP_LEN) { accum -= STEP_LEN; goForward(); }
         else if (accum <= -STEP_LEN) { accum += STEP_LEN; goBack(); }
       };
       window.addEventListener("wheel", function (e) {
         if (!mActive) return;
-        e.preventDefault();                       // ページスクロールを止めて制御
+        e.preventDefault();                       // ページの通常スクロールを止めて自前制御
         var strict = (mStep < 2);                 // 失敗→再挑戦までは強制1スクロール＝1ステップ
         if (strict) {
           accum = 0;
@@ -316,7 +464,8 @@
         accum += e.deltaY;
         advanceByAccum();                         // 余りは持ち越し＝スクロール分を無駄にしない
       }, { passive: false });
-      /* キーボード操作（アクセシビリティ） */
+
+      /* --- 入力：キーボード（アクセシビリティ） --- */
       window.addEventListener("keydown", function (e) {
         if (!mActive || mBusy) return;
         if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); goForward(); }
@@ -325,175 +474,13 @@
     }
   }
 
-  /* ---------- MV romaji typing ---------- */
-  var roman = document.querySelector(".p-top-mv__roman[data-text]");
-  if (roman) {
-    var text = roman.getAttribute("data-text");
-    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      roman.textContent = text;
-    } else {
-      roman.textContent = "";
-      var i = 0;
-      var type = function () {
-        if (i <= text.length) {
-          roman.textContent = text.slice(0, i);
-          i++;
-          setTimeout(type, 130);
-        }
-      };
-      setTimeout(type, 1100);
-    }
-  }
-
-  /* ---------- Top intro: isolated, one-way overlay (page locked) ---------- */
-  var intro = document.querySelector(".p-intro");
-  if (intro) {
-    var opening = intro.querySelector(".p-intro__opening");
-    var roulette = intro.querySelector(".p-intro__roulette");
-    var lines = intro.querySelectorAll(".p-intro__line");
-    var statements = intro.querySelector(".p-intro__statements");
-    var mediaImgs = intro.querySelectorAll(".p-intro__media-img");
-    var introScroll = intro.querySelector(".p-intro__scroll");
-    var burstBox = intro.querySelector(".p-intro__burst");
-    var introReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var docEl = document.documentElement;
-    var prog = 0, introDone = false, burstDone = false, brandReached = false, brandTime = 0;
-    var openUntil = 0.07, brandAt = 0.70;
-    var SENS = 1 / 1500; // wheel units needed to complete the intro (~one screen of scrolling)
-    var palette = ["#e60012","#ed6d1f","#f5a200","#009944","#41a1be","#1d2088","#601986","#e95383"];
-
-    /* build explosion particles */
-    if (burstBox && !introReduced) {
-      for (var bi = 0; bi < 64; bi++) {
-        var sp = document.createElement("span");
-        sp.className = "p-intro__particle";
-        var ang = Math.random() * Math.PI * 2, dist = 150 + Math.random() * 420;
-        sp.style.setProperty("--tx", Math.cos(ang) * dist + "px");
-        sp.style.setProperty("--ty", Math.sin(ang) * dist + "px");
-        var sz = 6 + Math.random() * 18;
-        sp.style.width = sz + "px"; sp.style.height = sz + "px";
-        var col = palette[bi % palette.length];
-        sp.style.background = col; sp.style.color = col;
-        sp.style.animationDelay = (Math.random() * 0.08) + "s";
-        burstBox.appendChild(sp);
-      }
-    }
-    var fireBurst = function () {
-      if (burstDone || introReduced) return;
-      burstDone = true; intro.classList.add("is-burst");
-    };
-
-    var lockScroll = function () { docEl.classList.add("is-intro-lock"); document.body.classList.add("is-intro-lock"); };
-    var unlockScroll = function () { docEl.classList.remove("is-intro-lock"); document.body.classList.remove("is-intro-lock"); };
-
-    var render = function () {
-      if (introDone) return;
-      var p = prog;
-      if (p < openUntil) {
-        if (opening) opening.classList.remove("is-hide");
-        statements.classList.add("is-hide");
-        intro.classList.remove("is-story", "is-brand");
-        if (introScroll) introScroll.classList.remove("is-hide");
-        return;
-      }
-      if (opening) opening.classList.add("is-hide");
-      if (p >= brandAt) {
-        statements.classList.add("is-hide");
-        intro.classList.remove("is-story");
-        intro.classList.add("is-brand");
-        fireBurst();
-        if (introScroll) introScroll.classList.add("is-hide");
-      } else {
-        statements.classList.remove("is-hide");
-        intro.classList.add("is-story");
-        intro.classList.remove("is-brand");
-        if (introScroll) introScroll.classList.remove("is-hide");
-        var span = brandAt - openUntil;
-        lines.forEach(function (l, i) {
-          l.classList.toggle("is-show", p >= openUntil + span * i / lines.length);
-        });
-        if (mediaImgs.length) {
-          var frac = (p - openUntil) / span;
-          var stage = Math.min(mediaImgs.length - 1, Math.floor(frac * mediaImgs.length));
-          mediaImgs.forEach(function (im, i) { im.classList.toggle("is-show", i === stage); });
-        }
-      }
-    };
-
-    var finish = function () {
-      if (introDone) return;
-      introDone = true;
-      intro.classList.add("is-brand"); fireBurst();
-      setTimeout(function () {
-        unlockScroll();
-        intro.classList.add("is-resolved");   // 社名ヒーローとして在流配置で残す
-        window.scrollTo(0, 0);
-        if (introScroll) introScroll.classList.remove("is-hide"); // 下へ誘導するSCROLLを再表示
-      }, 350);
-    };
-
-    /* one-way only: downward input advances, upward is ignored.
-       社名が出たら、少しの間(演出を見せる)のあと“ひと押し”で本編へ解放する */
-    var advance = function (delta) {
-      if (introDone || delta <= 0) return;
-      if (brandReached) {
-        if (Date.now() - brandTime > 450) finish();   // 社名表示後の次のスクロールで解放
-        return;
-      }
-      prog = Math.min(1, prog + delta * SENS);
-      render();
-      if (prog >= brandAt && !brandReached) { brandReached = true; brandTime = Date.now(); }
-    };
-
-    if (introReduced) {
-      // skip the sequence entirely; reveal the page
-      introDone = true;
-      intro.style.display = "none";
-    } else {
-      lockScroll();
-
-      /* opening word roulette (auto, once) */
-      if (roulette) {
-        var words = (roulette.getAttribute("data-words") || "").split(",").filter(Boolean);
-        var finalWord = roulette.getAttribute("data-final") || roulette.textContent;
-        var idx = 0, ticks = 0, maxTicks = 22, delay = 70;
-        var spin = function () {
-          if (introDone) return;
-          roulette.textContent = words.length ? words[idx % words.length] : finalWord;
-          idx++; ticks++;
-          if (ticks >= maxTicks) { roulette.textContent = finalWord; roulette.classList.add("is-set"); return; }
-          delay += (ticks > maxTicks - 7) ? 45 : 5;
-          setTimeout(spin, delay);
-        };
-        setTimeout(spin, 900);
-      }
-
-      var onWheel = function (e) { if (introDone) return; e.preventDefault(); advance(e.deltaY); };
-      window.addEventListener("wheel", onWheel, { passive: false });
-
-      var ty = null;
-      window.addEventListener("touchstart", function (e) { if (introDone) return; ty = e.touches[0].clientY; }, { passive: true });
-      window.addEventListener("touchmove", function (e) {
-        if (introDone) return;
-        e.preventDefault();
-        var y = e.touches[0].clientY;
-        if (ty !== null) advance((ty - y) * 2.2);
-        ty = y;
-      }, { passive: false });
-
-      window.addEventListener("keydown", function (e) {
-        if (introDone) return;
-        if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " " || e.key === "Spacebar") {
-          e.preventDefault(); advance(150);
-        }
-      });
-
-      render();
-    }
-  }
-
-  /* ---------- Mobile nav toggle ---------- */
+  /* ============================================================
+     5-a. スマホのナビ開閉（ハンバーガー）
+     ------------------------------------------------------------
+     navToggle … ハンバーガーボタン, nav … グローバルナビ
+     開閉に合わせて aria-expanded を更新（アクセシビリティ）。
+     リンク押下や Esc で閉じる。
+     ============================================================ */
   var navToggle = document.querySelector(".c-hamburger-btn");
   var nav = document.querySelector(".p-global-nav");
 
@@ -509,14 +496,18 @@
       navToggle.setAttribute("aria-expanded", String(open));
     });
     nav.addEventListener("click", function (e) {
-      if (e.target.closest("a")) closeNav();
+      if (e.target.closest("a")) closeNav();       // ナビ内リンクを押したら閉じる
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeNav();
     });
   }
 
-  /* ---------- Dropdown accordions (mobile) ---------- */
+  /* ============================================================
+     5-b. 「会社情報」ドロップダウン（スマホのアコーディオン）
+     ------------------------------------------------------------
+     複数の親ボタンのうち、押したもの以外は閉じる（1つだけ開く）。
+     ============================================================ */
   var parents = document.querySelectorAll(".p-global-nav__parent");
   parents.forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -532,7 +523,12 @@
     });
   });
 
-  /* ---------- 全ページにスクロールリビールを自動付与（トップ以外も動くHPに） ---------- */
+  /* ============================================================
+     6-a. スクロールで要素をふわっと表示（reveal）を全ページに自動付与
+     ------------------------------------------------------------
+     各セクションの直下要素に .reveal を付け、少しずつ遅延(スタッガー)を掛ける。
+     すでに .reveal がある/内部に持つ塊は二重化しない。
+     ============================================================ */
   (function autoReveal() {
     var containers = document.querySelectorAll(".l-section .l-container");
     Array.prototype.forEach.call(containers, function (container) {
@@ -549,14 +545,19 @@
     });
   })();
 
-  /* ---------- Reveal on scroll ---------- */
+  /* ============================================================
+     6-b. reveal の発火（画面に入ったら is-visible）
+     ------------------------------------------------------------
+     IntersectionObserver で「画面内に入った要素」に is-visible を付ける。
+     非対応ブラウザでは即表示（フォールバック）。
+     ============================================================ */
   var revealEls = document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add("is-visible");
-          io.unobserve(entry.target);
+          io.unobserve(entry.target);              // 一度出したら監視解除
         }
       });
     }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
@@ -565,7 +566,13 @@
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
 
-  /* ---------- Magnetic buttons（PCのみ・reduced無効） / Count-up ---------- */
+  /* ============================================================
+     6-c. マグネットボタン（PCのみ）＋数値カウントアップ
+     ------------------------------------------------------------
+     fine   … マウス等の細かいポインタか（＝PC。タッチは対象外）
+     reduce … 動きを減らす設定か
+     PCかつ reduce でないときだけ、ボタンがカーソルに軽く追従。
+     ============================================================ */
   var fine = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (fine && !reduce) {
@@ -579,18 +586,19 @@
       btn.addEventListener("mouseleave", function () { btn.style.transform = ""; });
     });
   }
+  // 数値カウントアップ：data-countup を持つ要素が画面に入ったら 0→目標値へ
   (function countUp() {
     var nums = document.querySelectorAll("[data-countup]");
     if (!nums.length) return;
-    var fmt = function (n) { return n.toLocaleString("ja-JP"); };
+    var fmt = function (n) { return n.toLocaleString("ja-JP"); };     // 3桁区切り
     var run = function (el) {
       var target = parseFloat(el.getAttribute("data-countup")) || 0;
       var suffix = el.getAttribute("data-suffix") || "";
-      if (reduce) { el.textContent = fmt(target) + suffix; return; }
+      if (reduce) { el.textContent = fmt(target) + suffix; return; }  // 動き無し設定は即最終値
       var dur = 1300, t0 = null;
       var tick = function (ts) {
         if (!t0) t0 = ts;
-        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3); // ease-out
         el.textContent = fmt(Math.round(target * e)) + suffix;
         if (p < 1) requestAnimationFrame(tick);
       };
@@ -604,11 +612,18 @@
     } else { nums.forEach(run); }
   })();
 
-  /* ---------- Contact form（contact.php へ実送信 / info@revenge.co.jp） ---------- */
+  /* ============================================================
+     7. 問い合わせフォーム（contact だけ）
+     ------------------------------------------------------------
+     form … #contactForm, note … 補助メッセージ表示欄
+     送信は contact.php へ fetch（JSON）。結果は画面中央のモーダルで通知。
+     fetch 非対応時は通常のフォーム送信にフォールバック。
+     ============================================================ */
   var form = document.getElementById("contactForm");
   var note = document.getElementById("formNote");
   if (form) {
-    /* 送信結果ポップアップ（モーダル）。DOMに1つ生成して使い回す */
+    /* 結果モーダルはDOMに1つだけ作って使い回す。
+       modal … モーダル要素, modalLastFocus … 閉じた後に戻すフォーカス元 */
     var modal = null, modalLastFocus = null;
     function buildModal() {
       var m = document.createElement("div");
@@ -628,7 +643,7 @@
         '</div>';
       document.body.appendChild(m);
       m.addEventListener("click", function (ev) {
-        if (ev.target.hasAttribute("data-close")) closeModal();
+        if (ev.target.hasAttribute("data-close")) closeModal();   // 背景/閉じるで閉じる
       });
       document.addEventListener("keydown", function (ev) {
         if (!modal || modal.hidden) return;
@@ -636,6 +651,7 @@
       });
       return m;
     }
+    // モーダルを開く（ok=成功か, title=見出し, text=本文HTML）
     function showModal(ok, title, text) {
       if (!modal) modal = buildModal();
       modal.classList.toggle("-err", !ok);
@@ -644,8 +660,7 @@
       modal.querySelector(".c-modal__text").innerHTML = text;
       modalLastFocus = document.activeElement;
       modal.hidden = false;
-      /* reflow → クラス付与でトランジション発火 */
-      void modal.offsetWidth;
+      void modal.offsetWidth;                       // reflow → クラス付与でトランジション発火
       modal.classList.add("is-open");
       var closeBtn = modal.querySelector(".c-modal__close");
       if (closeBtn) closeBtn.focus();
@@ -661,12 +676,12 @@
         var done = false;
         var fin = function () { if (done) return; done = true; hide(); };
         p.addEventListener("transitionend", fin, { once: true });
-        setTimeout(fin, 500);
+        setTimeout(fin, 500);                         // transitionend が来ない時の保険
       }
       if (modalLastFocus && modalLastFocus.focus) { try { modalLastFocus.focus(); } catch (e) {} }
     }
 
-    /* 事業詳細ページの相談ボタン（?type=…）でお問い合わせ種別を自動選択 */
+    /* 事業詳細ページの相談ボタン（?type=…）で問い合わせ種別を自動選択 */
     var qType = new URLSearchParams(window.location.search).get("type");
     if (qType) {
       var typeSel = form.querySelector('select[name="type"]');
@@ -675,6 +690,8 @@
         if (opt) { typeSel.value = qType; }
       }
     }
+
+    // 送信処理：バリデーション → fetch → 結果モーダル
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (!form.checkValidity()) {
@@ -691,7 +708,7 @@
       fetch(action, { method: "POST", body: new FormData(form), headers: { "X-Requested-With": "fetch" } })
         .then(function (r) { return r.json().catch(function () { return { ok: r.ok }; }); })
         .then(function (d) {
-          if (d && d.ok) {
+          if (d && d.ok) {                            // 成功
             note.textContent = "";
             note.className = "p-form__note";
             form.reset();
@@ -705,7 +722,7 @@
               "恐れ入りますが今しばらく<br>" +
               "ご返信をお待ちください。"
             );
-          } else {
+          } else {                                    // サーバがエラーを返した
             note.textContent = "";
             note.className = "p-form__note";
             showModal(
@@ -719,7 +736,7 @@
             );
           }
         })
-        .catch(function () {
+        .catch(function () {                          // 通信そのものが失敗
           note.textContent = "";
           note.className = "p-form__note";
           showModal(
@@ -733,11 +750,17 @@
             "直接ご連絡ください。"
           );
         })
-        .then(function () { if (btn) btn.disabled = false; });
+        .then(function () { if (btn) btn.disabled = false; }); // 最後に必ずボタンを戻す
     });
   }
 
-  /* ---------- News via WordPress REST (optional, graceful fallback) ---------- */
+  /* ============================================================
+     8. WordPress のニュースを差し込む（任意・失敗しても静的のまま）
+     ------------------------------------------------------------
+     window.MISIMA_WP_BASE（config.js で設定）がある時だけ、
+     WP REST から最新記事を取得してトップのニュース一覧を差し替える。
+     未設定・取得失敗時は、HTMLに書かれた静的ニュースをそのまま使う。
+     ============================================================ */
   (function loadWpNews() {
     var base = (window.MISIMA_WP_BASE || "").replace(/\/+$/, "");
     if (!base) return;                         // WP未設定 → 静的ニュースを維持
@@ -746,7 +769,7 @@
     var count = parseInt(list.getAttribute("data-news-count") || "4", 10);
 
     var pad = function (n) { return (n < 10 ? "0" : "") + n; };
-    var esc = function (s) {
+    var esc = function (s) {                    // HTML特殊文字をエスケープ（XSS対策）
       return String(s).replace(/[&<>"]/g, function (c) {
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
       });
