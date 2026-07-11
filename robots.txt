@@ -48,3 +48,4 @@ User-agent: Meta-ExternalAgent
 Allow: /
 
 Sitemap: https://revenge.co.jp/sitemap.xml
+Sitemap: https://revenge.co.jp/wp/wp-sitemap.xml
