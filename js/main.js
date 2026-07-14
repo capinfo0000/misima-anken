@@ -23,6 +23,72 @@
   "use strict";
 
   /* ============================================================
+     0. 共有ヘッダーを注入（全ページ共通・ヘッダーの「正」はこの main.js）
+     ------------------------------------------------------------
+     ヘッダーの中身をこの main.js が持ち、各ページに焼き込まれた
+     ヘッダー（<header class="l-header"> の中身）を、読み込み時に
+     最新版へまるごと差し替える。
+       → 今後ヘッダーを変えたいときは、この main.js だけ差し替えれば
+         全ページに反映される（HTMLを1枚ずつ直す必要がない）。
+     ・各HTMLに焼き込まれたヘッダーは、JS 無効時やクローラ向けの
+       フォールバックとして残している（見た目は同じ）。
+     ・サブフォルダ（service/ など）でもリンクが壊れないよう、
+       既存ロゴリンクの href から相対パス接頭辞（"" か "../"）を読み取る。
+     ※ この後の「ヘッダー縮小」「ナビ開閉」等が要素を取得する前に
+       実行する必要があるため、いちばん最初に置く。
+     ============================================================ */
+  (function injectSharedHeader() {
+    var headerEl = document.querySelector(".l-header");
+    if (!headerEl) return;                       // ヘッダーが無いページは何もしない
+
+    // 相対パス接頭辞（"" か "../"）を既存ロゴリンクの href から読み取る
+    var logoLink = headerEl.querySelector(".l-header__logo a");
+    var href = logoLink ? (logoLink.getAttribute("href") || "index.html") : "index.html";
+    var idx = href.lastIndexOf("index.html");
+    var base = idx >= 0 ? href.slice(0, idx) : "";   // 例: "../index.html" → "../"
+
+    // 現在ページ（ファイル名）から、どのメニューを現在地表示にするか決める
+    var file = (location.pathname.split("/").pop() || "index.html");
+    var isCompany  = (file === "message.html" || file === "purpose.html" || file === "profile.html");
+    var isServices = (file === "services.html" || /^service-\d/.test(file));
+    var isNews     = (file.indexOf("news") === 0);
+    var isPolicy   = (file === "security.html" || file === "sitepolicy.html" || file === "privacy.html");
+    var sub = function (on) { return on ? " is-current" : ""; };   // ドロップダウン<li>用
+    var lnk = function (on) { return on ? "is-current" : ""; };    // 単独リンク<a>用
+
+    headerEl.innerHTML =
+      '<div class="l-header__inner">' +
+        '<p class="l-header__logo"><a href="' + base + 'index.html" aria-label="株式会社Revenge ホーム"><span class="l-header__mark" aria-hidden="true"></span><span class="l-header__word">Re:venge</span></a></p>' +
+        '<nav class="p-global-nav" id="globalNav" aria-label="メインナビゲーション">' +
+          '<ul class="p-global-nav__list">' +
+            '<li class="p-global-nav__item has-sub' + sub(isCompany) + '">' +
+              '<button class="p-global-nav__parent" aria-expanded="false">会社情報</button>' +
+              '<ul class="p-global-nav__sub">' +
+                '<li><a href="' + base + 'message.html">代表メッセージ</a></li>' +
+                '<li><a href="' + base + 'purpose.html">社名の由来</a></li>' +
+                '<li><a href="' + base + 'profile.html">会社概要</a></li>' +
+              '</ul>' +
+            '</li>' +
+            '<li class="p-global-nav__item"><a href="' + base + 'services.html" class="' + lnk(isServices) + '">事業内容</a></li>' +
+            '<li class="p-global-nav__item"><a href="' + base + 'news.html" class="' + lnk(isNews) + '">ニュース</a></li>' +
+            '<li class="p-global-nav__item has-sub' + sub(isPolicy) + '">' +
+              '<button class="p-global-nav__parent" aria-expanded="false">ポリシー</button>' +
+              '<ul class="p-global-nav__sub">' +
+                '<li><a href="' + base + 'security.html">情報セキュリティ基本方針</a></li>' +
+                '<li><a href="' + base + 'sitepolicy.html">サイトポリシー</a></li>' +
+                '<li><a href="' + base + 'privacy.html">プライバシーポリシー</a></li>' +
+              '</ul>' +
+            '</li>' +
+            '<li class="p-global-nav__item"><a href="' + base + 'contact.html" class="p-global-nav__cta">お問い合わせ</a></li>' +
+          '</ul>' +
+        '</nav>' +
+        '<button class="c-hamburger-btn" aria-controls="globalNav" aria-expanded="false" aria-label="メニューを開く">' +
+          '<span></span><span></span><span></span>' +
+        '</button>' +
+      '</div>';
+  })();
+
+  /* ============================================================
      1. 再読み込み時は必ず最上部から
      ------------------------------------------------------------
      ブラウザは前回のスクロール位置を復元することがあるので、

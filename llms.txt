@@ -10,11 +10,10 @@
 - [会社概要](https://revenge.co.jp/profile.html): 会社名・所在地・設立・資本金などの基本情報
 
 ## 事業
-- [事業内容](https://revenge.co.jp/services.html): 4事業の概要
+- [事業内容](https://revenge.co.jp/services.html): 3事業の概要
 - [セールスプロモーション事業](https://revenge.co.jp/service/service-01.html): 販売支援・営業支援
 - [BPO事業](https://revenge.co.jp/service/service-02.html): 業務請負・アウトソーシング
 - [教育・研修事業](https://revenge.co.jp/service/service-03.html): 人材育成・研修
-- [デジタルソリューション事業](https://revenge.co.jp/service/service-04.html): HP制作・埋め込みRAG・イベント運営システム・システム開発
 
 ## その他
 - [ニュース](https://revenge.co.jp/news.html): お知らせ・プレスリリース
