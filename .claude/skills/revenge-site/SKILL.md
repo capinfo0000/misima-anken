@@ -165,6 +165,25 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
 
 ---
 
+## 7b. インフラ構成（ドメイン・サーバ・WP・メール）
+
+汎用の手順・判断は `homepage-production` の §I を参照。本案件の具体は下記。
+
+- **ドメイン**：`revenge.co.jp`（Value Domain で仮登録済み → 登記後アクティベートして公開）。
+  商号に「:」不可のため登記名/ドメインはコロン無し「株式会社Revenge」、表示のみ「Re:venge」。
+- **サーバ**：CoreServer（Value Domain と同系列）。PHP・無料SSL・独自ドメイン対応。
+  公開フォルダは `public_html/`。**差分最小デプロイ**（変更ファイルだけ同階層で上書き）。常時HTTPS。
+- **WordPress**：ニュースのみのハイブリッド運用。`/wp`（`config.js` の `MISIMA_WP_BASE="/wp"`）。
+  実認証情報を含むため `/wp/` は `.gitignore`（Git非コミット、配布ZIPには同梱）。`wp-sitemap.xml` を robots に併記。
+- **メール**：`info@revenge.co.jp`。お問い合わせは `contact.php` が **PHP `mail()`** で送信（From/送信元を
+  同一ドメインにして SPF 通過を狙う設計）。件名/本文はUTF-8統一（`mb_send_mail`は使わない＝文字化け対策）。
+  - ⚠️ **Google Workspace 等でメール受信する場合は要確認**：MX を外部に向けると PHP `mail()` の
+    サーバ送信が SPF/DKIM/DMARC と矛盾して不達になりやすい。SPFにサーバを含める／SMTP送信へ切替／
+    送信専用サービス利用のいずれかで、**SPF/DKIM/DMARC pass で届く**ことを送信テストで確認する。
+    （現状の Workspace 設定状況は未確認。設定するなら MX/SPF/DKIM/DMARC の整合を必ずチェック）
+
+---
+
 ## 8. 変更のチェックリスト（毎回）
 
 1. `gen.py`（またはCSS/JS/contact.php）を編集。HTMLは直接編集しない。
