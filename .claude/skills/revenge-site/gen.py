@@ -410,7 +410,7 @@ def packages_section():
             f'<h4 class="p-pkg__name">{p["name"]}{badge}</h4>'
             f'<p class="p-pkg__summary">{p["summary"]}</p>'
             f'{_pkg_price(p)}'
-            f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しく見る（LP）</a>'
+            f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
             '</div>')
     return ('\n<h3>提供メニューと料金</h3>\n'
             '<p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。</p>\n'
