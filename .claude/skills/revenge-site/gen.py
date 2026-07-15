@@ -466,7 +466,7 @@ def flow_section():
     ]
     lis = "".join(f"<li><b>{t}</b>：{d}</li>" for t, d in steps)
     return ('''
-  <section class="l-section">
+  <section class="l-section -tint">
     <div class="l-container">
       <div class="p-prose reveal">
         <h3>ご相談の流れ（まずは無料）</h3>
@@ -486,7 +486,8 @@ SERVICES.append({
                "イベント運営 事前決済システム", "新規システム開発"],
     "body": ["Web制作からAI活用、業務システムの開発まで、デジタルの力で企業の課題解決と成長を支援します。",
              "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。"],
-    "extra": packages_section() + rag_demo_section() + flow_section(),
+    # 「埋め込みRAGのデモ」節は一旦非表示（RAG実演は #21 のembed.js設置時に改めて用意）。
+    "extra": packages_section() + flow_section(),
 })
 
 # 個別LP（lp/<slug>.html）＝PACKAGES から自動生成。詳細は順次拡充（現状は概要＋料金＋CVのスタブ）。
