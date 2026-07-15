@@ -175,15 +175,14 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
   公開フォルダは `public_html/`。**差分最小デプロイ**（変更ファイルだけ同階層で上書き）。常時HTTPS。
 - **WordPress**：ニュースのみのハイブリッド運用。`/wp`（`config.js` の `MISIMA_WP_BASE="/wp"`）。
   実認証情報を含むため `/wp/` は `.gitignore`（Git非コミット、配布ZIPには同梱）。`wp-sitemap.xml` を robots に併記。
-- **メール**：`info@revenge.co.jp`。お問い合わせは `contact.php` が **PHP `mail()`** で送信（From/送信元を
-  同一ドメインにして SPF 通過を狙う設計）。件名/本文はUTF-8統一（`mb_send_mail`は使わない＝文字化け対策）。
-  - ⚠️ **Google Workspace でメール受信する場合の手順は `google-workspace-setup` スキル**を使う
-    （このスタック＝Value Domain(DNS)＋CoreServer＋Workspace 専用）。要点：
-    - Value Domain DNS：所有権TXT→**MX `smtp.google.com.`（末尾ドット必須）**→SPFはCoreServer分に
-      `include:_spf.google.com` を**マージ（v=spf1 は1行のみ）**→DKIM(`google._domainkey`)。
-    - **CoreServer「メール配送設定」で対象ドメインを外部扱いに（チェックを外す）**。これをやらないと、
-      MXをGoogleに向けても **`contact.php` などサーバ発のメールが旧CoreServer webmail に落ちる**（最頻の見落とし）。
-    - 検証は 8.8.8.8/権威NS で `nslookup`＋実送受信テスト。Google側ログイン/ToS同意/課金は**顧客本人**が行う。
+- **メール**：`info@revenge.co.jp`。**Google Workspace で受信・運用中（設定完了済み）**。
+  MX は Google（`smtp.google.com.`）、SPF/DKIM/DMARC 設定済み。DNS は Value Domain、Web/旧メールは CoreServer。
+  設定手順・レコード仕様は **`google-workspace-setup` スキル**（＋`references/value-domain-dns.md`）を参照。
+  - お問い合わせは `contact.php` が **PHP `mail()`** で `info@revenge.co.jp` へ送信。件名/本文はUTF-8統一
+    （`mb_send_mail`は使わない＝文字化け対策）。
+  - ⚠️ **フォーム送信の到達だけは別枠で要確認**：MXがGoogleでも、CoreServerの「メール配送設定」で当該ドメインを
+    **外部扱い（チェックを外す）にしていないと、`contact.php` などサーバ発メールが旧CoreServer webmail に落ちる**
+    （通常の外部受信が正常でも、この経路だけ別問題になり得る）。フォームを実送信して **Gmail 側に届くか**を確認する。
 
 ---
 
