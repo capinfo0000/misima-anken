@@ -479,7 +479,7 @@ def strengths_section():
   </div>
   <section class="l-section">
     <div class="l-container">
-''' + _sec_heading("Our Strengths", "選ばれる理由") + f'''
+''' + _sec_heading("Features", "Revengeデジタルの特徴") + f'''
       <div class="p-top-reasons__grid">{cards}</div>
     </div>
   </section>
