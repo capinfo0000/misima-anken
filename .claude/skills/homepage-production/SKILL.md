@@ -117,6 +117,9 @@ description: >
   - **Workspace/外部のSMTPで送る**（SMTP認証）／送信専用サービス（SES/SendGrid等）を使う、
   - 受信先(通知先)と送信ドメインの整合・**SPF/DKIM/DMARCをpassにする**ことを送信テストで確認。
 - 到達性テスト（mail-tester等の観点：SPF/DKIM/DMARC/PTR、スパムスコア）を公開前に実施。
+- **Value Domain＋CoreServer＋Google Workspace の具体手順は `google-workspace-setup` スキル**を使う
+  （ドメイン所有権TXT→MX(smtp.google.com. の末尾ドット必須)→SPFマージ→DKIM、そして
+  **CoreServerのメール配送設定を「外部」に切替**＝フォーム/WP送信もGmailへ、という最重要の落とし穴まで網羅）。
 
 ### インフラ完了チェック
 - [ ] ドメイン取得/アクティベート（co.jpは審査完了）

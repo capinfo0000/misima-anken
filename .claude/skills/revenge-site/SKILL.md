@@ -177,10 +177,13 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
   実認証情報を含むため `/wp/` は `.gitignore`（Git非コミット、配布ZIPには同梱）。`wp-sitemap.xml` を robots に併記。
 - **メール**：`info@revenge.co.jp`。お問い合わせは `contact.php` が **PHP `mail()`** で送信（From/送信元を
   同一ドメインにして SPF 通過を狙う設計）。件名/本文はUTF-8統一（`mb_send_mail`は使わない＝文字化け対策）。
-  - ⚠️ **Google Workspace 等でメール受信する場合は要確認**：MX を外部に向けると PHP `mail()` の
-    サーバ送信が SPF/DKIM/DMARC と矛盾して不達になりやすい。SPFにサーバを含める／SMTP送信へ切替／
-    送信専用サービス利用のいずれかで、**SPF/DKIM/DMARC pass で届く**ことを送信テストで確認する。
-    （現状の Workspace 設定状況は未確認。設定するなら MX/SPF/DKIM/DMARC の整合を必ずチェック）
+  - ⚠️ **Google Workspace でメール受信する場合の手順は `google-workspace-setup` スキル**を使う
+    （このスタック＝Value Domain(DNS)＋CoreServer＋Workspace 専用）。要点：
+    - Value Domain DNS：所有権TXT→**MX `smtp.google.com.`（末尾ドット必須）**→SPFはCoreServer分に
+      `include:_spf.google.com` を**マージ（v=spf1 は1行のみ）**→DKIM(`google._domainkey`)。
+    - **CoreServer「メール配送設定」で対象ドメインを外部扱いに（チェックを外す）**。これをやらないと、
+      MXをGoogleに向けても **`contact.php` などサーバ発のメールが旧CoreServer webmail に落ちる**（最頻の見落とし）。
+    - 検証は 8.8.8.8/権威NS で `nslookup`＋実送受信テスト。Google側ログイン/ToS同意/課金は**顧客本人**が行う。
 
 ---
 
