@@ -391,14 +391,14 @@ PACKAGES = [
      "init": "2万円", "maint": "5,000円"},
     {"slug": "dev", "name": "新規システム開発", "kind": "受託開発",
      "summary": "業務課題に合わせた新規システムを、企画から開発・運用まで一気通貫でご提供します。",
-     "init": "お見積り（要相談）", "maint": None},
+     "init": "お見積り", "maint": None},
 ]
 
 def _pkg_price(p):
-    if p["maint"] is None:
-        return f'<p class="p-pkg__price">料金：{p["init"]}</p>'
-    return (f'<p class="p-pkg__price">初期 <b>{p["init"]}</b>／月額保守 <b>{p["maint"]}</b>'
-            f'<small>（税込）</small></p>')
+    # 全カードで同じ形式（初期／月額保守）に統一。金額が無いものは「要相談」。税込表記は一覧の上部にまとめて記載。
+    maint = p["maint"] if p["maint"] is not None else "要相談"
+    return (f'<p class="p-pkg__price"><span class="p-pkg__price-row"><span>初期</span><b>{p["init"]}</b></span>'
+            f'<span class="p-pkg__price-row"><span>月額保守</span><b>{maint}</b></span></p>')
 
 def packages_section():
     cards = []
@@ -413,7 +413,8 @@ def packages_section():
             f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
             '</div>')
     return ('\n<h3>提供メニューと料金</h3>\n'
-            '<p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。</p>\n'
+            '<p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。'
+            '<small>（金額はすべて税込）</small></p>\n'
             '<div class="p-pkg-grid">' + "".join(cards) + '</div>\n')
 
 def rag_demo_section():
