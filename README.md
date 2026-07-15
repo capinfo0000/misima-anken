@@ -4,8 +4,9 @@
 フレームワーク不要の HTML / CSS / JavaScript のみで構成し、そのまま静的ホスティングに公開できます。
 ニュースだけは任意で WordPress（ヘッドレス）連携でき、**静的サイト＋`/wp` のハイブリッド構成**で運用します。
 
-> 生成方式：ページHTMLは生成スクリプト `gen.py`（scratchpad 管理・リポジトリ外）から出力しています。
-> 文言・構成の変更は `gen.py` を編集して再生成します。CSS(`css/style.css`)・JS(`js/`)・画像(`assets/`)は手管理です。
+> 生成方式：ページHTMLは生成スクリプト `gen.py`（**`.claude/skills/revenge-site/gen.py`** に同梱・リポジトリ管理）から出力しています。
+> 文言・構成の変更は `gen.py` を編集して `python3 .claude/skills/revenge-site/gen.py` で再生成します。CSS(`css/style.css`)・JS(`js/`)・画像(`assets/`)・`contact.php` は手管理です。
+> 制作・検証・納品の詳しい手順と規約は `revenge-site` スキル（`.claude/skills/revenge-site/SKILL.md`）にまとめています。
 
 ---
 
