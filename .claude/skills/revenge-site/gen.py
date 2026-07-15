@@ -352,6 +352,9 @@ def svc_detail_page(s):
     # 相談ボタン：詳細ページの事業に応じてお問い合わせ種別を自動セット（?type=…）
     ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital"}.get(s["slug"], "")
     contact_href = f"contact.html?type={ctype}" if ctype else "contact.html"
+    # extra（料金カード等）は2カラムに押し込めず、下に全幅（l-containerで中央寄せ）で表示する
+    extra = s.get("extra", "")
+    extra_block = f'\n      <div class="p-prose p-service-extra reveal">{extra}</div>' if extra else ""
     return page_hero("Service", s["title"], s["lead"],
         [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + f"""
   <section class="l-section">
@@ -361,9 +364,9 @@ def svc_detail_page(s):
         <div class="p-prose reveal -right">
           {body}
           <h3>主な業務内容</h3>
-          <ul class="-bullets">{pts}</ul>{s.get("extra","")}
+          <ul class="-bullets">{pts}</ul>
         </div>
-      </div>
+      </div>{extra_block}
       <div class="c-btn-wrap">
         <a href="{contact_href}" class="c-btn -fill">このサービスを相談する</a>
         <a href="services.html" class="c-btn">事業内容へ戻る</a>
@@ -938,8 +941,15 @@ pages = [
 ]
 for _s in SERVICES:
     pages.append(("service/" + _s["slug"] + ".html", _s["title"], _s["title"] + "の詳細｜通信業界専門の人材サービス。", "services", svc_detail_page(_s)))
-# デジタルソリューションの個別LP（lp/<slug>.html）＝PACKAGES から自動生成。
+# デジタルソリューションの個別LP（lp/<slug>.html）
+#   運用：LPは別環境でブラッシュアップして戻す方針のため、gen.py は「まだ無いLPだけ」スタブ生成する。
+#   既存のLP（手動で磨いた版）は上書きしない＝保持。作り直したいときは該当ファイルを削除してから再生成。
+#   ※ 既存LPも sitemap には自動で載る（sitemapはファイル実走査）／ヘッダーは main.js が自動注入。
 for _p in PACKAGES:
+    _lp_path = os.path.join(OUT, "lp", _p["slug"] + ".html")
+    if os.path.exists(_lp_path):
+        print("keep lp/%s.html (既存を保持＝手動ブラッシュアップ分)" % _p["slug"])
+        continue
     pages.append(("lp/" + _p["slug"] + ".html", _p["name"] + "｜デジタルソリューション事業",
                   _p["summary"], "services", lp_page(_p)))
 # ニュース詳細ページは生成しない（WordPress運用に一本化）。記事はWP側のURLで公開。

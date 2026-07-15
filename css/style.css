@@ -330,6 +330,8 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-pkg__more{font-size:.85rem;font-weight:700;color:#e60012;}
 .p-note{font-size:.85rem;color:#555;background:#f7f7f7;border-radius:8px;padding:.7rem 1rem;}
 .p-flow{padding-left:1.2em;}.p-flow li{margin:.45rem 0;line-height:1.7;}
+.p-service-extra{margin-top:2.6rem;}
+@media (min-width:1000px){.p-pkg-grid{grid-template-columns:repeat(4,1fr);}}
 .p-top-service__card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s;}
 .p-top-service__card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);}
 .p-top-service__card-img{aspect-ratio:3/2;overflow:hidden;}
