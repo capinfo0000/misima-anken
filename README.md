@@ -7,10 +7,7 @@
 > 生成方式：ページHTMLは生成スクリプト `gen.py`（**`.claude/skills/revenge-site/gen.py`** に同梱・リポジトリ管理）から出力しています。
 > 文言・構成の変更は `gen.py` を編集して `python3 .claude/skills/revenge-site/gen.py` で再生成します。CSS(`css/style.css`)・JS(`js/`)・画像(`assets/`)・`contact.php` は手管理です。
 > 制作・検証・納品の詳しい手順と規約は `revenge-site` スキル（`.claude/skills/revenge-site/SKILL.md`）にまとめています。
-> 案件横断で使える汎用スキル（ホームページ制作の進め方／Google Workspaceメール設定）は
-> **`homepage-toolkit` プラグイン**として配布しています（このリポジトリがマーケットプレイス）。
-> 他プロジェクト/スマホから使うには：`/plugin marketplace add capinfo0000/misima-anken` →
-> `/plugin install homepage-toolkit@capinfo`（詳細は `plugins/homepage-toolkit/README.md`）。
+> 案件横断で使える汎用スキルは `.claude/skills/homepage-production`・`.claude/skills/google-workspace-setup` にあります。
 
 ---
 
