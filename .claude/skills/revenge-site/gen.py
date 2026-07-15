@@ -352,8 +352,18 @@ def svc_detail_page(s):
     # 相談ボタン：詳細ページの事業に応じてお問い合わせ種別を自動セット（?type=…）
     ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital"}.get(s["slug"], "")
     contact_href = f"contact.html?type={ctype}" if ctype else "contact.html"
-    # extra（料金・RAGデモ・相談フロー）は事業説明とは分け、独立セクション群として下に並べる。
+    # extra（強み・料金・相談フロー・CTA）は事業説明とは分け、独立セクション群として下に並べる。
     extra = s.get("extra", "")
+    # no_default_cta のページは extra 側にCTA（cta_section等）を持つので既定のボタン行は出さない。
+    default_cta = "" if s.get("no_default_cta") else f"""  <section class="l-section">
+    <div class="l-container">
+      <div class="c-btn-wrap">
+        <a href="{contact_href}" class="c-btn -fill">このサービスを相談する</a>
+        <a href="services.html" class="c-btn">事業内容へ戻る</a>
+      </div>
+    </div>
+  </section>
+"""
     return page_hero("Service", s["title"], s["lead"],
         [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + f"""
   <section class="l-section">
@@ -368,15 +378,7 @@ def svc_detail_page(s):
       </div>
     </div>
   </section>
-{extra}  <section class="l-section">
-    <div class="l-container">
-      <div class="c-btn-wrap">
-        <a href="{contact_href}" class="c-btn -fill">このサービスを相談する</a>
-        <a href="services.html" class="c-btn">事業内容へ戻る</a>
-      </div>
-    </div>
-  </section>
-{s.get("tail", "")}"""
+{extra}{default_cta}{s.get("tail", "")}"""
 
 # ================================================================ デジタルソリューション事業（IT）＝データ駆動
 # パッケージをここに1件足すだけで、service-04 の料金カード／個別LP(lp/<slug>.html)／
@@ -398,10 +400,10 @@ PACKAGES = [
      "init": "2万円", "maint": "5,000円"},
 ]
 
-# 商品タイプごとのセクション（順番＝表示順。背景色は交互）。
+# 商品タイプごとのセクション（順番＝表示順）。sub=英字サブ見出し（c-section-heading 用）。
 PKG_GROUPS = [
-    ("custom",  "制作・開発（オーダーメイド）", "ご要望に合わせて一から制作・開発します。"),
-    ("package", "パッケージ商品",             "すぐ導入できる定型パッケージ。低コストで素早く始められます。"),
+    ("custom",  "Custom Development", "制作・開発（オーダーメイド）", "ご要望に合わせて、一から制作・開発します。"),
+    ("package", "Packages",           "パッケージ商品",             "すぐ導入できる定型パッケージ。低コストで素早く始められます。"),
 ]
 
 def _pkg_price(p):
@@ -421,40 +423,59 @@ def _pkg_card(p):
         f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
         '</div>')
 
+def _sec_heading(sub, title):
+    # 全ページ共通の見出しコンポーネント（英字サブ＋日本語見出し）＝サイトの統一感を担保。
+    return (f'<div class="c-section-heading -center reveal">'
+            f'<span class="c-section-heading__sub">{sub}</span>'
+            f'<h2 class="c-section-heading__title">{title}</h2></div>')
+
+def strengths_section():
+    # 「選ばれる理由」＝トップページと同じ c-card（番号付き）で技術的信頼感を訴求。
+    items = [
+        ("01", "企画から実装まで一気通貫", "要件定義・デザイン・開発・公開まで社内で対応。窓口ひとつで、素早くカタチにします。"),
+        ("02", "AI・RAGも自社で実装", "生成AIを使った埋め込みRAG（AIチャット）まで内製。最新技術を実用レベルで導入します。"),
+        ("03", "まず無料でプロトタイプ", "早い段階で動くプロトタイプを無料で作成。見て・触れて納得してから本契約へ。"),
+        ("04", "公開後も継続支援", "作って終わりにせず、保守・運用・集客改善まで伴走。成果につながるまで支えます。"),
+    ]
+    cards = "".join(
+        f'<div class="c-card reveal"><span class="c-card__num">{n}</span>'
+        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+        for n, t, d in items)
+    return ('''
+  <div class="c-band reveal -multi" aria-hidden="true">
+    <span class="c-band__bar" style="--c:var(--c-red)"></span>
+    <span class="c-band__bar" style="--c:var(--c-orange)"></span>
+    <span class="c-band__bar" style="--c:var(--c-green)"></span>
+    <span class="c-band__bar" style="--c:var(--c-blue)"></span>
+    <span class="c-band__bar" style="--c:var(--c-purple)"></span>
+  </div>
+  <section class="l-section">
+    <div class="l-container">
+''' + _sec_heading("Our Strengths", "選ばれる理由") + f'''
+      <div class="p-top-reasons__grid">{cards}</div>
+    </div>
+  </section>
+''')
+
 def packages_section():
-    # 商品タイプごとに別セクション（パッケージ商品／オーダーメイド制作・開発）を出力。背景色は交互。
+    # 商品タイプごとに別セクション。見出しは共通の c-section-heading を使用。
     out = []
-    for i, (gkey, gtitle, gdesc) in enumerate(PKG_GROUPS):
+    for i, (gkey, gsub, gtitle, gdesc) in enumerate(PKG_GROUPS):
         items = [p for p in PACKAGES if p.get("group") == gkey]
         if not items:
             continue
-        tint = " -tint" if i % 2 == 0 else ""
+        tint = " -tint" if i % 2 == 1 else ""
         cards = "".join(_pkg_card(p) for p in items)
         out.append(f'''
   <section class="l-section{tint}">
     <div class="l-container">
-      <div class="p-prose reveal">
-        <h3>{gtitle}</h3>
-        <p>{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
-        <div class="p-pkg-grid">{cards}</div>
-      </div>
+''' + _sec_heading(gsub, gtitle) + f'''
+      <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
+      <div class="p-pkg-grid">{cards}</div>
     </div>
   </section>
 ''')
     return "".join(out)
-
-def rag_demo_section():
-    return ('''
-  <section class="l-section -tint">
-    <div class="l-container">
-      <div class="p-prose reveal">
-        <h3>埋め込みRAGのデモ</h3>
-        <p>このページ右下のチャットボタンから、当社のRAG（AIチャット）を実際にお試しいただけます。各サービスの概要にお答えします。詳しい仕様・事例は各LPをご覧ください。</p>
-        <p class="p-note">※ デモは無料枠で提供しているため、<b>1日の利用回数に制限</b>があります。混み合う場合は時間をおいてお試しください。</p>
-      </div>
-    </div>
-  </section>
-''')
 
 def flow_section():
     steps = [
@@ -464,14 +485,27 @@ def flow_section():
         ("納得いくまで修正", "公開まで、ご満足いただけるまで修正します。"),
         ("公開後も継続支援", "保守・運用・集客改善まで継続。単発で終わらせません。"),
     ]
-    lis = "".join(f"<li><b>{t}</b>：{d}</li>" for t, d in steps)
+    cards = "".join(
+        f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+        for i, (t, d) in enumerate(steps, 1))
     return ('''
   <section class="l-section -tint">
     <div class="l-container">
-      <div class="p-prose reveal">
-        <h3>ご相談の流れ（まずは無料）</h3>
-        <ol class="p-flow">''' + lis + '''</ol>
-      </div>
+''' + _sec_heading("Flow", "ご相談の流れ（まずは無料）") + f'''
+      <div class="p-top-reasons__grid">{cards}</div>
+    </div>
+  </section>
+''')
+
+def cta_section():
+    # サイト共通の p-contact パターンでお問い合わせへ誘導（無料相談を強調）。
+    return ('''
+  <section class="p-contact l-section">
+    <div class="l-container">
+''' + _sec_heading("Contact", "まずは無料でご相談ください") + '''
+      <p class="p-contact__lead reveal">ヒアリング後、無料でプロトタイプを作成します。「作って終わり」にせず、公開後の運用・改善まで伴走します。まずはお気軽にご相談ください。</p>
+      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn -fill">無料で相談する</a></div>
     </div>
   </section>
 ''')
@@ -495,8 +529,9 @@ SERVICES.append({
                "イベント運営 事前決済システム", "新規システム開発"],
     "body": ["Web制作からAI活用、業務システムの開発まで、デジタルの力で企業の課題解決と成長を支援します。",
              "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。"],
-    "extra": packages_section() + flow_section(),
-    "tail": RAG_EMBED,   # このページだけ埋め込みRAG（右下チャット）を読み込む
+    "extra": strengths_section() + packages_section() + flow_section() + cta_section(),
+    "no_default_cta": True,   # 末尾は cta_section（お問い合わせ誘導）を使うので既定のボタン行は出さない
+    "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
 
 # 個別LP（lp/<slug>.html）＝PACKAGES から自動生成。詳細は順次拡充（現状は概要＋料金＋CVのスタブ）。

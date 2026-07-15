@@ -847,3 +847,5 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   .p-fv__en,.p-fv__lead,.p-fv__scroll,.p-fv__line i,.p-fv__brand span{opacity:1;transform:none;animation:none;}
   .p-fv__scroll-line::after{animation:none;}
 }
+
+.p-lead-text.-center{text-align:center;}
