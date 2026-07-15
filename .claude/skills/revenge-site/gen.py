@@ -376,7 +376,7 @@ def svc_detail_page(s):
       </div>
     </div>
   </section>
-"""
+{s.get("tail", "")}"""
 
 # ================================================================ デジタルソリューション事業（IT）＝データ駆動
 # パッケージをここに1件足すだけで、service-04 の料金カード／個別LP(lp/<slug>.html)／
@@ -476,6 +476,15 @@ def flow_section():
   </section>
 ''')
 
+# 埋め込みRAG（公式embed.js）＝service-04 だけに設置。右下フローティングの💬チャット。
+# data-src 省略時は embed.js と同じ場所の chat/?embed=1 を読む（＝RAGホスト側）。
+RAG_HOST = "https://rag.engineer.v2008.coreserver.jp"
+RAG_EMBED = (
+    '\n  <!-- 埋め込みRAG（このページのみ）。右下に💬チャットボタンを表示 -->\n'
+    f'  <script src="{RAG_HOST}/embed.js" data-title="Re:venge AIアシスタント" '
+    'data-color="#e60012" data-position="right" '
+    f'data-src="{RAG_HOST}/chat/?embed=1"></script>\n')
+
 # service-04（デジタルソリューション事業）を SERVICES に追加＝4事業。
 # extra にパッケージ料金＋RAGデモ＋相談フローをまとめて差し込む。
 SERVICES.append({
@@ -486,8 +495,8 @@ SERVICES.append({
                "イベント運営 事前決済システム", "新規システム開発"],
     "body": ["Web制作からAI活用、業務システムの開発まで、デジタルの力で企業の課題解決と成長を支援します。",
              "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。"],
-    # 「埋め込みRAGのデモ」節は一旦非表示（RAG実演は #21 のembed.js設置時に改めて用意）。
     "extra": packages_section() + flow_section(),
+    "tail": RAG_EMBED,   # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
 
 # 個別LP（lp/<slug>.html）＝PACKAGES から自動生成。詳細は順次拡充（現状は概要＋料金＋CVのスタブ）。
