@@ -352,9 +352,8 @@ def svc_detail_page(s):
     # 相談ボタン：詳細ページの事業に応じてお問い合わせ種別を自動セット（?type=…）
     ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital"}.get(s["slug"], "")
     contact_href = f"contact.html?type={ctype}" if ctype else "contact.html"
-    # extra（料金カード等）は2カラムに押し込めず、下に全幅（l-containerで中央寄せ）で表示する
+    # extra（料金・RAGデモ・相談フロー）は事業説明とは分け、独立セクション群として下に並べる。
     extra = s.get("extra", "")
-    extra_block = f'\n      <div class="p-prose p-service-extra reveal">{extra}</div>' if extra else ""
     return page_hero("Service", s["title"], s["lead"],
         [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + f"""
   <section class="l-section">
@@ -366,7 +365,11 @@ def svc_detail_page(s):
           <h3>主な業務内容</h3>
           <ul class="-bullets">{pts}</ul>
         </div>
-      </div>{extra_block}
+      </div>
+    </div>
+  </section>
+{extra}  <section class="l-section">
+    <div class="l-container">
       <div class="c-btn-wrap">
         <a href="{contact_href}" class="c-btn -fill">このサービスを相談する</a>
         <a href="services.html" class="c-btn">事業内容へ戻る</a>
@@ -403,26 +406,40 @@ def _pkg_price(p):
 def packages_section():
     cards = []
     for p in PACKAGES:
-        badge = '<span class="p-pkg__badge">サイト内で実演中</span>' if p.get("demo") else ""
+        badge = '<span class="p-pkg__badge">実演中</span>' if p.get("demo") else ""
         cards.append(
             '<div class="p-pkg">'
-            f'<p class="p-pkg__kind">{p["kind"]}</p>'
-            f'<h4 class="p-pkg__name">{p["name"]}{badge}</h4>'
+            f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
+            f'<h4 class="p-pkg__name">{p["name"]}</h4>'
             f'<p class="p-pkg__summary">{p["summary"]}</p>'
             f'{_pkg_price(p)}'
             f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
             '</div>')
-    return ('\n<h3>提供メニューと料金</h3>\n'
-            '<p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。'
+    return ('''
+  <section class="l-section -tint">
+    <div class="l-container">
+      <div class="p-prose reveal">
+        <h3>提供メニューと料金</h3>
+        <p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。'''
             '<small>（金額はすべて税込）</small></p>\n'
-            '<div class="p-pkg-grid">' + "".join(cards) + '</div>\n')
+            '        <div class="p-pkg-grid">' + "".join(cards) + '''</div>
+      </div>
+    </div>
+  </section>
+''')
 
 def rag_demo_section():
-    return ('\n<h3>埋め込みRAGのデモ</h3>\n'
-            '<p>このページ右下のチャットボタンから、当社のRAG（AIチャット）を実際にお試しいただけます。'
-            '各サービスの概要にお答えします。詳しい仕様・事例は各LPをご覧ください。</p>\n'
-            '<p class="p-note">※ デモは無料枠で提供しているため、<b>1日の利用回数に制限</b>があります。'
-            '混み合う場合は時間をおいてお試しください。</p>\n')
+    return ('''
+  <section class="l-section">
+    <div class="l-container">
+      <div class="p-prose reveal">
+        <h3>埋め込みRAGのデモ</h3>
+        <p>このページ右下のチャットボタンから、当社のRAG（AIチャット）を実際にお試しいただけます。各サービスの概要にお答えします。詳しい仕様・事例は各LPをご覧ください。</p>
+        <p class="p-note">※ デモは無料枠で提供しているため、<b>1日の利用回数に制限</b>があります。混み合う場合は時間をおいてお試しください。</p>
+      </div>
+    </div>
+  </section>
+''')
 
 def flow_section():
     steps = [
@@ -433,8 +450,16 @@ def flow_section():
         ("公開後も継続支援", "保守・運用・集客改善まで継続。単発で終わらせません。"),
     ]
     lis = "".join(f"<li><b>{t}</b>：{d}</li>" for t, d in steps)
-    return ('\n<h3>ご相談の流れ（まずは無料）</h3>\n'
-            f'<ol class="p-flow">{lis}</ol>\n')
+    return ('''
+  <section class="l-section -tint">
+    <div class="l-container">
+      <div class="p-prose reveal">
+        <h3>ご相談の流れ（まずは無料）</h3>
+        <ol class="p-flow">''' + lis + '''</ol>
+      </div>
+    </div>
+  </section>
+''')
 
 # service-04（デジタルソリューション事業）を SERVICES に追加＝4事業。
 # extra にパッケージ料金＋RAGデモ＋相談フローをまとめて差し込む。
