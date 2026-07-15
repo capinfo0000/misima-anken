@@ -382,19 +382,26 @@ def svc_detail_page(s):
 # パッケージをここに1件足すだけで、service-04 の料金カード／個別LP(lp/<slug>.html)／
 # サイトマップまで自動反映される（今後パッケージが増える前提の設計）。
 # name=名称 / kind=区分 / summary=概要 / init=初期費用 / maint=月額保守(税込。Noneなら要相談) / demo=サイト内RAG実演の対象か
+# group=商品タイプ（"custom"=オーダーメイド制作・開発 / "package"=定型パッケージ商品）。セクションを分けて表示する。
 PACKAGES = [
-    {"slug": "hp", "name": "ホームページ制作", "kind": "オリジナル制作",
+    {"slug": "hp", "name": "ホームページ制作", "kind": "オリジナル制作", "group": "custom",
      "summary": "目的・ブランドに合わせた完全オリジナルのサイト/LPを制作。公開後の保守・運用・集客改善まで継続支援します。",
      "init": "5〜30万円", "maint": "1〜10万円"},
-    {"slug": "rag", "name": "埋め込み型RAG", "kind": "パッケージ",
-     "summary": "自社の情報を学習したAIチャットをサイトに設置し、問い合わせ対応や社内検索を自動化します（このページ右下で実演中）。",
-     "init": "5〜20万円", "maint": "2〜10万円", "demo": True},
-    {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ",
-     "summary": "イベントの事前申込とオンライン決済をまとめて処理。当日の運営負荷と未収リスクを減らします。",
-     "init": "2万円", "maint": "5,000円"},
-    {"slug": "dev", "name": "新規システム開発", "kind": "受託開発",
+    {"slug": "dev", "name": "新規システム開発", "kind": "受託開発", "group": "custom",
      "summary": "業務課題に合わせた新規システムを、企画から開発・運用まで一気通貫でご提供します。",
      "init": "お見積り", "maint": None},
+    {"slug": "rag", "name": "埋め込み型RAG", "kind": "パッケージ", "group": "package",
+     "summary": "自社の情報を学習したAIチャットをサイトに設置し、問い合わせ対応や社内検索を自動化します（このページ右下で実演中）。",
+     "init": "5〜20万円", "maint": "2〜10万円", "demo": True},
+    {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ", "group": "package",
+     "summary": "イベントの事前申込とオンライン決済をまとめて処理。当日の運営負荷と未収リスクを減らします。",
+     "init": "2万円", "maint": "5,000円"},
+]
+
+# 商品タイプごとのセクション（順番＝表示順。背景色は交互）。
+PKG_GROUPS = [
+    ("custom",  "制作・開発（オーダーメイド）", "ご要望に合わせて一から制作・開発します。"),
+    ("package", "パッケージ商品",             "すぐ導入できる定型パッケージ。低コストで素早く始められます。"),
 ]
 
 def _pkg_price(p):
@@ -403,34 +410,42 @@ def _pkg_price(p):
     return (f'<p class="p-pkg__price"><span class="p-pkg__price-row"><span>初期</span><b>{p["init"]}</b></span>'
             f'<span class="p-pkg__price-row"><span>月額保守</span><b>{maint}</b></span></p>')
 
+def _pkg_card(p):
+    badge = '<span class="p-pkg__badge">実演中</span>' if p.get("demo") else ""
+    return (
+        '<div class="p-pkg">'
+        f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
+        f'<h4 class="p-pkg__name">{p["name"]}</h4>'
+        f'<p class="p-pkg__summary">{p["summary"]}</p>'
+        f'{_pkg_price(p)}'
+        f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
+        '</div>')
+
 def packages_section():
-    cards = []
-    for p in PACKAGES:
-        badge = '<span class="p-pkg__badge">実演中</span>' if p.get("demo") else ""
-        cards.append(
-            '<div class="p-pkg">'
-            f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
-            f'<h4 class="p-pkg__name">{p["name"]}</h4>'
-            f'<p class="p-pkg__summary">{p["summary"]}</p>'
-            f'{_pkg_price(p)}'
-            f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
-            '</div>')
-    return ('''
-  <section class="l-section -tint">
+    # 商品タイプごとに別セクション（パッケージ商品／オーダーメイド制作・開発）を出力。背景色は交互。
+    out = []
+    for i, (gkey, gtitle, gdesc) in enumerate(PKG_GROUPS):
+        items = [p for p in PACKAGES if p.get("group") == gkey]
+        if not items:
+            continue
+        tint = " -tint" if i % 2 == 0 else ""
+        cards = "".join(_pkg_card(p) for p in items)
+        out.append(f'''
+  <section class="l-section{tint}">
     <div class="l-container">
       <div class="p-prose reveal">
-        <h3>提供メニューと料金</h3>
-        <p>料金は内容により変動します。まずは無料でヒアリングし、最適なプランをご提案します。'''
-            '<small>（金額はすべて税込）</small></p>\n'
-            '        <div class="p-pkg-grid">' + "".join(cards) + '''</div>
+        <h3>{gtitle}</h3>
+        <p>{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
+        <div class="p-pkg-grid">{cards}</div>
       </div>
     </div>
   </section>
 ''')
+    return "".join(out)
 
 def rag_demo_section():
     return ('''
-  <section class="l-section">
+  <section class="l-section -tint">
     <div class="l-container">
       <div class="p-prose reveal">
         <h3>埋め込みRAGのデモ</h3>
@@ -451,7 +466,7 @@ def flow_section():
     ]
     lis = "".join(f"<li><b>{t}</b>：{d}</li>" for t, d in steps)
     return ('''
-  <section class="l-section -tint">
+  <section class="l-section">
     <div class="l-container">
       <div class="p-prose reveal">
         <h3>ご相談の流れ（まずは無料）</h3>
