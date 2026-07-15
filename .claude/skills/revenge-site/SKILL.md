@@ -118,6 +118,20 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
 
 ---
 
+## 4b. 本番デプロイZIP（IT事業・RAG初期ナレッジ同梱）
+
+将来 IT事業（service-04・各LP・RAG埋め込み）を含めて本番へ入れるとき用の一括ZIPを作れる。
+
+- ビルド：`python3 .claude/skills/revenge-site/build_deploy_zip.py [出力先.zip]`（既定 `revenge-deploy.zip`、`*.zip`はgit非対象）。
+  - 中身：`public_html/`（公開サイト一式・ホワイトリスト同梱）＋ `rag-knowledge/`（RAG初期ナレッジ）＋ `SETUP_README.txt`。
+  - **除外（安全側）**：`/wp`・`.env`等の実シークレット・`チャットログ.md`/`差し替えファイル履歴.md`/`docs/` 等の社内資料・`.git`/`.claude`。
+- **`rag-knowledge/`**（リポジトリ直下）＝埋め込みRAGの初期ナレッジ（Markdown）。会社概要等は含めず、
+  **デジタル4サービス（HP制作/RAG/イベント事前決済/新規開発）＋共通方針(00)** のみ。サービスごと1ファイル＝
+  1件直しても再取り込みはそのファイルのみ（埋め込みAPI節約）。RAG側は vault に置き `php scripts/sync_obsidian.php <vault>` で取込。
+- 注意：RAGホスト/embed 設定（`RAG_HOST` in gen.py）は RAG本体の最新版に合わせて更新すること。
+
+---
+
 ## 5. コミット / ブランチ / ログ
 
 - 作業ブランチ：**`claude/peaceful-lovelace-jhm089`**（指定ブランチのみ push。PRは依頼時のみ）。
