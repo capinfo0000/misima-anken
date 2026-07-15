@@ -187,6 +187,28 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
 
 ---
 
+## 7c. 検索エンジン登録（GSC / Bing）＝登録済み（2026-07-15）
+
+別セッションで登録完了。状況の記録（詳細な経緯は別セッションの handoff 参照）。
+
+- **Google Search Console**：ドメインプロパティ `sc-domain:revenge.co.jp`。所有 Google アカウント
+  `info@revenge.co.jp`（Workspace）。**所有権は既存の DNS TXT（google-site-verification）で自動確認**。
+  - ⚠️ **この所有権確認用 TXT は削除しない**（消すと GSC の確認が外れる）。
+  - サイトマップ送信済み：`sitemap.xml`（成功・**13ページ**検出）、`wp/wp-sitemap.xml`（サイトマップインデックス・成功）。
+- **Bing Webmaster Tools**：GSC からインポートで追加（GSC認証を引き継ぎ＝サイト確認不要）。
+  `sitemap.xml`・`wp/wp-sitemap.xml` を手動送信（処理中）。
+- 運用：普段は GSC の「検索パフォーマンス」を月1回。新ページ公開時は URL を「インデックス登録をリクエスト」。
+
+### sitemap 運用の要点（handoff 残タスクBへの回答）
+- **`gen.py` はこのリポジトリの `.claude/skills/revenge-site/gen.py` にある**（PCローカルには無い＝別セッションが
+  「所在不明」とした理由）。`python3 .claude/skills/revenge-site/gen.py` で `sitemap.xml` は**全ページ自動再生成**される
+  （＝「追加ページのたびの手作業」は不要。静的ページを `SERVICES`/`pages` に足せばサイトマップにも自動反映）。
+- 未対応の改善は **`lastmod` の自動日付化**のみ（現状 `BUILD_DATE = "2026-07-10"` 固定）。
+  対応するなら `gen.py` 冒頭を `import datetime; BUILD_DATE = datetime.date.today().isoformat()` 等に。
+  ※ handoff の方針により**残改善はユーザー確認まで自動着手しない**。
+
+---
+
 ## 8. 変更のチェックリスト（毎回）
 
 1. `gen.py`（またはCSS/JS/contact.php）を編集。HTMLは直接編集しない。
