@@ -180,9 +180,10 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
   設定手順・レコード仕様は **`google-workspace-setup` スキル**（＋`references/value-domain-dns.md`）を参照。
   - お問い合わせは `contact.php` が **PHP `mail()`** で `info@revenge.co.jp` へ送信。件名/本文はUTF-8統一
     （`mb_send_mail`は使わない＝文字化け対策）。
-  - ⚠️ **フォーム送信の到達だけは別枠で要確認**：MXがGoogleでも、CoreServerの「メール配送設定」で当該ドメインを
-    **外部扱い（チェックを外す）にしていないと、`contact.php` などサーバ発メールが旧CoreServer webmail に落ちる**
-    （通常の外部受信が正常でも、この経路だけ別問題になり得る）。フォームを実送信して **Gmail 側に届くか**を確認する。
+  - **CoreServer のメール配送は外部化済み**（当該ドメインを外部扱いに設定済み）＝サーバ発（フォーム送信）も
+    Gmail に届く。※`google-workspace-setup` スキルは**この設定を完了させたあとに手順を書き起こしたもの**で、
+    Value Domain の DNS（MX/SPF/DKIM/DMARC）と CoreServer 配送外部化は実運用で反映済み。
+    もしフォールバックや障害切り分けが必要になったら同スキルの Step 3／検証手順を参照。
 
 ---
 
