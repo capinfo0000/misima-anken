@@ -866,17 +866,46 @@ robots += "Sitemap: %s/sitemap.xml\n" % SITE
 robots += "Sitemap: %s/wp/wp-sitemap.xml\n" % SITE   # WordPress(投稿)側のサイトマップ
 write("robots.txt", robots)
 
-# sitemap.xml：全ページ（priority/changefreqはトップを最優先）
-def _sm(loc, pri):
-    return ("  <url>\n    <loc>%s</loc>\n    <lastmod>%s</lastmod>\n"
-            "    <changefreq>weekly</changefreq>\n    <priority>%s</priority>\n  </url>\n"
-            % (loc, BUILD_DATE, pri))
+# sitemap.xml：出力フォルダ内の *.html を「実際に走査」して自動生成する。
+#   → 静的ページを増やすだけ（pages に足す／将来 lp/ 等にHTMLを置く）で、再生成時に自動で載る。
+#     URLの手書き追記は不要。lastmod は各HTMLファイルの更新日時から自動設定（日付の手入力も不要）。
+import datetime
+
+# サイトマップに含めない（公開ページでない）フォルダ
+_SITEMAP_SKIP_DIRS = {"wp", ".git", ".claude", "node_modules", "docs", "assets"}
+
+def _sitemap_priority(rel):
+    if rel == "index.html":
+        return "1.0"
+    # サブフォルダ配下の詳細ページ（service/ news/ lp/ 等）と主要ナビは高め
+    if "/" in rel or rel in ("services.html", "news.html", "message.html", "purpose.html", "profile.html"):
+        return "0.8"
+    return "0.5"
+
+def _collect_html(root):
+    found = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        # 隠しフォルダ・非公開フォルダは辿らない
+        dirnames[:] = [d for d in dirnames if d not in _SITEMAP_SKIP_DIRS and not d.startswith(".")]
+        for fn in filenames:
+            if fn.endswith(".html"):
+                full = os.path.join(dirpath, fn)
+                rel = os.path.relpath(full, root).replace(os.sep, "/")
+                found.append((rel, full))
+    # index.html を先頭に、あとはパス順で安定ソート
+    return sorted(found, key=lambda x: (x[0] != "index.html", x[0]))
+
 sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-for name, title, desc, cur, body in pages:
-    pri = "1.0" if name == "index.html" else ("0.8" if cur in ("services", "news", "company") else "0.5")
-    sm += _sm(_abs(name), pri)
+_page_count = 0
+for rel, full in _collect_html(OUT):
+    lastmod = datetime.date.fromtimestamp(os.path.getmtime(full)).isoformat()
+    sm += ("  <url>\n    <loc>%s</loc>\n    <lastmod>%s</lastmod>\n"
+           "    <changefreq>weekly</changefreq>\n    <priority>%s</priority>\n  </url>\n"
+           % (_abs(rel), lastmod, _sitemap_priority(rel)))
+    _page_count += 1
 sm += "</urlset>\n"
 write("sitemap.xml", sm)
+print("sitemap.xml:", _page_count, "URLs (auto-scanned)")
 
 # llms.txt：LLM向けサイト要約（AIO標準フォーマット）
 def _llm_link(label, path, note):

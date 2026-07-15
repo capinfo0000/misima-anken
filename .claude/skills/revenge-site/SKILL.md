@@ -199,13 +199,16 @@ NODE_PATH=/opt/node22/lib/node_modules node script.js
   `sitemap.xml`・`wp/wp-sitemap.xml` を手動送信（処理中）。
 - 運用：普段は GSC の「検索パフォーマンス」を月1回。新ページ公開時は URL を「インデックス登録をリクエスト」。
 
-### sitemap 運用の要点（handoff 残タスクBへの回答）
+### sitemap 運用の要点（handoff 残タスクB＝対応済み）
 - **`gen.py` はこのリポジトリの `.claude/skills/revenge-site/gen.py` にある**（PCローカルには無い＝別セッションが
-  「所在不明」とした理由）。`python3 .claude/skills/revenge-site/gen.py` で `sitemap.xml` は**全ページ自動再生成**される
-  （＝「追加ページのたびの手作業」は不要。静的ページを `SERVICES`/`pages` に足せばサイトマップにも自動反映）。
-- 未対応の改善は **`lastmod` の自動日付化**のみ（現状 `BUILD_DATE = "2026-07-10"` 固定）。
-  対応するなら `gen.py` 冒頭を `import datetime; BUILD_DATE = datetime.date.today().isoformat()` 等に。
-  ※ handoff の方針により**残改善はユーザー確認まで自動着手しない**。
+  「所在不明」とした理由）。`python3 .claude/skills/revenge-site/gen.py` で `sitemap.xml` を生成。
+- **静的ページ追加＝自動でサイトマップに載る**（実装済み）：sitemap 生成は出力フォルダ内の `*.html` を
+  **実走査**する方式（`_collect_html()`）。`SERVICES`/`pages` にページを足す、あるいは将来 `lp/` 等に HTML を置くだけで、
+  再生成時にサイトマップへ自動追加される（URLの手書き不要）。除外フォルダ＝`wp/.git/.claude/node_modules/docs/assets`。
+- **`lastmod` は各HTMLの更新日時から自動設定**（実装済み。`BUILD_DATE` 固定値には依存しない）。
+- 反映手順：ページ追加 → `gen.py` 再生成 → `sitemap.xml`（＋新HTML）を `public_html/` へアップ。
+  GSC は robots 経由で自動再クロールするが、急ぐなら GSC で当該URLの「インデックス登録をリクエスト」。
+- ※ `BUILD_DATE`（現状 `2026-07-10`）は JSON-LD の記事 `dateModified` 用に残置（sitemap とは無関係）。
 
 ---
 
