@@ -335,6 +335,12 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-flow{padding-left:1.2em;}.p-flow li{margin:.45rem 0;line-height:1.7;}
 .p-service-extra{margin-top:2.6rem;}
 .l-section.-tint{background:#f7f8fa;}
+/* ヒーロー直下のCTA帯（service-04）＋ボタン下のマイクロコピー */
+.p-hero-cta{background:#fff;border-bottom:1px solid #f0f0f0;padding:1.6rem 0 1.8rem;text-align:center;}
+.p-hero-cta__text{font-size:1.02rem;margin:0 0 1rem;}
+.p-hero-cta__text b{color:#e60012;}
+.c-btn-note{text-align:center;font-size:.8rem;color:#777;margin-top:.7rem;}
+@media (min-width:760px){.p-stats.-three{grid-template-columns:repeat(3,1fr);}}
 .p-top-service__card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .25s,box-shadow .25s;}
 .p-top-service__card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);}
 .p-top-service__card-img{aspect-ratio:3/2;overflow:hidden;}

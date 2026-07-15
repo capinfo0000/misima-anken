@@ -364,8 +364,17 @@ def svc_detail_page(s):
     </div>
   </section>
 """
+    # ヒーロー直下のCTA帯（研究知見：FV内CTA＋不安を消すマイクロコピーでCVが上がる）
+    hero_cta = "" if not s.get("hero_cta") else f"""  <div class="p-hero-cta reveal">
+    <div class="l-container">
+      <p class="p-hero-cta__text">ヒアリングのあと、<b>動くプロトタイプを無料</b>でお見せします。</p>
+      <a href="{contact_href}" class="c-btn -fill">無料で相談する</a>
+      <p class="c-btn-note">メール1本でOK。しつこい営業はいたしません。</p>
+    </div>
+  </div>
+"""
     return page_hero("Service", s["title"], s["lead"],
-        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + f"""
+        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + hero_cta + f"""
   <section class="l-section">
     <div class="l-container">
       <div class="p-service-single">
@@ -393,7 +402,8 @@ PACKAGES = [
      "summary": "業務課題に合わせた新規システムを、企画から開発・運用まで一気通貫でご提供します。",
      "init": "お見積り", "maint": None},
     {"slug": "rag", "name": "埋め込み型RAG", "kind": "パッケージ", "group": "package",
-     "summary": "自社の情報を学習したAIチャットをサイトに設置し、問い合わせ対応や社内検索を自動化します。",
+     "summary": "自社の情報を学習したAIチャットをサイトに設置し、問い合わせ対応や社内検索を自動化します。"
+                "SaaSの汎用ボットと違い、自社データで個別構築してサイトへ完全埋め込み。<b>今、このページ右下で実際に動いています。</b>",
      "init": "5〜20万円", "maint": "2〜10万円"},
     {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ", "group": "package",
      "summary": "イベントの事前申込とオンライン決済をまとめて処理。当日の運営負荷と未収リスクを減らします。",
@@ -428,6 +438,24 @@ def _sec_heading(sub, title):
     return (f'<div class="c-section-heading -center reveal">'
             f'<span class="c-section-heading__sub">{sub}</span>'
             f'<h2 class="c-section-heading__title">{title}</h2></div>')
+
+def promise_section():
+    # 数字で見せる「Revengeの約束」＝実在の事実のみ（プロトタイプ0円／修正無制限／保守5,000円〜）。
+    stats = [
+        ("0<small>円</small>", "動くプロトタイプを無料で"),
+        ("無制限", "納得いくまで修正"),
+        ("5,000<small>円〜</small>", "月額保守（内容に応じて）"),
+    ]
+    cells = "".join(
+        f'<div class="c-stat reveal"><div class="c-stat__num">{n}</div><div class="c-stat__label">{l}</div></div>'
+        for n, l in stats)
+    return f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+      <div class="p-stats -three">{cells}</div>
+    </div>
+  </section>
+'''
 
 def strengths_section():
     # 「選ばれる理由」＝トップページと同じ c-card（番号付き）で技術的信頼感を訴求。
@@ -472,6 +500,7 @@ def packages_section():
 ''' + _sec_heading(gsub, gtitle) + f'''
       <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
       <div class="p-pkg-grid">{cards}</div>
+      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
     </div>
   </section>
 ''')
@@ -506,6 +535,7 @@ def cta_section():
 ''' + _sec_heading("Contact", "まずは無料でご相談ください") + '''
       <p class="p-contact__lead reveal">ヒアリング後、無料でプロトタイプを作成します。「作って終わり」にせず、公開後の運用・改善まで伴走します。まずはお気軽にご相談ください。</p>
       <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn -fill">無料で相談する</a></div>
+      <p class="c-btn-note reveal">メール1本でOK。しつこい営業はいたしません。</p>
     </div>
   </section>
 ''')
@@ -524,12 +554,13 @@ RAG_EMBED = (
 SERVICES.append({
     "slug": "service-04", "title": "デジタルソリューション事業", "img": "service04",
     "desc": "ホームページ制作・埋め込みRAG・イベント運営システム・新規開発まで。ITで事業の成長を支援します。",
-    "lead": "Web・AI・システムで、事業の成長とデジタル活用を支援します。",
+    "lead": "まず“動くもの”を無料で。ホームページもAIも、触ってから決められます。",
+    "hero_cta": True,   # ヒーロー直下にCTA帯（無料相談＋不安を消すマイクロコピー）
     "points": ["ホームページ制作（オリジナル）", "埋め込み型RAG（AIチャット）",
                "イベント運営 事前決済システム", "新規システム開発"],
     "body": ["Web制作からAI活用、業務システムの開発まで、デジタルの力で企業の課題解決と成長を支援します。",
              "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。"],
-    "extra": strengths_section() + packages_section() + flow_section() + cta_section(),
+    "extra": promise_section() + strengths_section() + packages_section() + flow_section() + cta_section(),
     "no_default_cta": True,   # 末尾は cta_section（お問い合わせ誘導）を使うので既定のボタン行は出さない
     "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
