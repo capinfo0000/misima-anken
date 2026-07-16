@@ -407,7 +407,10 @@ PACKAGES = [
      "init": "5〜20万円", "maint": "2〜10万円"},
     {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ", "group": "package",
      "summary": "イベントの事前申込とオンライン決済をまとめて処理。当日の運営負荷と未収リスクを減らします。",
-     "init": "2万円", "maint": "5,000円"},
+     "init": "2万円", "maint": "5,000円",
+     # 実物スクリーンショット（スマホ実機の画面。左=参加者向け申込画面/右=主催者ダッシュボード）
+     "shots": [("pkg-event-form.webp", "参加者向けのイベント申込画面（実物）"),
+               ("pkg-event-dash.webp", "主催者向けの管理ダッシュボード（実物）")]},
 ]
 
 # 商品タイプごとのセクション（順番＝表示順）。sub=英字サブ見出し（c-section-heading 用）。
@@ -424,11 +427,17 @@ def _pkg_price(p):
 
 def _pkg_card(p):
     badge = '<span class="p-pkg__badge">実演中</span>' if p.get("demo") else ""
+    # shots＝実物スクリーンショット（あれば概要の下に表示。「実物を見せる」＝信頼訴求）
+    shots = ""
+    if p.get("shots"):
+        imgs = "".join(f'<img src="assets/img/{f}" alt="{alt}" loading="lazy">' for f, alt in p["shots"])
+        shots = f'<div class="p-pkg__shots">{imgs}</div>'
     return (
         '<div class="p-pkg">'
         f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
         f'<h4 class="p-pkg__name">{p["name"]}</h4>'
         f'<p class="p-pkg__summary">{p["summary"]}</p>'
+        f'{shots}'
         f'{_pkg_price(p)}'
         f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
         '</div>')
