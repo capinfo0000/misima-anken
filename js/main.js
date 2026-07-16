@@ -590,6 +590,22 @@
   });
 
   /* ============================================================
+     5-c. 料金カードの「もっと見る」開閉（デジタルソリューション事業）
+     ------------------------------------------------------------
+     商品が増えたとき、4件目以降は閉じた2列目（.p-pkg-grid.-more）に
+     入っている。ボタン（.js-pkg-toggle）で開閉し、文言も切り替える。
+     ============================================================ */
+  document.querySelectorAll(".js-pkg-toggle").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var row = document.getElementById(btn.getAttribute("aria-controls"));
+      if (!row) return;
+      var open = row.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+      btn.childNodes[0].nodeValue = open ? "閉じる" : btn.getAttribute("data-more-label");
+    });
+  });
+
+  /* ============================================================
      6-a. スクロールで要素をふわっと表示（reveal）を全ページに自動付与
      ------------------------------------------------------------
      各セクションの直下要素に .reveal を付け、少しずつ遅延(スタッガー)を掛ける。

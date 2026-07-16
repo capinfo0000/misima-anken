@@ -320,6 +320,11 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 /* デジタルソリューション：パッケージ料金カード／注記／相談フロー（service-04・LP） */
 .p-pkg-grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;margin:1.2rem 0 1.6rem;}
 @media (min-width:700px){.p-pkg-grid{grid-template-columns:repeat(2,1fr);}}
+@media (min-width:1000px){.p-pkg-grid{grid-template-columns:repeat(3,1fr);}}
+/* 4件目以降の折りたたみ行：初期は閉じ、.is-open で開く（開閉は .js-pkg-toggle） */
+.p-pkg-grid.-more{display:none;margin-top:0;}
+.p-pkg-grid.-more.is-open{display:grid;}
+button.c-btn{font-family:inherit;cursor:pointer;}
 .p-pkg{border:1px solid #ececec;border-radius:12px;padding:1.2rem 1.3rem;background:#fff;display:flex;flex-direction:column;}
 .p-pkg__kind{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem .5rem;font-size:.78rem;color:#e60012;font-weight:700;margin:0 0 .3rem;}
 .p-pkg__name{font-size:1.05rem;margin:0 0 .5rem;}

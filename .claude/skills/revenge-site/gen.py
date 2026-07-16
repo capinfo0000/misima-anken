@@ -485,21 +485,33 @@ def strengths_section():
   </section>
 ''')
 
+PKG_VISIBLE = 3   # 各グループの初期表示件数。これを超えた分は折りたたみ行に入り「もっと見る」で開閉。
+
 def packages_section():
     # 商品タイプごとに別セクション。見出しは共通の c-section-heading を使用。
+    # 商品が PKG_VISIBLE 件を超えたら、超過分は閉じた2列目（.p-pkg-grid.-more）に自動で入る。
     out = []
     for i, (gkey, gsub, gtitle, gdesc) in enumerate(PKG_GROUPS):
         items = [p for p in PACKAGES if p.get("group") == gkey]
         if not items:
             continue
         tint = " -tint" if i % 2 == 0 else ""
-        cards = "".join(_pkg_card(p) for p in items)
+        vis, rest = items[:PKG_VISIBLE], items[PKG_VISIBLE:]
+        cards = "".join(_pkg_card(p) for p in vis)
+        more = ""
+        if rest:
+            more_cards = "".join(_pkg_card(p) for p in rest)
+            more_label = f"残り{len(rest)}件をすべて見る"
+            more = (f'\n      <div class="p-pkg-grid -more" id="pkg-more-{gkey}">{more_cards}</div>'
+                    f'\n      <div class="c-btn-wrap"><button type="button" class="c-btn js-pkg-toggle"'
+                    f' aria-expanded="false" aria-controls="pkg-more-{gkey}"'
+                    f' data-more-label="{more_label}">{more_label}</button></div>')
         out.append(f'''
   <section class="l-section{tint}">
     <div class="l-container">
 ''' + _sec_heading(gsub, gtitle) + f'''
       <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
-      <div class="p-pkg-grid">{cards}</div>
+      <div class="p-pkg-grid">{cards}</div>{more}
       <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
     </div>
   </section>
