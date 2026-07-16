@@ -414,8 +414,7 @@ PACKAGES = [
      "init": "2万円", "maint": "5,000円",
      # 実物スクリーンショット（スマホ実機の画面。左=参加者向け申込画面/右=主催者ダッシュボード）
      "shots": [("pkg-event-form.webp", "参加者向けのイベント申込画面（実物）"),
-               ("pkg-event-dash.webp", "主催者向けの管理ダッシュボード（実物）")],
-     "shots_crop": True},   # 縦長スクショのため高さ固定で切り抜き表示（カードが伸びすぎないように）
+               ("pkg-event-dash.webp", "主催者向けの管理ダッシュボード（実物）")]},
 ]
 
 # 商品タイプごとのセクション（順番＝表示順）。sub=英字サブ見出し（c-section-heading 用）。
@@ -435,10 +434,9 @@ def _pkg_card(p):
     # shots＝実物スクリーンショット（あれば概要の下に表示。「実物を見せる」＝信頼訴求）
     shots = ""
     if p.get("shots"):
+        # 表示枠は高さ230px固定。見切れ防止は画像側（ほぼ正方形で書き出す）で調整する。
         imgs = "".join(f'<img src="assets/img/{f}" alt="{alt}" loading="lazy">' for f, alt in p["shots"])
-        # shots_crop=True のカードは高さを揃えて切り抜き表示（縦長スクショ向け）。指定なしは全体表示。
-        crop = " -crop" if p.get("shots_crop") else ""
-        shots = f'<div class="p-pkg__shots{crop}">{imgs}</div>'
+        shots = f'<div class="p-pkg__shots">{imgs}</div>'
     return (
         '<div class="p-pkg">'
         f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'

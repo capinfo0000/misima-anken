@@ -339,10 +339,9 @@ button.c-btn{font-family:inherit;cursor:pointer;}
 .p-pkg__badge{display:inline-block;font-size:.66rem;background:#e60012;color:#fff;border-radius:999px;padding:.12rem .55rem;white-space:nowrap;}
 .p-pkg__summary{font-size:.9rem;line-height:1.75;margin:0 0 .9rem;flex:1 0 auto;}
 /* 実物スクリーンショット（スマホ画面2枚並び。上端から表示し高さを揃える） */
-.p-pkg__shots{display:flex;gap:.7rem;margin:0 0 1rem;align-items:flex-start;}
-.p-pkg__shots img{width:calc(50% - .35rem);height:auto;border:1px solid #e8e8e8;border-radius:10px;background:#f7f8fa;}
-/* -crop：縦長スクショ用。高さを揃えて上端から切り抜き（カードが伸びすぎない） */
-.p-pkg__shots.-crop img{height:230px;object-fit:cover;object-position:top;}
+.p-pkg__shots{display:flex;gap:.7rem;margin:0 0 1rem;}
+/* 高さ固定230px。見切れ防止は画像側で調整（表示枠に近い縦横比＝ほぼ正方形で書き出す） */
+.p-pkg__shots img{width:calc(50% - .35rem);height:230px;object-fit:cover;object-position:top;border:1px solid #e8e8e8;border-radius:10px;background:#f7f8fa;}
 .p-pkg__note{display:block;margin-top:.4rem;color:#8a8a8a;font-size:.78rem;}
 .p-pkg__price{font-size:.9rem;margin:0 0 1rem;padding-top:.8rem;border-top:1px solid #f0f0f0;}
 .p-pkg__price-row{display:flex;justify-content:space-between;align-items:baseline;gap:.5em;margin:.15rem 0;}
