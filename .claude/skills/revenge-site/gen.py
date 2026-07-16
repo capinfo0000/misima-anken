@@ -411,7 +411,42 @@ PACKAGES = [
      "init": "5〜20万円", "maint": "2〜10万円",
      # 実物スクリーンショット（左=チャットUI/右=既存サイトへ埋め込んだ状態。RAGホストの実UIをミラー描画で撮影）
      "shots": [("pkg-rag-chat.webp", "RAGチャットの画面（社内規程アシスタントのデモ）"),
-               ("pkg-rag-embed.webp", "既存サイトに埋め込んだ状態（右下ボタン→チャットが開く）")]},
+               ("pkg-rag-embed.webp", "既存サイトに埋め込んだ状態（右下ボタン→チャットが開く）")],
+     # ---- LP本文（lp/rag.html）。内容は製品の実仕様（README/チャットUI記載）に準拠、実績風の誇張なし ----
+     "lp": {
+        "sub_en": "AI Chat / RAG",
+        "catch": "問い合わせ対応、AIに任せませんか。",
+        "lead": "自社の資料を学習したAIチャットが、サイトの上で24時間自動回答。既存ホームページに1行で設置できます。",
+        "cta_text": "ヒアリングのあと、<b>あなたの会社のデータで動くデモを無料</b>でお作りします。",
+        "pains": [
+            ("同じ質問に何度も答えている", "営業時間・料金・手続き…。よくある質問への対応に、毎日時間を取られていませんか。"),
+            ("営業時間外の問い合わせを逃す", "夜間や休日に来た質問に答えられず、見込み客がそのまま離れてしまう。"),
+            ("FAQページが読まれない", "せっかく用意したよくある質問も、探すのが面倒で結局電話やメールが来る。"),
+            ("社内の質問が特定の人に集中", "規程やマニュアルの場所を聞かれるたびに、詳しい人の手が止まる。"),
+        ],
+        "pain_close": "その「答える時間」、AIチャットがまるごと引き受けます。",
+        "features": [
+            ("自社データで個別構築", "PDF・Word・Excel・テキストなどの資料をそのまま学習。貴社専用のAIチャットに仕上げます。"),
+            ("既存サイトに1行で設置", "いまのホームページを作り直す必要はありません。scriptタグ1行で右下にチャットボタンが現れます。"),
+            ("出典付きで正確に回答", "回答は登録した資料に書かれた情報のみ。推測では答えず、根拠となる出典を必ず表示します。"),
+            ("導入も更新も丸ごと代行", "資料の登録・チューニング・公開後の内容更新まで当社が対応。ITのご担当者がいなくても大丈夫です。"),
+        ],
+        "showcase": {
+            "title": "実際の画面",
+            "desc": "左が回答画面、右が既存サイトに設置した状態です。当社サイトの<a href=\"service/service-04.html\">デジタルソリューション事業のページ</a>右下でも実際に動いています。",
+            "shots": [("pkg-rag-chat.webp", "RAGチャットの回答画面（社内規程アシスタントのデモ）"),
+                      ("pkg-rag-embed.webp", "既存サイトに埋め込んだ状態（右下のボタンからチャットが開く）")],
+            "note": "※ 当社サイトのデモは無料枠で提供しているため、1日の利用回数に制限があります。",
+            "try": True,
+        },
+        "price_note": "料金は学習させる資料の量や要件により変動します。まずは無料ヒアリングで概算をご提示します。",
+        "faq": [
+            ("どんな資料を覚えさせられますか？", "PDF・Word・Excel・テキスト・Markdownなどに対応しています。会社案内、FAQ、マニュアル、社内規程など、お手元の資料をそのままお渡しください。"),
+            ("間違った回答をしませんか？", "回答は登録した資料に記載された情報のみで、推測では答えない設計です。回答には根拠となる出典を必ず表示するため、確認もかんたんです。"),
+            ("いまのホームページを作り直す必要はありますか？", "ありません。既存のページにscriptタグを1行追加するだけで設置できます（設置作業も当社が代行できます）。"),
+            ("資料の内容が変わったら？", "資料の差し替え・更新は月額保守の範囲で対応します。内容の変更をお送りいただくだけでAIの回答も最新になります。"),
+        ],
+     }},
     {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ", "group": "package",
      "summary": "イベントの事前申込・オンライン決済・参加名簿の管理までひとつで対応。当日の運営負荷と未収リスクを減らします。",
      "init": "2万円", "maint": "5,000円",
@@ -598,12 +633,22 @@ SERVICES.append({
     "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
 
-# 個別LP（lp/<slug>.html）＝PACKAGES から自動生成。詳細は順次拡充（現状は概要＋料金＋CVのスタブ）。
+# ================================================================ 個別LP（lp/<slug>.html）
+# LP本文はデータ駆動：PACKAGES の "lp" キーに内容を持たせる。
+# 構成（リサーチの勝ちパターン）＝FVベネフィット＋CTA → 課題 → 特徴 → 実物 → 料金 → 流れ → FAQ → CTA。
+# "lp" が無い商品は従来のスタブ（準備中）を出す。
+
+def _lp_cta(label="無料で相談する"):
+    return (f'\n      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn -fill">{label}</a></div>'
+            '\n      <p class="c-btn-note reveal">メール1本でOK。しつこい営業はいたしません。</p>\n')
+
 def lp_page(p):
-    return page_hero("Service LP", p["name"], p["summary"],
-        [("事業内容", "services.html"),
-         ("デジタルソリューション事業", "service/service-04.html"),
-         (p["name"], "lp/" + p["slug"] + ".html")]) + f"""
+    lp = p.get("lp")
+    crumbs = [("事業内容", "services.html"),
+              ("デジタルソリューション事業", "service/service-04.html"),
+              (p["name"], "lp/" + p["slug"] + ".html")]
+    if not lp:
+        return page_hero("Service LP", p["name"], p["summary"], crumbs) + f"""
   <section class="l-section">
     <div class="l-container">
       <div class="p-prose">
@@ -618,6 +663,85 @@ def lp_page(p):
     </div>
   </section>
 """
+    # --- フルLP ---
+    out = page_hero(lp["sub_en"], lp["catch"], lp["lead"], crumbs)
+    # FV直下CTA（研究知見：FV内CTA＋不安除去コピー）
+    out += f"""  <div class="p-hero-cta reveal">
+    <div class="l-container">
+      <p class="p-hero-cta__text">{lp["cta_text"]}</p>
+      <a href="contact.html?type=digital" class="c-btn -fill">無料で相談する</a>
+      <p class="c-btn-note">メール1本でOK。しつこい営業はいたしません。</p>
+    </div>
+  </div>
+"""
+    # 課題（こんなお悩みありませんか）
+    pains = "".join(f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+                    f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+                    for i, (t, d) in enumerate(lp["pains"], 1))
+    out += f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+{_sec_heading("Problems", "こんなお悩みはありませんか？")}
+      <div class="p-top-reasons__grid">{pains}</div>
+      <p class="p-lead-text -center reveal" style="margin-top:2rem;">{lp["pain_close"]}</p>
+    </div>
+  </section>
+'''
+    # 特徴
+    feats = "".join(f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+                    f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+                    for i, (t, d) in enumerate(lp["features"], 1))
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("Features", p["name"] + "の特徴")}
+      <div class="p-top-reasons__grid">{feats}</div>
+    </div>
+  </section>
+'''
+    # 実物（スクリーンショット）
+    if lp.get("showcase"):
+        sc = lp["showcase"]
+        imgs = "".join(f'<img src="assets/img/{f}" alt="{alt}" loading="lazy">' for f, alt in sc["shots"])
+        note = f'<p class="p-note reveal" style="margin-top:1rem;">{sc["note"]}</p>' if sc.get("note") else ""
+        out += f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+{_sec_heading("Demo", sc["title"])}
+      <p class="p-lead-text -center reveal">{sc["desc"]}</p>
+      <div class="p-pkg__shots -lp reveal">{imgs}</div>{note}
+{_lp_cta("この画面を試してみたい方はこちら" if sc.get("try") else "無料で相談する")}    </div>
+  </section>
+'''
+    # 料金
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("Price", "料金")}
+      <div class="p-lp-price reveal">
+        <div class="p-lp-price__row"><span>初期費用</span><b>{p["init"]}</b></div>
+        <div class="p-lp-price__row"><span>月額保守</span><b>{p["maint"] if p["maint"] else "要相談"}</b></div>
+      </div>
+      <p class="p-lead-text -center reveal">{lp["price_note"]}<small>（金額はすべて税込）</small></p>
+{_lp_cta("見積もりを相談する")}    </div>
+  </section>
+'''
+    # 導入の流れ（共通5ステップ）
+    out += flow_section()
+    # FAQ
+    faqs = "".join(f'<div class="p-faq__item reveal"><dt class="p-faq__q">{q}</dt><dd class="p-faq__a">{a}</dd></div>'
+                   for q, a in lp["faq"])
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("FAQ", "よくあるご質問")}
+      <dl class="p-faq">{faqs}</dl>
+    </div>
+  </section>
+'''
+    # 締めCTA（共通）
+    out += cta_section()
+    return out
 
 # ================================================================ BUSINESS OBJECTS (事業内容14項目)
 BUSINESS_OBJECTS = [
@@ -1100,8 +1224,11 @@ for _p in PACKAGES:
     if os.path.exists(_lp_path):
         print("keep lp/%s.html (既存を保持＝手動ブラッシュアップ分)" % _p["slug"])
         continue
+    # RAGのLPには実演ウィジェット（右下チャット）も設置する
+    _lp_body = lp_page(_p) + (RAG_EMBED if _p["slug"] == "rag" else "")
+    _lp_desc = re.sub(r"<[^>]+>", "", _p["lp"]["lead"] if _p.get("lp") else _p["summary"])
     pages.append(("lp/" + _p["slug"] + ".html", _p["name"] + "｜デジタルソリューション事業",
-                  _p["summary"], "services", lp_page(_p)))
+                  _lp_desc, "services", _lp_body))
 # ニュース詳細ページは生成しない（WordPress運用に一本化）。記事はWP側のURLで公開。
 
 for name, title, desc, cur, body in pages:
