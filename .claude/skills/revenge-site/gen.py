@@ -450,7 +450,7 @@ def promise_section():
         f'<div class="c-stat reveal"><div class="c-stat__num">{n}</div><div class="c-stat__label">{l}</div></div>'
         for n, l in stats)
     return f'''
-  <section class="l-section -tint">
+  <section class="l-section">
     <div class="l-container">
       <div class="p-stats -three">{cells}</div>
     </div>
@@ -458,7 +458,7 @@ def promise_section():
 '''
 
 def strengths_section():
-    # 「選ばれる理由」＝トップページと同じ c-card（番号付き）で技術的信頼感を訴求。
+    # 「私たちの特徴」＝トップページと同じ c-card（番号付き）で信頼感を訴求。
     items = [
         ("01", "小さく始められる", "ホームページは5万円〜、AIチャットも定額パッケージ。個人事業主・中小企業の予算感で、必要な分だけ導入できます。"),
         ("02", "IT担当がいなくても大丈夫", "専門用語を使わずにご説明し、企画から公開まで窓口ひとつで対応。丸ごとお任せいただけます。"),
@@ -477,7 +477,7 @@ def strengths_section():
     <span class="c-band__bar" style="--c:var(--c-blue)"></span>
     <span class="c-band__bar" style="--c:var(--c-purple)"></span>
   </div>
-  <section class="l-section">
+  <section class="l-section -tint">
     <div class="l-container">
 ''' + _sec_heading("Features", "私たちの特徴") + f'''
       <div class="p-top-reasons__grid">{cards}</div>
@@ -492,7 +492,7 @@ def packages_section():
         items = [p for p in PACKAGES if p.get("group") == gkey]
         if not items:
             continue
-        tint = " -tint" if i % 2 == 1 else ""
+        tint = " -tint" if i % 2 == 0 else ""
         cards = "".join(_pkg_card(p) for p in items)
         out.append(f'''
   <section class="l-section{tint}">
@@ -560,7 +560,8 @@ SERVICES.append({
                "イベント運営 事前決済システム", "新規システム開発"],
     "body": ["Web制作からAI活用、業務システムの開発まで。個人事業主・中小企業の「人手が足りない」「ITに詳しい人がいない」を、デジタルの力で解決します。",
              "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。ITのご担当者がいなくても大丈夫です。"],
-    "extra": promise_section() + strengths_section() + packages_section() + flow_section() + cta_section(),
+    # 並び＝訪問者の関心順：商品(何を・いくらで)→特徴(なぜ当社か)→約束の数字→流れ→CTA
+    "extra": packages_section() + strengths_section() + promise_section() + flow_section() + cta_section(),
     "no_default_cta": True,   # 末尾は cta_section（お問い合わせ誘導）を使うので既定のボタン行は出さない
     "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
