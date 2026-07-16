@@ -501,7 +501,7 @@ def packages_section():
         more = ""
         if rest:
             more_cards = "".join(_pkg_card(p) for p in rest)
-            more_label = f"残り{len(rest)}件をすべて見る"
+            more_label = "もっと見る"
             more = (f'\n      <div class="p-pkg-grid -more" id="pkg-more-{gkey}">{more_cards}</div>'
                     f'\n      <div class="c-btn-wrap"><button type="button" class="c-btn js-pkg-toggle"'
                     f' aria-expanded="false" aria-controls="pkg-more-{gkey}"'
