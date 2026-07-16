@@ -497,12 +497,15 @@ def packages_section():
             continue
         tint = " -tint" if i % 2 == 0 else ""
         vis, rest = items[:PKG_VISIBLE], items[PKG_VISIBLE:]
+        # 3件未満の行は件数クラス(-n1/-n2)を付け、少ない枚数でも中央・全幅に広がるようにする
+        def _ncls(n):
+            return f" -n{n}" if n < 3 else ""
         cards = "".join(_pkg_card(p) for p in vis)
         more = ""
         if rest:
             more_cards = "".join(_pkg_card(p) for p in rest)
             more_label = "もっと見る"
-            more = (f'\n      <div class="p-pkg-grid -more" id="pkg-more-{gkey}">{more_cards}</div>'
+            more = (f'\n      <div class="p-pkg-grid -more{_ncls(len(rest))}" id="pkg-more-{gkey}">{more_cards}</div>'
                     f'\n      <div class="c-btn-wrap"><button type="button" class="c-btn js-pkg-toggle"'
                     f' aria-expanded="false" aria-controls="pkg-more-{gkey}"'
                     f' data-more-label="{more_label}">{more_label}</button></div>')
@@ -511,7 +514,7 @@ def packages_section():
     <div class="l-container">
 ''' + _sec_heading(gsub, gtitle) + f'''
       <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
-      <div class="p-pkg-grid">{cards}</div>{more}
+      <div class="p-pkg-grid{_ncls(len(vis))}">{cards}</div>{more}
       <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
     </div>
   </section>

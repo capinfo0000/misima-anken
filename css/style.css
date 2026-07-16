@@ -321,6 +321,9 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-pkg-grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;margin:1.2rem 0 1.6rem;}
 @media (min-width:700px){.p-pkg-grid{grid-template-columns:repeat(2,1fr);}}
 @media (min-width:1000px){.p-pkg-grid{grid-template-columns:repeat(3,1fr);}}
+/* 件数が少ない行：2件=2列で全幅（中央）、1件=中央に1枚 */
+@media (min-width:1000px){.p-pkg-grid.-n2{grid-template-columns:repeat(2,1fr);}}
+.p-pkg-grid.-n1{grid-template-columns:1fr;max-width:560px;margin-inline:auto;}
 /* 4件目以降の折りたたみ行：初期は閉じ、.is-open で開く（開閉は .js-pkg-toggle） */
 .p-pkg-grid.-more{display:none;margin-top:0;}
 .p-pkg-grid.-more.is-open{display:grid;}
