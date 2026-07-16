@@ -325,6 +325,11 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
 .p-pkg-grid.-more{display:none;margin-top:0;}
 .p-pkg-grid.-more.is-open{display:grid;}
 button.c-btn{font-family:inherit;cursor:pointer;}
+/* 「もっと見る」の矢印は → ではなく山括弧「〉」。閉時=下向き／開時=上向きに回転 */
+.js-pkg-toggle::after{content:"〉";transform:rotate(90deg);}
+.js-pkg-toggle:hover::after{transform:rotate(90deg) translateX(3px);}
+.js-pkg-toggle[aria-expanded="true"]::after{transform:rotate(-90deg);}
+.js-pkg-toggle[aria-expanded="true"]:hover::after{transform:rotate(-90deg) translateX(3px);}
 .p-pkg{border:1px solid #ececec;border-radius:12px;padding:1.2rem 1.3rem;background:#fff;display:flex;flex-direction:column;}
 .p-pkg__kind{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem .5rem;font-size:.78rem;color:#e60012;font-weight:700;margin:0 0 .3rem;}
 .p-pkg__name{font-size:1.05rem;margin:0 0 .5rem;}
