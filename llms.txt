@@ -1,0 +1,22 @@
+# 株式会社Revenge（Re:venge）
+
+> 株式会社Revenge（Re:venge）は、鹿児島県指宿市を拠点に、セールスプロモーション事業・BPO事業・教育／研修事業を展開する企業です。通信業界を中心に、企業の売上向上と人・組織の成長を支援します。
+
+鹿児島県指宿市を拠点とする企業。代表取締役社長：今別府 尭。設立：2026年7月。事業内容：セールスプロモーション事業／BPO事業／教育・研修事業。対応エリア：全国。お問い合わせ：info@revenge.co.jp
+
+## 会社情報
+- [代表メッセージ](https://revenge.co.jp/message.html): 代表取締役からのメッセージ
+- [社名の由来](https://revenge.co.jp/purpose.html): 社名・ブランドに込めた思い
+- [会社概要](https://revenge.co.jp/profile.html): 会社名・所在地・設立・資本金などの基本情報
+
+## 事業
+- [事業内容](https://revenge.co.jp/services.html): 3事業の概要
+- [セールスプロモーション事業](https://revenge.co.jp/service/service-01.html): 販売支援・営業支援
+- [BPO事業](https://revenge.co.jp/service/service-02.html): 業務請負・アウトソーシング
+- [教育・研修事業](https://revenge.co.jp/service/service-03.html): 人材育成・研修
+
+## その他
+- [ニュース](https://revenge.co.jp/news.html): お知らせ・プレスリリース
+- [お問い合わせ](https://revenge.co.jp/contact.html): お問い合わせフォーム
+- [プライバシーポリシー](https://revenge.co.jp/privacy.html): 個人情報の取り扱い
+
