@@ -7,7 +7,7 @@
 ## 会社情報
 - [代表メッセージ](https://revenge.co.jp/message.html): 代表取締役からのメッセージ
 - [社名の由来](https://revenge.co.jp/purpose.html): 社名・ブランドに込めた思い
-- [会社概要](https://revenge.co.jp/profile.html): 会社名・所在地・設立・資本金などの基本情報
+- [会社概要](https://revenge.co.jp/profile.html): 会社名・所在地・設立などの基本情報
 
 ## 事業
 - [事業内容](https://revenge.co.jp/services.html): 3事業の概要
