@@ -1038,8 +1038,9 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-monitor__body{ flex:1 1 380px; }
 .page-s04 .p-monitor__title{ margin:0 0 .3rem; font-size:1rem; font-weight:700; line-height:1.6; }
 .page-s04 .p-monitor__note{ margin:0; font-size:.8rem; color:var(--text-muted); line-height:1.7; }
-.page-s04 .p-monitor__cta{ flex:none; }
-@media (max-width:700px){ .page-s04 .p-monitor__cta{ width:100%; } }
+.page-s04 .p-monitor__act{ flex:none; text-align:center; }
+.page-s04 .p-monitor__micro{ margin:.4rem 0 0; font-size:.72rem; color:var(--text-muted); }
+@media (max-width:700px){ .page-s04 .p-monitor__act{ width:100%; } .page-s04 .p-monitor__cta{ width:100%; } }
 
 /* --- reduced-motion 配慮 --- */
 @media (prefers-reduced-motion:reduce){
