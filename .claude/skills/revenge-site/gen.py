@@ -696,7 +696,7 @@ def _pkg_card(p):
         '<div class="p-pkg">'
         f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
         f'<h4 class="p-pkg__name">{p["name"]}</h4>'
-        f'<p class="p-pkg__summary">{p["summary"]}</p>'
+        f'<div class="p-pkg__box"><p class="p-pkg__summary">{p["summary"]}</p></div>'
         f'{_pkg_more(p)}'
         '</div>')
 

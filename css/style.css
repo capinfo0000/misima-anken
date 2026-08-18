@@ -970,6 +970,12 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
   transition:background-position .45s ease, box-shadow .28s, transform .2s;
 }
 .page-s04 .p-pkg__more:hover{ background-position:100% 0; opacity:1; box-shadow:0 10px 22px -10px rgba(230,0,18,.55); }
+/* ajike風：中央寄せタイトル＋内側の薄グレーボックス */
+.page-s04 .p-pkg{ text-align:center; padding:1.6rem 1.4rem; }
+.page-s04 .p-pkg__kind{ justify-content:center; }
+.page-s04 .p-pkg__name{ text-align:center; font-size:1.15rem; margin:0 0 .9rem; }
+.page-s04 .p-pkg__box{ background:#f6f7fb; border:1px solid #eef0f5; border-radius:12px; padding:1rem 1.1rem; margin:0 0 1.2rem; flex:1 0 auto; display:flex; align-items:center; }
+.page-s04 .p-pkg__box .p-pkg__summary{ text-align:left; margin:0; }
 
 /* --- 強み(c-stat)：カード化してホバーで浮上 --- */
 .page-s04 .c-stat{ border-radius:12px; transition:transform .25s, box-shadow .25s; }
