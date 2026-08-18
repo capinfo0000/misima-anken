@@ -16,6 +16,7 @@ OUT = os.environ.get("REVENGE_OUT") or os.path.abspath(
 
 # ---------------------------------------------------------------- SEO / AIO 設定（ブラウザ非表示のメタのみ）
 SITE = "https://revenge.co.jp"            # 正規ドメイン
+PUBLISH_LPS = False   # 個別LP(lp/*.html)を公開するか。Falseの間はカードのリンク・sitemap・llmsからLPを除外し、生成もしない（＝未公開）。ブラッシュアップ版が固まったらTrueに。
 BUILD_DATE = "2026-07-10"                 # sitemap lastmod / 記事 dateModified
 OG_IMAGE = SITE + "/assets/img/mv.webp"   # OGP画像（メインビジュアル・既存アセット）
 LOGO_URL = SITE + "/assets/img/logo-mark.webp"
@@ -698,8 +699,14 @@ def _pkg_card(p):
         f'<p class="p-pkg__summary">{p["summary"]}</p>'
         f'{shots}'
         f'{_pkg_price(p)}'
-        f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
+        f'{_pkg_more(p)}'
         '</div>')
+
+def _pkg_more(p):
+    # LP公開中は個別LPへ、未公開の間はお問い合わせ（デジタル種別）へ誘導＝リンク切れを出さない。
+    if PUBLISH_LPS:
+        return f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
+    return '<a class="p-pkg__more" href="contact.html?type=digital">お問い合わせ<span aria-hidden="true">→</span></a>'
 
 def _sec_heading(sub, title):
     # 全ページ共通の見出しコンポーネント（英字サブ＋日本語見出し）＝サイトの統一感を担保。
@@ -1448,7 +1455,7 @@ for _s in SERVICES:
 #   運用：LPは別環境でブラッシュアップして戻す方針のため、gen.py は「まだ無いLPだけ」スタブ生成する。
 #   既存のLP（手動で磨いた版）は上書きしない＝保持。作り直したいときは該当ファイルを削除してから再生成。
 #   ※ 既存LPも sitemap には自動で載る（sitemapはファイル実走査）／ヘッダーは main.js が自動注入。
-for _p in PACKAGES:
+for _p in (PACKAGES if PUBLISH_LPS else []):   # LP未公開の間は生成・登録しない
     _lp_path = os.path.join(OUT, "lp", _p["slug"] + ".html")
     if os.path.exists(_lp_path):
         print("keep lp/%s.html (既存を保持＝手動ブラッシュアップ分)" % _p["slug"])
@@ -1488,6 +1495,8 @@ import datetime
 
 # サイトマップに含めない（公開ページでない）フォルダ
 _SITEMAP_SKIP_DIRS = {"wp", ".git", ".claude", "node_modules", "docs", "assets"}
+if not PUBLISH_LPS:
+    _SITEMAP_SKIP_DIRS = _SITEMAP_SKIP_DIRS | {"lp"}   # LP未公開の間は sitemap から除外
 
 def _sitemap_priority(rel):
     if rel == "index.html":
@@ -1546,11 +1555,12 @@ llms = "\n".join([
     _llm_link("BPO事業", "service/service-02.html", "業務請負・アウトソーシング"),
     _llm_link("教育・研修事業", "service/service-03.html", "人材育成・研修"),
     _llm_link("デジタルソリューション事業", "service/service-04.html", "HP制作・埋め込みRAG・イベント運営システム・新規開発"),
+] + ([
     "",
     "## デジタルソリューション（LP）",
 ] + [
     _llm_link(_p["name"], "lp/" + _p["slug"] + ".html", _p["summary"]) for _p in PACKAGES
-] + [
+] if PUBLISH_LPS else []) + [
     "",
     "## その他",
     _llm_link("ニュース", "news.html", "お知らせ・プレスリリース"),
