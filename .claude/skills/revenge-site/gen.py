@@ -20,8 +20,8 @@ BUILD_DATE = "2026-07-10"                 # sitemap lastmod / 記事 dateModifie
 OG_IMAGE = SITE + "/assets/img/mv.webp"   # OGP画像（メインビジュアル・既存アセット）
 LOGO_URL = SITE + "/assets/img/logo-mark.webp"
 ORG_DESC = ("株式会社Revenge（Re:venge）は、鹿児島県指宿市を拠点に、"
-            "セールスプロモーション事業・BPO事業・教育／研修事業を展開する企業です。"
-            "通信業界を中心に、企業の売上向上と人・組織の成長を支援します。")
+            "セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開する企業です。"
+            "通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。")
 
 def _abs(path):
     """ページ相対パス → 絶対URL。index.html はルートに正規化。"""
@@ -172,7 +172,7 @@ def rebrand(html):
 
 # ---------------------------------------------------------------- head
 def head(title, desc, path="index.html", cur="", article_date=None):
-    full_title = f"{title} | 株式会社ミシマ"
+    full_title = title if ("株式会社ミシマ" in title or "株式会社Revenge" in title) else f"{title} | 株式会社ミシマ"
     seo = seo_head(full_title, desc, path, cur, article_date)
     return f"""<!DOCTYPE html>
 <html lang="ja">
@@ -186,7 +186,10 @@ def head(title, desc, path="index.html", cur="", article_date=None):
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />{seo}
+  <link rel="icon" href="/favicon.ico?v=2" sizes="any" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/favicon-96.png?v=2" />
+  <link rel="icon" href="/assets/favicon.svg?v=2" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />{seo}
 </head>
 <body>"""
 
@@ -307,7 +310,8 @@ def write(name, html):
     print("wrote", name)
 
 # ================================================================ SERVICES (data + builders)
-# 事業内容＝3事業（セールスプロモーション／BPO／教育・研修）。画像カード＋個別詳細ページ。
+# 事業内容＝4事業（セールスプロモーション／BPO／教育・研修／デジタルソリューション）。画像カード＋個別詳細ページ。
+# ※ service-01〜03 をここで定義し、デジタルソリューション(service-04)は下で PACKAGES を使って append する。
 # title=事業名 / desc=カード説明 / lead=詳細ヒーロー一言 / points=主な業務内容 / body=本文段落。
 SERVICES = [
     {"slug":"service-01","title":"セールスプロモーション事業","img":"service-01",
@@ -351,18 +355,11 @@ def svc_detail_page(s):
     # 相談ボタン：詳細ページの事業に応じてお問い合わせ種別を自動セット（?type=…）
     ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital"}.get(s["slug"], "")
     contact_href = f"contact.html?type={ctype}" if ctype else "contact.html"
-    return page_hero("Service", s["title"], s["lead"],
-        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + f"""
-  <section class="l-section">
+    # extra（強み・料金・相談フロー・CTA）は事業説明とは分け、独立セクション群として下に並べる。
+    extra = s.get("extra", "")
+    # no_default_cta のページは extra 側にCTA（cta_section等）を持つので既定のボタン行は出さない。
+    default_cta = "" if s.get("no_default_cta") else f"""  <section class="l-section">
     <div class="l-container">
-      <div class="p-service-single">
-        <div class="p-service-single__img reveal -left"><img src="assets/img/{s['img']}.webp" alt="{s['title']}"></div>
-        <div class="p-prose reveal -right">
-          {body}
-          <h3>主な業務内容</h3>
-          <ul class="-bullets">{pts}</ul>{s.get("extra","")}
-        </div>
-      </div>
       <div class="c-btn-wrap">
         <a href="{contact_href}" class="c-btn -fill">このサービスを相談する</a>
         <a href="services.html" class="c-btn">事業内容へ戻る</a>
@@ -370,6 +367,611 @@ def svc_detail_page(s):
     </div>
   </section>
 """
+    # ヒーロー直下のCTA帯（研究知見：FV内CTA＋不安を消すマイクロコピーでCVが上がる）
+    hero_cta = "" if not s.get("hero_cta") else f"""  <div class="p-hero-cta reveal">
+    <div class="l-container">
+      <p class="p-hero-cta__text">ヒアリングのあと、<b>動くプロトタイプを無料</b>でお見せします。</p>
+      <a href="{contact_href}" class="c-btn -fill">無料で相談する</a>
+      <p class="c-btn-note">メール1本でOK。しつこい営業はいたしません。</p>
+    </div>
+  </div>
+"""
+    return page_hero("Service", s["title"], s["lead"],
+        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + hero_cta + f"""
+  <section class="l-section">
+    <div class="l-container">
+      <div class="p-service-single">
+        <div class="p-service-single__img reveal -left"><img src="assets/img/{s['img']}.webp" alt="{s['title']}"></div>
+        <div class="p-prose reveal -right">
+          {body}
+          <h3>主な業務内容</h3>
+          <ul class="-bullets">{pts}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+{extra}{default_cta}{s.get("tail", "")}"""
+
+# ================================================================ デジタルソリューション事業（IT）＝データ駆動
+# パッケージをここに1件足すだけで、service-04 の料金カード／個別LP(lp/<slug>.html)／
+# サイトマップまで自動反映される（今後パッケージが増える前提の設計）。
+# name=名称 / kind=区分 / summary=概要 / init=初期費用 / maint=月額保守(税込。Noneなら要相談) / demo=サイト内RAG実演の対象か
+# group=商品タイプ（"custom"=オーダーメイド制作・開発 / "package"=定型パッケージ商品）。セクションを分けて表示する。
+PACKAGES = [
+    {"slug": "hp", "name": "ホームページ制作", "kind": "オリジナル制作", "group": "custom",
+     "summary": "目的・ブランドに合わせた完全オリジナルのサイト/LPを制作。公開後の保守・運用・集客改善まで継続支援します。"
+                "<small class=\"p-pkg__note\">制作例：当サイト（PC／スマホ対応）</small>",
+     "init": "5〜30万円", "maint": "1〜10万円",
+     # 制作例＝このコーポレートサイト自体（左=ヒーロー／右=代表メッセージのレイアウト）
+     "shots": [("pkg-hp-pc.webp", "制作例：当サイトのトップページ（メインビジュアル）"),
+               ("pkg-hp-message.webp", "制作例：当サイトの代表メッセージセクション")],
+     # ---- LP本文（lp/hp.html）----
+     "lp": {
+        "sub_en": "Web Design",
+        "catch": "“ちゃんとした”ホームページを、5万円から。",
+        "lead": "個人事業主・中小企業のための完全オリジナル制作。テンプレートに頼らず、目的に合わせて設計します。公開して終わりではなく、更新・集客改善まで伴走します。",
+        "cta_text": "ヒアリングのあと、<b>デザインの試作（プロトタイプ）を無料</b>でお見せします。",
+        "pains": [
+            ("ホームページがない・古い", "紹介されても調べてもらえるページがない。昔作ったきりでスマホで崩れる。それだけで機会を逃していませんか。"),
+            ("何から始めればいいか分からない", "相場も、頼み方も、何を用意すればいいのかも分からない。調べるほど不安になる。"),
+            ("作ったのに更新されず放置", "業者に頼んだが「作って終わり」。直したい箇所があっても頼みづらく、情報が古いまま。"),
+            ("テンプレだと他社と同じに見える", "安価なテンプレートでは、社名を入れ替えただけのようなページになり、信頼につながらない。"),
+        ],
+        "pain_close": "「作って終わり」にしない制作を、5万円から。",
+        "detail": [
+            ("お作りできるもの", [
+                "<ul class=\"-bullets\"><li><b>コーポレートサイト</b>：会社案内・事業紹介・お問い合わせを備えた、信頼づくりの基本形</li><li><b>店舗・サービスサイト</b>：メニュー・料金・アクセス・予約導線など、来店・利用につなげる構成</li><li><b>採用ページ</b>：仕事内容・待遇・メッセージで応募の不安を減らす</li><li><b>ランディングページ（LP）</b>：1つの商品・サービスを深く伝え、問い合わせ・申込へつなげる縦長ページ</li></ul>",
+                "ページ構成は「何のために作るか」から一緒に設計します。とりあえず立派なものを作るのではなく、目的（問い合わせを増やす、信頼を得る、採用したい）に必要なページだけを、必要な順番で作ります。",
+            ]),
+            ("料金の目安", [
+                "<ul class=\"-bullets\"><li><b>5〜10万円</b>：1〜3ページの小規模構成（例：会社案内＋お問い合わせ）。まず持っておきたい方に</li><li><b>10〜20万円</b>：5〜8ページの標準構成（例：トップ＋事業紹介＋会社情報＋お知らせ＋お問い合わせ）</li><li><b>20〜30万円</b>：ページ数が多い、デザインにこだわりたい、撮影・図版が多いなどの構成</li></ul>",
+                "上記は目安です。正確な金額は無料ヒアリングのうえでお見積りします。ご予算が先に決まっている場合は、その範囲でできる構成をご提案します。",
+            ]),
+            ("公開後の保守・運用（月額）", [
+                "<ul class=\"-bullets\"><li><b>1万円前後</b>：サーバー・ドメインの管理、バックアップ、軽微な文言修正</li><li><b>3万円前後</b>:上記＋テキスト・画像の更新代行、月次の状況報告</li><li><b>5万円〜</b>：上記＋アクセス解析にもとづく改善提案、集客のご相談</li></ul>",
+                "内容はご要望に合わせて調整します。「更新はほとんど無いので最低限でいい」「集客までしっかり見てほしい」など、率直にお聞かせください。",
+            ]),
+            ("SEO・AI検索への対応も標準で", [
+                "検索エンジン向けの基本対策（タイトル・説明文の最適化、構造化データ、サイトマップ）に加えて、ChatGPTなどのAI検索に見つけてもらうための対策（AI向けサイト情報の設置、AIクローラーへの対応）まで標準で行います。",
+                "「作ったのに検索に出ない」を避けるため、公開時にはGoogleへの登録作業（Search Console・サイトマップ送信）まで含めて対応します。",
+            ]),
+            ("技術面のこだわり（当社の標準構成）", [
+                "<ul class=\"-bullets\"><li><b>表示が速い</b>：重いシステムに頼らない軽量な構成で、ページの表示速度を確保。画像も軽量形式（WebP）で最適化します</li><li><b>更新に強い設計</b>：ヘッダーなどの共通部分は1ファイルの修正で全ページに反映される設計。後々の変更費用を抑えます</li><li><b>お知らせだけ自分で更新</b>：更新頻度の高いお知らせ部分のみブログの仕組みを組み合わせる「いいとこ取り」構成にも対応</li><li><b>お問い合わせフォーム</b>：迷惑メール対策（ボット対策）と文字化け対策を施したフォームを標準装備</li><li><b>アニメーション演出</b>：スクロールに合わせた表示演出や、印象に残るトップページの動きもご要望に応じて制作（当サイトのトップが実例です）</li></ul>",
+            ]),
+            ("ホームページ以外もまとめて代行できます", [
+                "<ul class=\"-bullets\"><li><b>ドメイン取得</b>：co.jp（法人登記が必要）を含む独自ドメインの取得・設定</li><li><b>サーバー手配</b>：レンタルサーバーの選定・契約・設定</li><li><b>会社メールの設定</b>：info@会社ドメイン のようなメールアドレスの開設。Gmail（Google Workspace）で送受信できるようにする設定や、迷惑メール判定を避けるための認証設定（SPF/DKIM/DMARC）まで対応</li><li><b>検索エンジン登録</b>：Google Search Console・Bing への登録とサイトマップ送信</li><li><b>AIチャット設置</b>：当社の埋め込み型RAGをホームページとセットで導入も可能</li></ul>",
+                "「ホームページを作りたい」の周辺には、ドメイン・サーバー・メールなど分かりづらい手続きがたくさんあります。全部まとめて代行できるので、初めての方も安心してお任せください。",
+            ]),
+            ("当サイトも自社制作です", [
+                "いまご覧いただいているこのサイト自体が、当社の制作実例です。企画・デザイン・実装から、SEO/AI検索対策、ページ右下のAIチャット（埋め込み型RAG）まで、すべて自社で制作・運用しています。デザインの雰囲気や動きは、ぜひトップページからご確認ください。",
+            ]),
+        ],
+        "features": [
+            ("完全オリジナルデザイン", "テンプレートの流用ではなく、貴社の目的・雰囲気に合わせて一から設計。他社と並んだときに違いが出ます。"),
+            ("スマホ対応は標準", "スマホ・タブレット・PCどの画面でも綺麗に表示。いまや閲覧の主役はスマホです。"),
+            ("SEO・AI検索対策込み", "検索エンジン対策に加え、AI検索（ChatGPT等）への対策まで標準対応。作った後に見つけてもらえるサイトに。"),
+            ("公開後も更新・改善", "月額保守で更新代行・改善提案まで伴走。「作って終わり」にしません。"),
+        ],
+        "showcase": {
+            "title": "制作例",
+            "desc": "当社コーポレートサイトのトップページです。左がメインビジュアル、右が代表メッセージのセクション。実際の動きは<a href=\"index.html\">トップページ</a>でご覧いただけます。",
+            "shots": [("pkg-hp-pc.webp", "制作例：当サイトのトップページ（メインビジュアル）"),
+                      ("pkg-hp-message.webp", "制作例：当サイトの代表メッセージセクション")],
+        },
+        "price_note": "ページ数・デザインのこだわり・撮影や原稿作成の有無により変動します。まず無料ヒアリングで概算をご提示します。",
+        "faq": [
+            ("写真や文章の用意がなくても大丈夫ですか？", "大丈夫です。ヒアリングでお話を伺いながら、文章の下書きはこちらでご用意します。写真は素材写真の活用や、必要に応じて撮影のご相談も可能です。"),
+            ("完成までどれくらいかかりますか？", "規模によりますが、まず早い段階で「動くデザイン試作」を無料でお見せします。全体の期間はヒアリング時に構成と合わせてご提示します。"),
+            ("ドメインやサーバーはどうすればいいですか？", "取得・設定はすべて代行します（取得費用・利用料は実費）。「会社名.co.jp のようなアドレスにしたい」といったご相談からで大丈夫です。"),
+            ("途中でやめられますか？", "デザイン試作（プロトタイプ）までは無料です。試作をご覧いただいて本契約前であれば、費用は一切かかりません。"),
+            ("自分で更新できるようにもできますか？", "できます。お知らせなど更新頻度の高い部分をご自身で編集できる形にする構成もご提案可能です。運用体制に合わせて設計します。"),
+        ],
+     }},
+    {"slug": "dev", "name": "新規システム開発", "kind": "受託開発", "group": "custom",
+     "summary": "業務課題に合わせた新規システムを、企画から開発・運用まで一気通貫でご提供します。",
+     "init": "お見積り", "maint": None,
+     # ---- LP本文（lp/dev.html）----
+     "lp": {
+        "sub_en": "System Development",
+        "catch": "その手作業、システムにできます。",
+        "lead": "Excelへの転記、二重入力、紙の申請書…。毎日の業務のムダを、貴社専用の小さなシステムで解決します。企画から開発・運用まで一気通貫。",
+        "cta_text": "ヒアリングのあと、<b>動く試作品（プロトタイプ）を無料</b>でお見せします。",
+        "pains": [
+            ("毎日の手作業に時間が溶ける", "転記・集計・チェック。人がやらなくてもいい作業に、毎日何時間も使っていませんか。"),
+            ("既製ソフトが業務に合わない", "パッケージソフトを入れたが、業務のやり方と合わず、結局Excelに戻ってしまった。"),
+            ("業務が属人化していて怖い", "あの人しか分からない作業がある。休まれると止まる。辞められたらもっと困る。"),
+            ("どこに頼めばいいか分からない", "システム開発は高そうで、相場も分からない。大手に頼むほどの規模でもない。"),
+        ],
+        "pain_close": "「大げさなシステム」ではなく、業務に合った「ちょうどいい道具」を作ります。",
+        "detail": [
+            ("対応できる開発の例", [
+                "<ul class=\"-bullets\"><li><b>予約・申込の管理</b>：電話・紙で受けていた予約をWebで受付・一覧管理</li><li><b>顧客・案件の管理</b>：Excelで限界を迎えた顧客台帳・進捗管理のシステム化</li><li><b>日報・報告の集約</b>：現場からスマホで報告→自動で集計・共有</li><li><b>見積・請求まわり</b>：定型の見積書・請求書づくりと管理の自動化</li><li><b>在庫・備品の管理</b>：数と場所の見える化、発注タイミングの通知</li><li><b>既存Excel業務のWeb化</b>：複数人で使えない・壊れやすいExcel運用からの脱却</li><li><b>AIの組み込み</b>：埋め込み型RAG（AIチャット）や自動化など、AIを業務に組み込む開発</li></ul>",
+                "上記はあくまで例です。「これってシステムにできるの？」という段階のご相談から歓迎します。できないこと・やらない方がいいことは、理由と代替案を添えて正直にお伝えします。",
+            ]),
+            ("進め方（小さく作って、早く試す）", [
+                "いきなり大きな開発契約は結びません。まず無料ヒアリングで業務の流れとお困りごとを伺い、<b>動く試作品（プロトタイプ）を無料で</b>お見せします。画面を触っていただき、方向性が合っていることを確認してから、本契約・開発に進みます。",
+                "開発中も、できた部分から順にお見せして軌道修正します。数ヶ月後に「思っていたものと違う」が起きない進め方です。納品後は運用・保守として改善を続け、業務の変化に合わせてシステムも育てていきます。",
+            ]),
+            ("見積りの考え方", [
+                "開発費用は「作る機能の数と複雑さ」で決まります。ヒアリングで業務を伺ったうえで、機能を「必須」「あった方がいい」「将来でいい」に分け、まず必須だけを作る段階リリースをご提案します。初期費用を抑えつつ、早く使い始められます。",
+                "月額保守は、稼働監視・不具合対応・軽微な改修を含む内容で、システムの規模に応じてお見積りします。運用保守の相場は一般に開発費の15〜25％／年と言われており、この水準を目安に内容とあわせてご提示します。",
+            ]),
+            ("技術面・動作環境", [
+                "<ul class=\"-bullets\"><li><b>ブラウザで動作</b>：Webアプリとして開発するため、PC・スマホ・タブレットのブラウザからインストール不要で利用できます</li><li><b>共用レンタルサーバーでも動く</b>：中小規模のシステムなら高価なクラウド契約は不要。月数百円〜のレンタルサーバーで動く軽量な構成も得意です（ランニングコストを抑えられます）</li><li><b>AI連携</b>：生成AI（チャット・文章処理・検索）をシステムに組み込む開発に対応。当社の埋め込み型RAGはその実例です</li><li><b>外部サービス連携</b>：決済サービス、メール送信、既存のWebサービスとのAPI連携</li><li><b>データ管理</b>：データベース設計、既存Excelデータの移行、CSVでの出し入れ</li><li><b>セキュリティ</b>：ログイン認証、権限管理、認証情報の暗号化保管など基本を押さえた設計</li></ul>",
+            ]),
+            ("当社の開発実例", [
+                "当社が販売しているパッケージ（埋め込み型RAG、イベント運営 事前決済システム）は、いずれもこの受託開発の技術で自社開発したものです。また、いまご覧のこのサイト自体も、生成の仕組みから自社で設計・開発しています。小さく作って運用しながら育てる、という進め方を自社でも実践しています。",
+                "<ul class=\"-bullets\"><li><b>埋め込み型RAG</b>：生成AI＋文書検索。資料の取り込み、AI回答、管理画面、既存サイトへの埋め込みまで一式</li><li><b>イベント運営 事前決済システム</b>：申込フォーム、オンライン決済、残席管理、参加名簿、集計ダッシュボード</li><li><b>当コーポレートサイト</b>：ページ生成の仕組み、SEO/AI検索対策、問い合わせフォーム、更新に強い共通部品設計</li></ul>",
+            ]),
+        ],
+        "features": [
+            ("完全オーダーメイド", "業務のやり方に合わせて設計。ソフトに業務を合わせるのではなく、業務に道具を合わせます。"),
+            ("小さく作って早く試す", "動く試作品を無料で確認してから本契約。開発中もできた部分から見せて軌道修正します。"),
+            ("ブラウザで動く", "インストール不要。PC・スマホ・タブレットのブラウザから、事務所でも現場でも使えます。"),
+            ("作った後も育てる", "納品して終わりではなく、運用・保守で改善を継続。業務の変化に合わせて機能を足せます。"),
+        ],
+        "price_note": "機能の数と複雑さによりお見積りします。段階リリースで初期費用を抑えるご提案も可能です。まずは無料ヒアリングでご相談ください。",
+        "faq": [
+            ("小さな依頼でもいいですか？", "もちろんです。「この作業だけ自動化したい」という1機能からお受けします。小さく始めて、必要に応じて育てるのがおすすめです。"),
+            ("費用感だけ先に知りたいのですが", "無料ヒアリングのうえで概算をご提示します。ご予算が決まっている場合は、その範囲でできることをご提案します。"),
+            ("既存システムの改修や引き継ぎもできますか？", "内容によりますが、ご相談ください。現状を拝見して、対応できるか・どう進めるのがよいかを率直にお伝えします。"),
+            ("納期はどれくらいですか？", "規模によりますが、プロトタイプは早い段階でお見せします。全体のスケジュールはヒアリング時に機能の優先順位と合わせてご提示します。"),
+        ],
+     }},
+    {"slug": "rag", "name": "埋め込み型RAG", "kind": "パッケージ", "group": "package",
+     "summary": "自社の情報を学習したAIチャットをサイトに設置し、問い合わせの一次対応や社内検索を自動化します。"
+                "SaaSの汎用ボットと違い、自社データで個別構築してサイトへ完全埋め込み。<b>今、このページ右下で実際に動いています。</b>",
+     "init": "5〜20万円", "maint": "2〜10万円",
+     # 実物スクリーンショット（左=チャットUI/右=既存サイトへ埋め込んだ状態。RAGホストの実UIをミラー描画で撮影）
+     "shots": [("pkg-rag-chat.webp", "RAGチャットの画面（社内規程アシスタントのデモ）"),
+               ("pkg-rag-embed.webp", "既存サイトに埋め込んだ状態（右下ボタン→チャットが開く）")],
+     # ---- LP本文（lp/rag.html）。内容は製品の実仕様（README/チャットUI記載）に準拠、実績風の誇張なし ----
+     "lp": {
+        "sub_en": "AI Chat / RAG",
+        "catch": "問い合わせの一次対応、AIに任せませんか。",
+        "lead": "自社の資料を学習したAIチャットが、よくある質問に24時間自動回答。人が対応すべき相談だけが手元に届きます。既存ホームページに1行で設置できます。",
+        "cta_text": "ヒアリングのあと、<b>あなたの会社のデータで動くデモを無料</b>でお作りします。",
+        "pains": [
+            ("同じ質問に何度も答えている", "営業時間・料金・手続き…。よくある質問への対応に、毎日時間を取られていませんか。"),
+            ("営業時間外の問い合わせを逃す", "夜間や休日に来た質問に答えられず、見込み客がそのまま離れてしまう。"),
+            ("FAQページが読まれない", "せっかく用意したよくある質問も、探すのが面倒で結局電話やメールが来る。"),
+            ("社内の質問が特定の人に集中", "規程やマニュアルの場所を聞かれるたびに、詳しい人の手が止まる。"),
+        ],
+        "pain_close": "よくある質問への「一次対応」は、AIチャットに任せられます。",
+        "detail": [
+            ("埋め込み型RAGとは", [
+                "RAG（検索拡張生成）とは、AIが回答する前に「登録された資料の中から根拠を探す」仕組みです。一般的なAIチャットのように知識をあいまいに思い出すのではなく、貴社の資料を検索してから答えるため、貴社固有の内容（料金、営業時間、規程、手順など）に正確に答えられます。",
+                "回答には根拠となった資料名（出典）が必ず表示されます。資料に書かれていないことは「わかりません」と答える設計のため、AIが勝手な作り話をしてお客様を混乱させる心配を最小限に抑えています。",
+                "チャット画面は貴社サイトの右下に小さなボタンとして表示され、クリックすると開きます。既存ページのデザインや文章には一切手を加えません。",
+            ]),
+            ("役割は「一次対応」です", [
+                "このAIチャットの役割は、お問い合わせの<b>一次対応</b>です。よくある質問（営業時間・料金・手続きなど、資料に答えがあるもの）はAIがその場で即答し、資料にない質問や個別の相談は、お問い合わせフォームなど人の窓口へご案内します。",
+                "一方で、たとえば法律相談のように<b>個人の状況によって答えが変わるご相談</b>は、人が細かくヒアリングしたうえで答えるべき領域です。AIチャットはこうした質問に無理に答えず、人の窓口へおつなぎします。答えが決まっている質問はAIへ、状況を聞くべき相談は人へ——この線引きが、正確さと信頼を保つ鍵です。",
+                "すべての対応をAIに置き換えるものではありません。「単純な質問はAIが済ませ、人はきちんと向き合うべき相談に時間を使う」——その分担をつくるための道具です。導入後も回答ログを見ながら、AIに任せる範囲を少しずつ広げていけます。",
+            ]),
+            ("こんな場面で使えます", [
+                "<ul class=\"-bullets\"><li><b>お客様対応</b>：営業時間・料金・アクセス・サービス内容など、よくある質問に24時間自動回答</li><li><b>社内ヘルプデスク</b>：就業規則・経費精算・各種手続きなど、社内規程への質問対応を自動化</li><li><b>採用</b>：応募検討者からの質問（待遇・勤務地・選考の流れ）に即答して離脱を防ぐ</li><li><b>店舗・施設案内</b>：メニュー・予約方法・設備・キャンセル規定などの案内</li><li><b>マニュアル検索</b>：操作手順や仕様をチャットで聞くだけで該当箇所を提示</li></ul>",
+                "たとえば飲食店なら——「この料理に卵は使っていますか？」というアレルギーに関わる質問。とても重要な質問ですが、<b>答えはメニューの原材料情報に決まっています</b>。こうした“決まった答えがある質問”は、AIが登録された資料をもとに出典付きで正確に即答できる領域です。スタッフは予約の相談や当日の対応など、人にしかできない問い合わせに集中できます。",
+            ]),
+            ("料金に含まれるもの", [
+                "<ul class=\"-bullets\"><li><b>初期費用（5〜20万円）</b>：ヒアリング、資料の整理・登録、AIのチューニング、貴社サイトへの設置、動作確認、公開までの一式</li><li><b>月額保守（2〜10万円）</b>：資料の更新・差し替え、回答品質のモニタリングと改善、システムの稼働監視、AIの利用料、お問い合わせ対応</li></ul>",
+                "金額の幅は、学習させる資料の量・種類、想定される質問の範囲、利用量などによって決まります。無料ヒアリングで概算をご提示しますので、まずは目的とお手元の資料についてお聞かせください。",
+            ]),
+            ("対応データ形式と取り込み", [
+                "<ul class=\"-bullets\"><li><b>対応形式</b>：PDF／Word（docx）／Excel（xlsx）／テキスト／Markdown</li><li><b>スキャン書類</b>：画像化された書類はAI-OCRで文字起こしして取り込み可能</li><li><b>更新方法</b>：資料フォルダの内容を差し替えるだけで増分同期。変わった分だけ再学習するので更新が速い</li><li><b>整理不要</b>：お手元の資料をそのままお渡しいただければ、登録用の整理・変換は当社で行います</li></ul>",
+            ]),
+            ("チャット画面の機能", [
+                "<ul class=\"-bullets\"><li><b>よくある質問ボタン</b>：想定質問をワンタップで送れるチップを設置（内容はカスタマイズ可能）</li><li><b>出典表示</b>：回答の根拠となった資料名を[1][2]の形で明示</li><li><b>役立ちフィードバック</b>：回答ごとに「解決した／しなかった」を利用者が送信でき、改善に活用</li><li><b>スマホ対応</b>：PC・スマホどちらでも使いやすいチャットUI。全画面表示への切替も可能</li><li><b>見た目のカスタマイズ</b>:ボタンの色・タイトル・表示位置（右下/左下）を貴社サイトに合わせて調整</li></ul>",
+            ]),
+            ("管理画面でできること", [
+                "<ul class=\"-bullets\"><li><b>ナレッジ管理</b>：登録済み資料の一覧・確認</li><li><b>インサイト</b>：よく聞かれている質問、解決率などの利用状況を確認</li><li><b>QAレビュー</b>：実際の質問と回答を確認し、資料の不足に気づける</li><li><b>設定</b>：AIの動作設定を管理画面から変更可能</li></ul>",
+                "管理画面はログイン制で、運用は「当社にお任せ（推奨）」「貴社で運用」のどちらも選べます。お任せの場合も、見たいときにいつでもログインして状況を確認できます。",
+            ]),
+            ("技術仕様・セキュリティ", [
+                "<ul class=\"-bullets\"><li><b>設置方法</b>：既存ページにscriptタグ1行。iframe方式のため貴社サイトのデザイン・動作と干渉しません</li><li><b>AIの選択</b>：クラウドAI（標準）のほか、要件によってAIの構成変更に対応できる設計。コストと精度のバランスで最適な構成をご提案します</li><li><b>APIキー等の管理</b>：認証情報は暗号化して保管</li><li><b>データ主権が必要な場合</b>：社外にデータを出せない要件（完全社内運用）は、専用機器の構成からご相談ください</li></ul>",
+            ]),
+            ("安心してお使いいただくために", [
+                "回答は登録資料の記載情報に限定し、根拠の出典を明示する設計です。公開前には想定質問での動作確認を行い、公開後も回答ログをもとに継続的に精度を改善します。",
+                "公開範囲の制御（社内限定での利用など）や、扱う情報の性質に応じた構成は、ヒアリングの際にご相談ください。個人情報や機密情報を扱う場合の設計方針も含めてご提案します。",
+            ]),
+            ("導入までの期間", [
+                "資料の量や要件によって変わりますが、「まず触って判断したい」という段階では、代表的な資料をお預かりして動くデモを早期にお見せします。デモをご覧いただいてから本導入の範囲・料金を決められるので、費用が発生するのは内容にご納得いただいた後です。",
+            ]),
+        ],
+        "features": [
+            ("自社データで個別構築", "PDF・Word・Excel・テキストなどの資料をそのまま学習。貴社専用のAIチャットに仕上げます。"),
+            ("既存サイトに1行で設置", "いまのホームページを作り直す必要はありません。scriptタグ1行で右下にチャットボタンが現れます。"),
+            ("出典付きで正確に回答", "回答は登録した資料に書かれた情報のみ。推測では答えず、根拠となる出典を必ず表示します。"),
+            ("導入も更新も丸ごと代行", "資料の登録・チューニング・公開後の内容更新まで当社が対応。ITのご担当者がいなくても大丈夫です。"),
+        ],
+        "showcase": {
+            "title": "実際の画面",
+            "desc": "左が回答画面、右が既存サイトに設置した状態です。当社サイトの<a href=\"service/service-04.html\">デジタルソリューション事業のページ</a>右下でも実際に動いています。",
+            "shots": [("pkg-rag-chat.webp", "RAGチャットの回答画面（社内規程アシスタントのデモ）"),
+                      ("pkg-rag-embed.webp", "既存サイトに埋め込んだ状態（右下のボタンからチャットが開く）")],
+            "note": "※ 当社サイトのデモは無料枠で提供しているため、1日の利用回数に制限があります。",
+            "try": True,
+        },
+        "price_note": "料金は学習させる資料の量や要件により変動します。まずは無料ヒアリングで概算をご提示します。",
+        "faq": [
+            ("どんな資料を覚えさせられますか？", "PDF・Word・Excel・テキスト・Markdownなどに対応しています。会社案内、FAQ、マニュアル、社内規程など、お手元の資料をそのままお渡しください。"),
+            ("間違った回答をしませんか？", "回答は登録した資料に記載された情報のみで、推測では答えない設計です。回答には根拠となる出典を必ず表示するため、確認もかんたんです。"),
+            ("いまのホームページを作り直す必要はありますか？", "ありません。既存のページにscriptタグを1行追加するだけで設置できます（設置作業も当社が代行できます）。"),
+            ("資料の内容が変わったら？", "資料の差し替え・更新は月額保守の範囲で対応します。内容の変更をお送りいただくだけでAIの回答も最新になります。"),
+        ],
+     }},
+    {"slug": "event", "name": "イベント運営 事前決済システム", "kind": "パッケージ", "group": "package",
+     "summary": "イベントの事前申込・オンライン決済・参加名簿の管理までひとつで対応。当日の運営負荷と未収リスクを減らします。",
+     "init": "2万円", "maint": "5,000円",
+     # 実物スクリーンショット（スマホ実機の画面。左=参加者向け申込画面/右=主催者ダッシュボード）
+     "shots": [("pkg-event-form.webp", "参加者向けのイベント申込画面（実物）"),
+               ("pkg-event-dash.webp", "主催者向けの管理ダッシュボード（実物）")],
+     # ---- LP本文（lp/event.html）----
+     "lp": {
+        "sub_en": "Event Payment",
+        "catch": "イベントの申込・集金・名簿づくりを、ぜんぶ1つに。",
+        "lead": "参加申込フォーム、事前決済、参加名簿の管理までひとつのシステムで。初期2万円・月額5,000円の定額パッケージです。",
+        "cta_text": "<b>実際の画面をそのまま</b>お見せします。まずは触ってみてください。",
+        "pains": [
+            ("申込の受付がバラバラ", "メール・電話・LINE・紙…。申込が色々な経路で来て、まとめるだけでひと仕事になっている。"),
+            ("当日の集金が大変", "受付で現金を数え、お釣りを用意し、誰が払ったか控える。行列はできるし、未収も出る。"),
+            ("名簿づくりが手作業", "申込メールを見ながらExcelへ転記。ミスも起きるし、直前の変更に追いつかない。"),
+            ("残席・定員の管理が不安", "いま何人埋まっているのか即答できない。定員超過や二重受付が怖い。"),
+        ],
+        "pain_close": "申込から決済・名簿まで、主催者の手間をまるごと減らします。",
+        "detail": [
+            ("できること", [
+                "<ul class=\"-bullets\"><li><b>申込フォーム</b>：氏名・連絡先・参加人数・備考（アレルギー・要望など）を受付</li><li><b>事前決済</b>：申込と同時にオンラインで前払い。当日支払いとの併用や、事前・当日で異なる料金設定も可能（例：事前4,000円／当日5,000円）</li><li><b>定員・残席管理</b>：定員と残り枠を自動管理し、申込ページに表示</li><li><b>参加名簿</b>：申込内容から名簿を自動作成。当日の受付にそのまま使えます</li><li><b>管理ダッシュボード</b>：総申込数・事前入金合計・当日未収合計・申込推移・支払い方法の内訳をひと目で確認</li><li><b>複数イベント対応</b>：同時に複数のイベントを登録・管理できます</li></ul>",
+            ]),
+            ("料金に含まれるもの", [
+                "<ul class=\"-bullets\"><li><b>初期費用（2万円）</b>：システムのセットアップ、イベント情報の登録、申込フォームの項目調整、動作確認</li><li><b>月額保守（5,000円）</b>：システムの稼働監視、軽微な調整、操作のお問い合わせ対応</li></ul>",
+                "オンライン決済の決済手段（クレジットカード等）と手数料は、ご要望・規模に合わせて決済サービスを選定のうえご案内します。手数料率は決済サービス所定のものが別途かかります。",
+            ]),
+            ("申込ページに表示できる情報", [
+                "<ul class=\"-bullets\"><li>イベント名・開催日時・開催場所</li><li>料金（事前決済価格／当日支払い価格を並記。例：事前 ¥4,000／当日 ¥5,000）</li><li>定員と残り枠（例：定員50名・残り44名）を自動表示</li><li>雨天中止などの注意事項</li></ul>",
+                "申込フォームの標準項目は「お名前（必須）」「メールアドレス（必須）」「電話番号」「参加人数（ご本人を含む）」「備考（アレルギー・ご要望など）」「お支払い方法の選択」。イベントに合わせて項目の追加・変更ができます。",
+            ]),
+            ("管理ダッシュボードで見られる数字", [
+                "<ul class=\"-bullets\"><li><b>総申込数</b>（事前決済・当日支払いの内訳つき）</li><li><b>事前入金合計</b>：すでに回収できている金額</li><li><b>当日・未収合計</b>：当日受け取る予定の金額</li><li><b>登録イベント数</b>：開催中・準備中のイベントを一覧管理</li><li><b>申込推移グラフ</b>：日ごとの申込の伸びを確認</li><li><b>支払い方法の内訳</b>：事前と当日の比率をグラフで確認</li></ul>",
+                "管理画面は「ダッシュボード」「イベント管理」「参加者管理」のタブで構成。イベントの作成から名簿の確認まで、ブラウザだけで完結します。",
+            ]),
+            ("こんなイベントに", [
+                "<ul class=\"-bullets\"><li>BBQ・懇親会・お祭りなどの<b>参加費があるイベント</b></li><li>スポーツ大会・レッスン・体験会などの<b>定員があるイベント</b></li><li>セミナー・勉強会・講演会などの<b>申込管理が必要なイベント</b></li><li>定期開催の教室・サークルの<b>月ごとの回収</b></li></ul>",
+                "「毎回イベントのたびに受付と集金で消耗している」という主催者の方にこそ使っていただきたいパッケージです。",
+            ]),
+            ("イベント系サービスとの違い", [
+                "チケット販売サービスの多くは、販売額に応じた手数料（数％〜10％前後）がかかります。本パッケージは<b>定額制（初期2万円＋月額5,000円）</b>のため、参加費の規模が大きくなっても費用が読めます。また、貴社（主催者）専用のページとして設置するので、案内から申込までの見た目を統一できます。",
+                "逆に、単発で小規模なイベントが1回だけ、という場合は既存のチケットサービスの方が安く済むこともあります。ヒアリングの際に、開催頻度・規模を伺ったうえで正直にご案内します。",
+            ]),
+            ("導入の流れ", [
+                "お申し込み後、イベントの内容（日時・場所・料金・定員・注意事項）をお知らせいただくだけで、申込ページと管理画面をご用意します。公開後の申込状況はダッシュボードでいつでも確認でき、名簿は当日の受付にそのまま使えます。",
+            ]),
+        ],
+        "features": [
+            ("申込フォームを自動化", "氏名・人数・備考まで申込時に受付。バラバラの経路をひとつのフォームにまとめます。"),
+            ("事前決済で未収ゼロへ", "参加費をオンラインで前払い。事前・当日で料金を変えて早期申込を促すこともできます。"),
+            ("参加名簿を自動作成", "申込がそのまま名簿になります。Excel転記も、直前の変更の追いかけも不要。"),
+            ("状況がひと目で分かる", "申込数・入金額・未収額・申込の推移をダッシュボードで確認。定員・残席も自動管理。"),
+        ],
+        "showcase": {
+            "title": "実際の画面",
+            "desc": "左が参加者向けの申込画面、右が主催者向けの管理ダッシュボードです（実際に稼働しているシステムの画面）。",
+            "shots": [("pkg-event-form.webp", "参加者向けのイベント申込画面（実物）"),
+                      ("pkg-event-dash.webp", "主催者向けの管理ダッシュボード（実物）")],
+            "try": True,
+        },
+        "price_note": "初期2万円・月額5,000円の定額です。決済手数料は選定する決済サービスの所定料率が別途かかります。",
+        "faq": [
+            ("参加者側にアプリのインストールは必要ですか？", "不要です。スマホやPCのブラウザから申込ページを開くだけで、申込から決済まで完結します。"),
+            ("決済方法は何が使えますか？", "ご要望と規模に合わせて決済サービスを選定してご案内します。クレジットカード決済を基本に、現地での当日支払いとの併用も可能です。"),
+            ("複数のイベントを同時に開催できますか？", "できます。イベントごとに申込ページが作られ、ダッシュボードでまとめて管理できます。"),
+            ("キャンセルや返金はどうなりますか？", "イベントの性質に合わせたキャンセル規定の見せ方・運用をご相談のうえ設計します。"),
+            ("申込項目は変えられますか？", "変えられます。アレルギー確認や送迎希望など、イベントに必要な項目をヒアリングのうえ調整します。"),
+        ],
+     }},
+]
+
+# 商品タイプごとのセクション（順番＝表示順）。sub=英字サブ見出し（c-section-heading 用）。
+PKG_GROUPS = [
+    ("custom",  "Custom Development", "制作・開発（オーダーメイド）", "ご要望に合わせて、一から制作・開発します。"),
+    ("package", "Packages",           "パッケージ商品",             "すぐ導入できる定型パッケージ。低コストで素早く始められます。"),
+]
+
+def _pkg_price(p):
+    # 全カードで同じ形式（初期／月額保守）に統一。金額が無いものは「要相談」。税込表記は一覧の上部にまとめて記載。
+    maint = p["maint"] if p["maint"] is not None else "要相談"
+    return (f'<p class="p-pkg__price"><span class="p-pkg__price-row"><span>初期</span><b>{p["init"]}</b></span>'
+            f'<span class="p-pkg__price-row"><span>月額保守</span><b>{maint}</b></span></p>')
+
+def _pkg_card(p):
+    badge = '<span class="p-pkg__badge">実演中</span>' if p.get("demo") else ""
+    # shots＝実物スクリーンショット（あれば概要の下に表示。「実物を見せる」＝信頼訴求）
+    shots = ""
+    if p.get("shots"):
+        # 表示枠は高さ230px固定。見切れ防止は画像側（ほぼ正方形で書き出す）で調整する。
+        imgs = "".join(f'<img src="assets/img/{f}" alt="{alt}" loading="lazy">' for f, alt in p["shots"])
+        shots = f'<div class="p-pkg__shots">{imgs}</div>'
+    return (
+        '<div class="p-pkg">'
+        f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
+        f'<h4 class="p-pkg__name">{p["name"]}</h4>'
+        f'<p class="p-pkg__summary">{p["summary"]}</p>'
+        f'{shots}'
+        f'{_pkg_price(p)}'
+        f'<a class="p-pkg__more" href="lp/{p["slug"]}.html">詳しくはこちら<span aria-hidden="true">→</span></a>'
+        '</div>')
+
+def _sec_heading(sub, title):
+    # 全ページ共通の見出しコンポーネント（英字サブ＋日本語見出し）＝サイトの統一感を担保。
+    return (f'<div class="c-section-heading -center reveal">'
+            f'<span class="c-section-heading__sub">{sub}</span>'
+            f'<h2 class="c-section-heading__title">{title}</h2></div>')
+
+def promise_section():
+    # 数字で見せる「Revengeの約束」＝実在の事実のみ（プロトタイプ0円／修正無制限／保守5,000円〜）。
+    stats = [
+        ("0<small>円</small>", "動くプロトタイプを無料で"),
+        ("無制限", "納得いくまで修正"),
+        ("5,000<small>円〜</small>", "月額保守（内容に応じて）"),
+    ]
+    cells = "".join(
+        f'<div class="c-stat reveal"><div class="c-stat__num">{n}</div><div class="c-stat__label">{l}</div></div>'
+        for n, l in stats)
+    return f'''
+  <section class="l-section">
+    <div class="l-container">
+      <div class="p-stats -three">{cells}</div>
+    </div>
+  </section>
+'''
+
+def strengths_section():
+    # 「私たちの特徴」＝トップページと同じ c-card（番号付き）で信頼感を訴求。
+    items = [
+        ("01", "小さく始められる", "ホームページは5万円〜、AIチャットも定額パッケージ。個人事業主・中小企業の予算感で、必要な分だけ導入できます。"),
+        ("02", "IT担当がいなくても大丈夫", "専門用語を使わずにご説明し、企画から公開まで窓口ひとつで対応。丸ごとお任せいただけます。"),
+        ("03", "まず無料でプロトタイプ", "早い段階で動くプロトタイプを無料で作成。見て・触れて納得してから本契約へ。"),
+        ("04", "AIも実用レベルで内製", "生成AIを使った埋め込みRAG（AIチャット）まで自社で実装。このページ右下で実際に動いています。"),
+    ]
+    cards = "".join(
+        f'<div class="c-card reveal"><span class="c-card__num">{n}</span>'
+        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+        for n, t, d in items)
+    return ('''
+  <div class="c-band reveal -multi" aria-hidden="true">
+    <span class="c-band__bar" style="--c:var(--c-red)"></span>
+    <span class="c-band__bar" style="--c:var(--c-orange)"></span>
+    <span class="c-band__bar" style="--c:var(--c-green)"></span>
+    <span class="c-band__bar" style="--c:var(--c-blue)"></span>
+    <span class="c-band__bar" style="--c:var(--c-purple)"></span>
+  </div>
+  <section class="l-section -tint">
+    <div class="l-container">
+''' + _sec_heading("Features", "私たちの特徴") + f'''
+      <div class="p-top-reasons__grid">{cards}</div>
+    </div>
+  </section>
+''')
+
+PKG_VISIBLE = 3   # 各グループの初期表示件数。これを超えた分は折りたたみ行に入り「もっと見る」で開閉。
+
+def packages_section():
+    # 商品タイプごとに別セクション。見出しは共通の c-section-heading を使用。
+    # 商品が PKG_VISIBLE 件を超えたら、超過分は閉じた2列目（.p-pkg-grid.-more）に自動で入る。
+    out = []
+    for i, (gkey, gsub, gtitle, gdesc) in enumerate(PKG_GROUPS):
+        items = [p for p in PACKAGES if p.get("group") == gkey]
+        if not items:
+            continue
+        tint = " -tint" if i % 2 == 0 else ""
+        vis, rest = items[:PKG_VISIBLE], items[PKG_VISIBLE:]
+        # 3件未満の行は件数クラス(-n1/-n2)を付け、少ない枚数でも中央・全幅に広がるようにする
+        def _ncls(n):
+            return f" -n{n}" if n < 3 else ""
+        cards = "".join(_pkg_card(p) for p in vis)
+        more = ""
+        if rest:
+            more_cards = "".join(_pkg_card(p) for p in rest)
+            more_label = "もっと見る"
+            more = (f'\n      <div class="p-pkg-grid -more{_ncls(len(rest))}" id="pkg-more-{gkey}">{more_cards}</div>'
+                    f'\n      <div class="c-btn-wrap"><button type="button" class="c-btn js-pkg-toggle"'
+                    f' aria-expanded="false" aria-controls="pkg-more-{gkey}"'
+                    f' data-more-label="{more_label}">{more_label}</button></div>')
+        out.append(f'''
+  <section class="l-section{tint}">
+    <div class="l-container">
+''' + _sec_heading(gsub, gtitle) + f'''
+      <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
+      <div class="p-pkg-grid{_ncls(len(vis))}">{cards}</div>{more}
+      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
+    </div>
+  </section>
+''')
+    return "".join(out)
+
+def flow_section():
+    steps = [
+        ("無料ヒアリング", "ヒアリングシートをもとに、目的・課題・ご要望をお伺いします（無料）。"),
+        ("無料プロトタイプ", "早い段階で動くプロトタイプを無料で作成。イメージを見ながら方向性を決めます。"),
+        ("本契約のご判断", "プロトタイプにご納得いただけたら本契約。無理な勧誘はいたしません。"),
+        ("納得いくまで修正", "公開まで、ご満足いただけるまで修正します。"),
+        ("公開後も継続支援", "保守・運用・集客改善まで継続。単発で終わらせません。"),
+    ]
+    cards = "".join(
+        f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+        for i, (t, d) in enumerate(steps, 1))
+    return ('''
+  <section class="l-section -tint">
+    <div class="l-container">
+''' + _sec_heading("Flow", "ご相談の流れ（まずは無料）") + f'''
+      <div class="p-top-reasons__grid">{cards}</div>
+    </div>
+  </section>
+''')
+
+def cta_section():
+    # サイト共通の p-contact パターンでお問い合わせへ誘導（無料相談を強調）。
+    return ('''
+  <section class="p-contact l-section">
+    <div class="l-container">
+''' + _sec_heading("Contact", "まずは無料でご相談ください") + '''
+      <p class="p-contact__lead reveal">ヒアリング後、無料でプロトタイプを作成します。ITのご担当者がいなくても大丈夫。専門用語を使わずご説明し、公開後の運用・改善まで伴走します。個人事業主・中小企業の方こそ、お気軽にご相談ください。</p>
+      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn -fill">無料で相談する</a></div>
+      <p class="c-btn-note reveal">メール1本でOK。しつこい営業はいたしません。</p>
+    </div>
+  </section>
+''')
+
+# 埋め込みRAG（公式embed.js）＝service-04 だけに設置。右下フローティングの💬チャット。
+# data-src 省略時は embed.js と同じ場所の chat/?embed=1 を読む（＝RAGホスト側）。
+RAG_HOST = "https://rag.engineer.v2008.coreserver.jp"
+RAG_EMBED = (
+    '\n  <!-- 埋め込みRAG（このページのみ）。右下に💬チャットボタンを表示 -->\n'
+    f'  <script src="{RAG_HOST}/embed.js" data-title="Re:venge AIアシスタント" '
+    'data-color="#e60012" data-position="right" '
+    f'data-src="{RAG_HOST}/chat/?embed=1"></script>\n')
+
+# service-04（デジタルソリューション事業）を SERVICES に追加＝4事業。
+# extra にパッケージ料金＋RAGデモ＋相談フローをまとめて差し込む。
+SERVICES.append({
+    "slug": "service-04", "title": "デジタルソリューション事業", "img": "service04",
+    "desc": "ホームページ制作・埋め込みRAG・イベント運営システム・新規開発まで。ITで事業の成長を支援します。",
+    "lead": "個人事業主・中小企業のためのWeb・AI・システム。まず“動くもの”を無料で、触ってから決められます。",
+    "hero_cta": True,   # ヒーロー直下にCTA帯（無料相談＋不安を消すマイクロコピー）
+    "points": ["ホームページ制作（オリジナル）", "埋め込み型RAG（AIチャット）",
+               "イベント運営 事前決済システム", "新規システム開発"],
+    "body": ["Web制作からAI活用、業務システムの開発まで。個人事業主・中小企業の「人手が足りない」「ITに詳しい人がいない」を、デジタルの力で解決します。",
+             "「作って終わり」にせず、公開後の保守・運用・集客改善まで継続してご一緒します。ITのご担当者がいなくても大丈夫です。"],
+    # 並び＝訪問者の関心順：商品(何を・いくらで)→特徴(なぜ当社か)→約束の数字→流れ→CTA
+    "extra": packages_section() + strengths_section() + promise_section() + flow_section() + cta_section(),
+    "no_default_cta": True,   # 末尾は cta_section（お問い合わせ誘導）を使うので既定のボタン行は出さない
+    "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
+})
+
+# ================================================================ 個別LP（lp/<slug>.html）
+# LP本文はデータ駆動：PACKAGES の "lp" キーに内容を持たせる。
+# 構成（リサーチの勝ちパターン）＝FVベネフィット＋CTA → 課題 → 特徴 → 実物 → 料金 → 流れ → FAQ → CTA。
+# "lp" が無い商品は従来のスタブ（準備中）を出す。
+
+def _lp_cta(label="無料で相談する"):
+    return (f'\n      <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn -fill">{label}</a></div>'
+            '\n      <p class="c-btn-note reveal">メール1本でOK。しつこい営業はいたしません。</p>\n')
+
+def lp_page(p):
+    lp = p.get("lp")
+    crumbs = [("事業内容", "services.html"),
+              ("デジタルソリューション事業", "service/service-04.html"),
+              (p["name"], "lp/" + p["slug"] + ".html")]
+    if not lp:
+        return page_hero("Service LP", p["name"], p["summary"], crumbs) + f"""
+  <section class="l-section">
+    <div class="l-container">
+      <div class="p-prose">
+        <p>{p["summary"]}</p>
+        {_pkg_price(p)}
+        <p class="p-note">※ このLPは準備中です。事例・機能・料金内訳・導入の流れは順次追加します。</p>
+      </div>
+      <div class="c-btn-wrap">
+        <a href="contact.html?type=digital" class="c-btn -fill">このサービスを相談する</a>
+        <a href="service/service-04.html" class="c-btn">デジタルソリューション事業へ戻る</a>
+      </div>
+    </div>
+  </section>
+"""
+    # --- フルLP ---
+    out = page_hero(lp["sub_en"], lp["catch"], lp["lead"], crumbs)
+    # FV直下CTA（研究知見：FV内CTA＋不安除去コピー）
+    out += f"""  <div class="p-hero-cta reveal">
+    <div class="l-container">
+      <p class="p-hero-cta__text">{lp["cta_text"]}</p>
+      <a href="contact.html?type=digital" class="c-btn -fill">無料で相談する</a>
+      <p class="c-btn-note">メール1本でOK。しつこい営業はいたしません。</p>
+    </div>
+  </div>
+"""
+    # 課題（こんなお悩みありませんか）
+    pains = "".join(f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+                    f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+                    for i, (t, d) in enumerate(lp["pains"], 1))
+    out += f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+{_sec_heading("Problems", "こんなお悩みはありませんか？")}
+      <div class="p-top-reasons__grid">{pains}</div>
+      <p class="p-lead-text -center reveal" style="margin-top:2rem;">{lp["pain_close"]}</p>
+    </div>
+  </section>
+'''
+    # 特徴
+    feats = "".join(f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
+                    f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+                    for i, (t, d) in enumerate(lp["features"], 1))
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("Features", p["name"] + "の特徴")}
+      <div class="p-top-reasons__grid">{feats}</div>
+    </div>
+  </section>
+'''
+    # 詳しい説明（自由記述ブロック：見出し＋段落群。段落が "<" 始まりなら生HTML＝箇条書き等）
+    if lp.get("detail"):
+        blocks = ""
+        for h, ps in lp["detail"]:
+            body_ps = "".join((x + "\n") if x.lstrip().startswith("<") else f"<p>{x}</p>\n" for x in ps)
+            blocks += f'<h3>{h}</h3>\n{body_ps}'
+        out += f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+{_sec_heading("Details", "サービスの詳細")}
+      <div class="p-prose reveal">{blocks}</div>
+    </div>
+  </section>
+'''
+    # 実物（スクリーンショット）
+    if lp.get("showcase"):
+        sc = lp["showcase"]
+        imgs = "".join(f'<img src="assets/img/{f}" alt="{alt}" loading="lazy">' for f, alt in sc["shots"])
+        note = f'<p class="p-note reveal" style="margin-top:1rem;">{sc["note"]}</p>' if sc.get("note") else ""
+        out += f'''
+  <section class="l-section -tint">
+    <div class="l-container">
+{_sec_heading("Demo", sc["title"])}
+      <p class="p-lead-text -center reveal">{sc["desc"]}</p>
+      <div class="p-pkg__shots -lp reveal">{imgs}</div>{note}
+{_lp_cta("この画面を試してみたい方はこちら" if sc.get("try") else "無料で相談する")}    </div>
+  </section>
+'''
+    # 料金
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("Price", "料金")}
+      <div class="p-lp-price reveal">
+        <div class="p-lp-price__row"><span>初期費用</span><b>{p["init"]}</b></div>
+        <div class="p-lp-price__row"><span>月額保守</span><b>{p["maint"] if p["maint"] else "要相談"}</b></div>
+      </div>
+      <p class="p-lead-text -center reveal">{lp["price_note"]}<small>（金額はすべて税込）</small></p>
+{_lp_cta("見積もりを相談する")}    </div>
+  </section>
+'''
+    # 導入の流れ（共通5ステップ）
+    out += flow_section()
+    # FAQ
+    faqs = "".join(f'<div class="p-faq__item reveal"><dt class="p-faq__q">{q}</dt><dd class="p-faq__a">{a}</dd></div>'
+                   for q, a in lp["faq"])
+    out += f'''
+  <section class="l-section">
+    <div class="l-container">
+{_sec_heading("FAQ", "よくあるご質問")}
+      <dl class="p-faq">{faqs}</dl>
+    </div>
+  </section>
+'''
+    # 締めCTA（共通）
+    out += cta_section()
+    return out
 
 # ================================================================ BUSINESS OBJECTS (事業内容14項目)
 BUSINESS_OBJECTS = [
@@ -447,7 +1049,7 @@ index_body = """
         <div class="p-top-about__img reveal -left"><img src="assets/img/about.webp" alt="通信の現場で活躍するスタッフ" loading="lazy"></div>
         <div class="reveal -right">
           <div class="c-section-heading -left"><span class="c-section-heading__sub">About Us</span><h2 class="c-section-heading__title">私たちの存在意義</h2></div>
-          <p class="p-top-about__text">株式会社Revengeは、セールスプロモーション事業・BPO事業・教育／研修事業を展開しています。通信業界を中心に、販売促進・業務受託・人材育成を通じて、企業の売上向上と人・組織の成長に貢献。「無知による搾取をなくす」という想いのもと、一人ひとりの“人生を変えるきっかけ”を提供し、お客様に寄り添うパートナーであり続けます。</p>
+          <p class="p-top-about__text">株式会社Revengeは、セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開しています。通信業界を中心に、販売促進・業務受託・人材育成・デジタル活用を通じて、企業の売上向上と人・組織の成長に貢献。「無知による搾取をなくす」という想いのもと、一人ひとりの“人生を変えるきっかけ”を提供し、お客様に寄り添うパートナーであり続けます。</p>
           <a href="purpose.html" class="c-btn">詳しく見る</a>
         </div>
       </div>
@@ -572,13 +1174,12 @@ profile_body = page_hero("Company Profile", "会社概要", "株式会社ミシ�
         <tr><th>代表者</th><td>代表取締役社長　今別府 尭</td></tr>
         <tr><th>所在地</th><td>〒891-0311 鹿児島県指宿市西方9051-1</td></tr>
         <tr><th>設立</th><td>2026年7月</td></tr>
-        <tr><th>資本金</th><td><span data-countup="1500000" data-suffix="円">1,500,000円</span></td></tr>
-        <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業</td></tr>
+        <tr><th>資本金</th><td><span data-countup="5000" data-suffix="万円">5,000万円</span></td></tr>
+        <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業<br />デジタルソリューション事業</td></tr>
         <tr><th>対応エリア</th><td>全国</td></tr>
         <tr><th>お問い合わせ</th><td><a href="contact.html">お問い合わせフォーム</a>よりお気軽にご連絡ください。</td></tr>
         <tr><th>営業時間</th><td>9:00〜18:00（土日祝を除く）</td></tr>
         <tr><th>メールアドレス</th><td><a href="mailto:info@revenge.co.jp">info@revenge.co.jp</a></td></tr>
-        <tr><th>法人番号</th><td>取得後掲載</td></tr>
       </tbody></table>
       <div class="c-btn-wrap"><a href="contact.html" class="c-btn -fill">お問い合わせ</a></div>
     </div>
@@ -623,11 +1224,11 @@ group_body = page_hero("Group", "グループ会社", "ミシマグループの�
   </section>
 """
 
-services_body = page_hero("Services", "事業内容", "セールスプロモーション・BPO・教育／研修の3事業で、企業の成長を支援します。",
+services_body = page_hero("Services", "事業内容", "セールスプロモーション・BPO・教育／研修・デジタルソリューションの4事業で、企業の成長を支援します。",
     [("事業内容", "services.html")]) + """
   <section class="p-top-service l-section">
     <div class="l-container">
-      <p class="p-lead-text" style="margin-bottom:2.5rem;">セールスプロモーション事業・BPO事業・教育／研修事業の3つの領域で、クライアント企業の売上向上と、人・組織の成長を支援します。</p>
+      <p class="p-lead-text" style="margin-bottom:2.5rem;">セールスプロモーション事業・BPO事業・教育／研修事業に加え、デジタルソリューション事業まで。幅広い領域で、クライアント企業の売上向上と、人・組織の成長、デジタル活用を支援します。</p>
       <div class="p-top-service__grid">
         __SVC_CARDS__
       </div>
@@ -752,7 +1353,7 @@ contact_body = page_hero("Contact", "お問い合わせ", "セールスプロモ
         <label><span class="p-form__label">会社名</span><input type="text" name="company" placeholder="株式会社〇〇" /></label>
         <label><span class="p-form__label">お名前<span class="p-form__req">必須</span></span><input type="text" name="name" required placeholder="山田 太郎" /></label>
         <label><span class="p-form__label">お問い合わせ種別</span>
-          <select name="type"><option value="promotion">セールスプロモーションについて</option><option value="bpo">BPO事業について</option><option value="training">教育・研修事業について</option><option value="other">その他</option></select>
+          <select name="type"><option value="promotion">セールスプロモーションについて</option><option value="bpo">BPO事業について</option><option value="training">教育・研修事業について</option><option value="digital">デジタルソリューションについて</option><option value="other">その他</option></select>
         </label>
         <label><span class="p-form__label">メールアドレス<span class="p-form__req">必須</span></span><input type="email" name="email" required placeholder="example@example.com" /></label>
         <label><span class="p-form__label">お問い合わせ内容<span class="p-form__req">必須</span></span><textarea name="message" rows="6" required placeholder="お問い合わせ内容をご記入ください"></textarea></label>
@@ -830,7 +1431,7 @@ services_body = services_body.replace("__SVC_CARDS__", svc_cards(SERVICES, False
 index_body = index_body.replace("__NEWS_TOP__", NEWS_FALLBACK)
 
 pages = [
-    ("index.html","人生を変えるきっかけを｜株式会社Revenge","株式会社Revenge — セールスプロモーション事業・BPO事業・教育／研修事業を展開。通信業界を中心に、企業の売上向上と人・組織の成長を支援します。","top",index_body),
+    ("index.html","人生を変えるきっかけを｜株式会社Revenge","株式会社Revenge — セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開。通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。","top",index_body),
     ("message.html","代表メッセージ","株式会社ミシマ 代表メッセージ。","company",message_body),
     ("purpose.html","社名の由来","株式会社ミシマの社名の由来。","company",purpose_body),
     ("profile.html","会社概要","株式会社ミシマの会社概要。","company",profile_body),
@@ -843,6 +1444,20 @@ pages = [
 ]
 for _s in SERVICES:
     pages.append(("service/" + _s["slug"] + ".html", _s["title"], _s["title"] + "の詳細｜通信業界専門の人材サービス。", "services", svc_detail_page(_s)))
+# デジタルソリューションの個別LP（lp/<slug>.html）
+#   運用：LPは別環境でブラッシュアップして戻す方針のため、gen.py は「まだ無いLPだけ」スタブ生成する。
+#   既存のLP（手動で磨いた版）は上書きしない＝保持。作り直したいときは該当ファイルを削除してから再生成。
+#   ※ 既存LPも sitemap には自動で載る（sitemapはファイル実走査）／ヘッダーは main.js が自動注入。
+for _p in PACKAGES:
+    _lp_path = os.path.join(OUT, "lp", _p["slug"] + ".html")
+    if os.path.exists(_lp_path):
+        print("keep lp/%s.html (既存を保持＝手動ブラッシュアップ分)" % _p["slug"])
+        continue
+    # RAGのLPには実演ウィジェット（右下チャット）も設置する
+    _lp_body = lp_page(_p) + (RAG_EMBED if _p["slug"] == "rag" else "")
+    _lp_desc = re.sub(r"<[^>]+>", "", _p["lp"]["lead"] if _p.get("lp") else _p["summary"])
+    pages.append(("lp/" + _p["slug"] + ".html", _p["name"] + "｜デジタルソリューション事業",
+                  _lp_desc, "services", _lp_body))
 # ニュース詳細ページは生成しない（WordPress運用に一本化）。記事はWP側のURLで公開。
 
 for name, title, desc, cur, body in pages:
@@ -917,7 +1532,7 @@ llms = "\n".join([
     "> " + ORG_DESC,
     "",
     "鹿児島県指宿市を拠点とする企業。代表取締役社長：今別府 尭。設立：2026年7月。"
-    "事業内容：セールスプロモーション事業／BPO事業／教育・研修事業。対応エリア：全国。"
+    "事業内容：セールスプロモーション事業／BPO事業／教育・研修事業／デジタルソリューション事業。対応エリア：全国。"
     "お問い合わせ：info@revenge.co.jp",
     "",
     "## 会社情報",
@@ -926,10 +1541,16 @@ llms = "\n".join([
     _llm_link("会社概要", "profile.html", "会社名・所在地・設立・資本金などの基本情報"),
     "",
     "## 事業",
-    _llm_link("事業内容", "services.html", "3事業の概要"),
+    _llm_link("事業内容", "services.html", "4事業の概要"),
     _llm_link("セールスプロモーション事業", "service/service-01.html", "販売支援・営業支援"),
     _llm_link("BPO事業", "service/service-02.html", "業務請負・アウトソーシング"),
     _llm_link("教育・研修事業", "service/service-03.html", "人材育成・研修"),
+    _llm_link("デジタルソリューション事業", "service/service-04.html", "HP制作・埋め込みRAG・イベント運営システム・新規開発"),
+    "",
+    "## デジタルソリューション（LP）",
+] + [
+    _llm_link(_p["name"], "lp/" + _p["slug"] + ".html", _p["summary"]) for _p in PACKAGES
+] + [
     "",
     "## その他",
     _llm_link("ニュース", "news.html", "お知らせ・プレスリリース"),
