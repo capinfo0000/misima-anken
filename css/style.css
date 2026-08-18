@@ -998,29 +998,24 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 /* --- ご相談の流れ：番号サークル＋プログレスラインの工程タイムライン --- */
 .page-s04 .p-flowsteps{ list-style:none; margin:2.4rem 0 0; padding:0; display:grid; gap:1.8rem; grid-template-columns:1fr; position:relative; }
 @media (min-width:900px){ .page-s04 .p-flowsteps{ grid-template-columns:repeat(5,1fr); gap:.9rem; } }
-/* PC：円の中心を貫くグラデのプログレスライン（カード間の背景に見える） */
+/* PC：円の中心を貫くグラデのつなぎ線（カード無し・背景に直接） */
 @media (min-width:900px){
   .page-s04 .p-flowsteps::before{
-    content:""; position:absolute; top:52px; left:10%; right:10%; height:3px; border-radius:999px;
-    background:var(--s04-grad); opacity:.28; z-index:0;
+    content:""; position:absolute; top:26px; left:10%; right:10%; height:3px; border-radius:999px;
+    background:var(--s04-grad); opacity:.35; z-index:0;
   }
 }
 .page-s04 .p-flowsteps__step{
-  position:relative; z-index:1; background:#fff; border:1px solid #eceef3; border-radius:16px;
-  padding:1.5rem 1.1rem 1.3rem; text-align:center;
-  box-shadow:0 12px 28px -22px rgba(29,32,136,.45);
-  transition:transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s;
+  position:relative; z-index:1; text-align:center; padding:0 .5rem;   /* 箱をやめてオープンに */
 }
-.page-s04 .p-flowsteps__step:hover{ transform:translateY(-5px); box-shadow:0 18px 34px -20px rgba(29,32,136,.5); }
 .page-s04 .p-flowsteps__no{
   display:grid; place-items:center; width:52px; height:52px; margin:0 auto .9rem; border-radius:50%;
   background:var(--s04-grad); color:#fff; font-family:var(--font-en); font-weight:700; font-size:1.15rem;
   border:3px solid #fff; box-shadow:0 10px 20px -8px rgba(230,0,18,.45);
 }
 .page-s04 .p-flowsteps__title{ font-size:1rem; margin:0 0 .5rem; line-height:1.4; }
-.page-s04 .p-flowsteps__desc{ font-size:.82rem; line-height:1.75; color:var(--text-muted); margin:0; text-align:left; }
-@media (max-width:899px){ .page-s04 .p-flowsteps__desc{ text-align:center; } }
-/* モバイル：カード間を下向き矢印で連結 */
+.page-s04 .p-flowsteps__desc{ font-size:.82rem; line-height:1.8; color:var(--text-muted); margin:0 auto; max-width:15em; }
+/* モバイル：縦に並ぶステップ間を下向き矢印で連結 */
 @media (max-width:899px){
   .page-s04 .p-flowsteps__step:not(:last-child)::after{
     content:""; position:absolute; left:50%; bottom:-1.15rem; transform:translateX(-50%) rotate(45deg);
