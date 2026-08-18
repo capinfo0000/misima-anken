@@ -731,17 +731,28 @@ def promise_section():
 '''
 
 def strengths_section():
-    # 「私たちの特徴」＝トップページと同じ c-card（番号付き）で信頼感を訴求。
+    # 「私たちの特徴」＝ajike風の4カラム・ラインアイコン図解（円形メダリオン＋ネイビーのラインアイコン）。
+    _SW = 'fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'
+    ICONS = {
+        # 小さく始めて育つ＝右肩上がりの棒グラフ
+        "grow": f'<svg viewBox="0 0 40 40" {_SW}><path d="M6 34h28"/><rect x="7" y="26" width="6" height="8" rx="1.2"/><rect x="17" y="19" width="6" height="15" rx="1.2"/><rect x="27" y="11" width="6" height="23" rx="1.2"/><path d="M28 8l6 0 0 6"/></svg>',
+        # 伴走・窓口ひとつ＝ヘッドセット（サポート）
+        "support": f'<svg viewBox="0 0 40 40" {_SW}><path d="M9 23v-3a11 11 0 0122 0v3"/><rect x="6" y="22" width="5.5" height="9" rx="2.2"/><rect x="28.5" y="22" width="5.5" height="9" rx="2.2"/><path d="M31 31v1a5 5 0 01-5 5h-4"/><circle cx="20" cy="37" r="1.4"/></svg>',
+        # 動くプロトタイプ＝画面＋カーソル
+        "proto": f'<svg viewBox="0 0 40 40" {_SW}><rect x="6" y="8" width="28" height="19" rx="2.5"/><path d="M6 13h28"/><path d="M17 27v4M13 34h10"/><path d="M20 17l8 3.4-3.4 1.4L23 25.4z"/></svg>',
+        # AI内製＝チャットバブル＋きらめき
+        "ai": f'<svg viewBox="0 0 40 40" {_SW}><path d="M8 9h24a3 3 0 013 3v9a3 3 0 01-3 3H19l-6 5v-5H8a3 3 0 01-3-3v-9a3 3 0 013-3z"/><path d="M21.5 12.5l1.2 2.9 2.9 1.2-2.9 1.2-1.2 2.9-1.2-2.9-2.9-1.2 2.9-1.2z"/></svg>',
+    }
     items = [
-        ("01", "小さく始められる", "ホームページは5万円〜、AIチャットも定額パッケージ。個人事業主・中小企業の予算感で、必要な分だけ導入できます。"),
-        ("02", "IT担当がいなくても大丈夫", "専門用語を使わずにご説明し、企画から公開まで窓口ひとつで対応。丸ごとお任せいただけます。"),
-        ("03", "まず無料でプロトタイプ", "早い段階で動くプロトタイプを無料で作成。見て・触れて納得してから本契約へ。"),
-        ("04", "AIも実用レベルで内製", "生成AIを使った埋め込みRAG（AIチャット）まで自社で実装。このページ右下で実際に動いています。"),
+        ("grow", "小さく始められる", "ホームページは5万円〜、AIチャットも定額パッケージ。個人事業主・中小企業の予算感で、必要な分だけ導入できます。"),
+        ("support", "IT担当がいなくても大丈夫", "専門用語を使わずにご説明し、企画から公開まで窓口ひとつで対応。丸ごとお任せいただけます。"),
+        ("proto", "まず無料でプロトタイプ", "早い段階で動くプロトタイプを無料で作成。見て・触れて納得してから本契約へ。"),
+        ("ai", "AIも実用レベルで内製", "生成AIを使った埋め込みRAG（AIチャット）まで自社で実装。このページ右下で実際に動いています。"),
     ]
-    cards = "".join(
-        f'<div class="c-card reveal"><span class="c-card__num">{n}</span>'
-        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
-        for n, t, d in items)
+    cells = "".join(
+        f'<div class="p-featicon reveal"><div class="p-featicon__ico" aria-hidden="true">{ICONS[k]}</div>'
+        f'<h3 class="p-featicon__title">{t}</h3><p class="p-featicon__desc">{d}</p></div>'
+        for k, t, d in items)
     return ('''
   <div class="c-band reveal -multi" aria-hidden="true">
     <span class="c-band__bar" style="--c:var(--c-red)"></span>
@@ -753,7 +764,7 @@ def strengths_section():
   <section class="l-section -tint">
     <div class="l-container">
 ''' + _sec_heading("Features", "私たちの特徴") + f'''
-      <div class="p-top-reasons__grid">{cards}</div>
+      <div class="p-featicons">{cells}</div>
     </div>
   </section>
 ''')
