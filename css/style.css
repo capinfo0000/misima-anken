@@ -974,6 +974,35 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .c-stat{ border-radius:12px; transition:transform .25s, box-shadow .25s; }
 .page-s04 .c-stat:hover{ transform:translateY(-4px); box-shadow:0 14px 28px -18px rgba(29,32,136,.38); }
 
+/* --- ご相談の流れ：ajike風シェブロン工程図 --- */
+.page-s04 .p-flowsteps{ list-style:none; margin:2rem 0 0; padding:0; display:grid; gap:1.6rem; grid-template-columns:1fr; }
+@media (min-width:900px){ .page-s04 .p-flowsteps{ grid-template-columns:repeat(5,1fr); gap:.7rem; } }
+.page-s04 .p-flowsteps__step{
+  position:relative; background:#fff; border:1px solid #eceef3; border-radius:14px;
+  padding:1.3rem 1.05rem; box-shadow:0 10px 26px -22px rgba(29,32,136,.4);
+}
+.page-s04 .p-flowsteps__step::before{        /* 上部の細い虹バー */
+  content:""; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0;
+  background:var(--s04-grad); opacity:.85;
+}
+.page-s04 .p-flowsteps__no{
+  display:inline-block; font-family:var(--font-en); font-weight:700; font-size:.72rem; letter-spacing:.14em;
+  background:var(--s04-grad); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:.45rem;
+}
+.page-s04 .p-flowsteps__title{ font-size:1rem; margin:0 0 .45rem; line-height:1.4; }
+.page-s04 .p-flowsteps__desc{ font-size:.82rem; line-height:1.75; color:var(--text-muted); margin:0; }
+/* コネクタ矢印：モバイル=下向き／PC=右向き */
+.page-s04 .p-flowsteps__step:not(:last-child)::after{
+  content:""; position:absolute; z-index:2; width:11px; height:11px;
+  border-right:2px solid #b9bdca; border-bottom:2px solid #b9bdca;
+  left:50%; bottom:-1.05rem; transform:translateX(-50%) rotate(45deg);
+}
+@media (min-width:900px){
+  .page-s04 .p-flowsteps__step:not(:last-child)::after{
+    left:auto; bottom:auto; right:-.5rem; top:50%; transform:translateY(-50%) rotate(-45deg);
+  }
+}
+
 /* --- reduced-motion 配慮 --- */
 @media (prefers-reduced-motion:reduce){
   .page-s04 .p-page-hero::after{ animation:none; }

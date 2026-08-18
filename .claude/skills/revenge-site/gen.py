@@ -802,15 +802,18 @@ def flow_section():
         ("納得いくまで修正", "公開まで、ご満足いただけるまで修正します。"),
         ("公開後も継続支援", "保守・運用・集客改善まで継続。単発で終わらせません。"),
     ]
-    cards = "".join(
-        f'<div class="c-card reveal"><span class="c-card__num">{i:02d}</span>'
-        f'<h3 class="c-card__title">{t}</h3><p class="c-card__text">{d}</p></div>'
+    # ajike風のシェブロン工程図（横=右向き矢印／縦=下向き矢印で連結）
+    li = "".join(
+        f'<li class="p-flowsteps__step reveal">'
+        f'<span class="p-flowsteps__no">STEP {i:02d}</span>'
+        f'<h3 class="p-flowsteps__title">{t}</h3>'
+        f'<p class="p-flowsteps__desc">{d}</p></li>'
         for i, (t, d) in enumerate(steps, 1))
     return ('''
   <section class="l-section -tint">
     <div class="l-container">
 ''' + _sec_heading("Flow", "ご相談の流れ（まずは無料）") + f'''
-      <div class="p-top-reasons__grid">{cards}</div>
+      <ol class="p-flowsteps">{li}</ol>
     </div>
   </section>
 ''')
