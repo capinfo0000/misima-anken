@@ -175,6 +175,7 @@ def rebrand(html):
 def head(title, desc, path="index.html", cur="", article_date=None):
     full_title = title if ("株式会社ミシマ" in title or "株式会社Revenge" in title) else f"{title} | 株式会社ミシマ"
     seo = seo_head(full_title, desc, path, cur, article_date)
+    body_cls = ' class="page-s04"' if path == "service/service-04.html" else ""  # IT事業ページだけ先進テーマを適用
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -192,7 +193,7 @@ def head(title, desc, path="index.html", cur="", article_date=None):
   <link rel="icon" href="/assets/favicon.svg?v=2" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />{seo}
 </head>
-<body>"""
+<body{body_cls}>"""
 
 # ---------------------------------------------------------------- header
 def header(cur=""):
