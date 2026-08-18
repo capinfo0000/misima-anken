@@ -400,8 +400,7 @@ def svc_detail_page(s):
 # group=商品タイプ（"custom"=オーダーメイド制作・開発 / "package"=定型パッケージ商品）。セクションを分けて表示する。
 PACKAGES = [
     {"slug": "hp", "name": "ホームページ制作", "kind": "オリジナル制作", "group": "custom",
-     "summary": "目的・ブランドに合わせた完全オリジナルのサイト/LPを制作。公開後の保守・運用・集客改善まで継続支援します。"
-                "<small class=\"p-pkg__note\">制作例：当サイト（PC／スマホ対応）</small>",
+     "summary": "目的・ブランドに合わせた完全オリジナルのサイト/LPを制作。公開後の保守・運用・集客改善まで継続支援します。",
      "init": "5〜30万円", "maint": "1〜10万円",
      # 制作例＝このコーポレートサイト自体（左=ヒーロー／右=代表メッセージのレイアウト）
      "shots": [("pkg-hp-pc.webp", "制作例：当サイトのトップページ（メインビジュアル）"),
@@ -697,8 +696,6 @@ def _pkg_card(p):
         f'<p class="p-pkg__kind">{p["kind"]}{badge}</p>'
         f'<h4 class="p-pkg__name">{p["name"]}</h4>'
         f'<p class="p-pkg__summary">{p["summary"]}</p>'
-        f'{shots}'
-        f'{_pkg_price(p)}'
         f'{_pkg_more(p)}'
         '</div>')
 
@@ -788,7 +785,7 @@ def packages_section():
   <section class="l-section{tint}">
     <div class="l-container">
 ''' + _sec_heading(gsub, gtitle) + f'''
-      <p class="p-lead-text -center reveal">{gdesc}<small>（金額はすべて税込／詳細は無料ヒアリングでご提案）</small></p>
+      <p class="p-lead-text -center reveal">{gdesc}<small>（詳細は無料ヒアリングでご提案）</small></p>
       <div class="p-pkg-grid{_ncls(len(vis))}">{cards}</div>{more}
       <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
     </div>
