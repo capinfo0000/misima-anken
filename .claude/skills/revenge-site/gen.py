@@ -378,8 +378,20 @@ def svc_detail_page(s):
     </div>
   </div>
 """
+    # 先行導入（モニター）価格の帯＝service-04のみ、ヒーロー直下に表示（実績づくりの正直な訴求）
+    monitor = "" if s["slug"] != "service-04" else f"""  <section class="p-monitor" aria-label="先行導入価格のご案内">
+    <div class="l-container p-monitor__inner">
+      <span class="p-monitor__badge">先行導入 / MONITOR</span>
+      <div class="p-monitor__body">
+        <p class="p-monitor__title">導入事例づくりにご協力いただける企業さまへ、<b>先行導入（モニター）価格</b>でご提供中。</p>
+        <p class="p-monitor__note">サービス開始につき、通常より抑えた価格でお引き受けしています。まずは無料プロトタイプからお気軽にどうぞ。※お引き受けできる件数には限りがあります。</p>
+      </div>
+      <a href="{contact_href}" class="p-monitor__cta c-btn -fill">無料で相談する</a>
+    </div>
+  </section>
+"""
     return page_hero("Service", s["title"], s["lead"],
-        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + hero_cta + f"""
+        [("事業内容", "services.html"), (s["title"], s["slug"] + ".html")]) + monitor + hero_cta + f"""
   <section class="l-section">
     <div class="l-container">
       <div class="p-service-single">
@@ -816,7 +828,7 @@ def flow_section():
     # ajike風のシェブロン工程図（横=右向き矢印／縦=下向き矢印で連結）
     li = "".join(
         f'<li class="p-flowsteps__step reveal">'
-        f'<span class="p-flowsteps__no">STEP {i:02d}</span>'
+        f'<span class="p-flowsteps__no">{i:02d}</span>'
         f'<h3 class="p-flowsteps__title">{t}</h3>'
         f'<p class="p-flowsteps__desc">{d}</p></li>'
         for i, (t, d) in enumerate(steps, 1))
