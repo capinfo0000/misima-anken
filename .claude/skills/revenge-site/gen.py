@@ -383,7 +383,7 @@ def svc_detail_page(s):
     <div class="l-container p-monitor__inner">
       <span class="p-monitor__badge">先行導入 / MONITOR</span>
       <div class="p-monitor__body">
-        <p class="p-monitor__title">導入事例づくりにご協力いただける企業さまへ、<b>先行導入（モニター）価格</b>でご提供中。</p>
+        <p class="p-monitor__title"><b>先行導入（モニター）価格</b>でご提供中。</p>
         <p class="p-monitor__note">サービス開始につき、通常より抑えた価格でお引き受けしています。ヒアリング後、<b>動くプロトタイプを無料</b>でお見せします。※お引き受けできる件数には限りがあります。</p>
       </div>
       <div class="p-monitor__act">
