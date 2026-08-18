@@ -995,33 +995,24 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-featicon__desc{ font-size:.85rem; line-height:1.8; color:var(--text-muted); margin:0; text-align:left; }
 @media (max-width:819px){ .page-s04 .p-featicon__desc{ text-align:center; } }
 
-/* --- ご相談の流れ：番号サークル＋プログレスラインの工程タイムライン --- */
-.page-s04 .p-flowsteps{ list-style:none; margin:2.4rem 0 0; padding:0; display:grid; gap:1.8rem; grid-template-columns:1fr; position:relative; }
-@media (min-width:900px){ .page-s04 .p-flowsteps{ grid-template-columns:repeat(5,1fr); gap:.9rem; } }
-/* PC：円の中心を貫くグラデのつなぎ線（カード無し・背景に直接） */
+/* --- ご相談の流れ：シェブロン矢印の帯（5枚で1本の虹グラデが流れる） --- */
+.page-s04 .p-flowchev{ list-style:none; margin:2.4rem 0 0; padding:0; display:grid; gap:.9rem; grid-template-columns:1fr; }
+@media (min-width:900px){ .page-s04 .p-flowchev{ grid-template-columns:repeat(var(--n,5),1fr); gap:.3rem; align-items:start; } }
+.page-s04 .p-flowchev__bar{
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.15rem;
+  min-height:62px; padding:.6rem 1.1rem; color:#fff; text-align:center;
+  background:var(--s04-grad); background-size:var(--sz,500%) 100%; background-position:var(--pos,0) 0;
+  border-radius:8px;
+}
 @media (min-width:900px){
-  .page-s04 .p-flowsteps::before{
-    content:""; position:absolute; top:26px; left:10%; right:10%; height:3px; border-radius:999px;
-    background:var(--s04-grad); opacity:.35; z-index:0;
-  }
+  /* 右向き矢印＋左に切り欠き＝シェブロンが噛み合う */
+  .page-s04 .p-flowchev__bar{ border-radius:0; padding-left:1.7rem; clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%, 18px 50%); }
+  .page-s04 .p-flowchev__step:first-child .p-flowchev__bar{ padding-left:1.1rem; clip-path:polygon(0 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 0 100%); border-radius:8px 0 0 8px; }
+  .page-s04 .p-flowchev__step:last-child .p-flowchev__bar{ clip-path:polygon(0 0, 100% 0, 100% 100%, 0 100%, 18px 50%); border-radius:0 8px 8px 0; }
 }
-.page-s04 .p-flowsteps__step{
-  position:relative; z-index:1; text-align:center; padding:0 .5rem;   /* 箱をやめてオープンに */
-}
-.page-s04 .p-flowsteps__no{
-  display:grid; place-items:center; width:52px; height:52px; margin:0 auto .9rem; border-radius:50%;
-  background:var(--s04-grad); color:#fff; font-family:var(--font-en); font-weight:700; font-size:1.15rem;
-  border:3px solid #fff; box-shadow:0 10px 20px -8px rgba(230,0,18,.45);
-}
-.page-s04 .p-flowsteps__title{ font-size:1rem; margin:0 0 .5rem; line-height:1.4; }
-.page-s04 .p-flowsteps__desc{ font-size:.82rem; line-height:1.8; color:var(--text-muted); margin:0 auto; max-width:15em; }
-/* モバイル：縦に並ぶステップ間を下向き矢印で連結 */
-@media (max-width:899px){
-  .page-s04 .p-flowsteps__step:not(:last-child)::after{
-    content:""; position:absolute; left:50%; bottom:-1.15rem; transform:translateX(-50%) rotate(45deg);
-    width:12px; height:12px; border-right:2px solid #c2c6d2; border-bottom:2px solid #c2c6d2;
-  }
-}
+.page-s04 .p-flowchev__no{ font-family:var(--font-en); font-weight:700; font-size:.64rem; letter-spacing:.12em; opacity:.92; }
+.page-s04 .p-flowchev__ttl{ font-size:.9rem; font-weight:700; line-height:1.3; }
+.page-s04 .p-flowchev__desc{ font-size:.8rem; line-height:1.75; color:var(--text-muted); margin:.75rem .3rem 0; text-align:center; }
 
 /* --- 先行導入（モニター）価格の帯（ヒーロー直下） --- */
 .page-s04 .p-monitor{ background:linear-gradient(100deg,#fff6f8,#f5fbff); border-top:1px solid #f2e2e6; border-bottom:1px solid #e4edf3; }

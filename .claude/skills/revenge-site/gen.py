@@ -831,18 +831,20 @@ def flow_section():
         ("納得いくまで修正", "公開まで、ご満足いただけるまで修正します。"),
         ("公開後も継続支援", "保守・運用・集客改善まで継続。単発で終わらせません。"),
     ]
-    # ajike風のシェブロン工程図（横=右向き矢印／縦=下向き矢印で連結）
+    # シェブロン矢印の帯（STEP1▶2▶…／5枚で1本の虹グラデが流れる）。下に各ステップの説明。
+    n = len(steps)
     li = "".join(
-        f'<li class="p-flowsteps__step reveal">'
-        f'<span class="p-flowsteps__no">{i:02d}</span>'
-        f'<h3 class="p-flowsteps__title">{t}</h3>'
-        f'<p class="p-flowsteps__desc">{d}</p></li>'
+        f'<li class="p-flowchev__step reveal">'
+        f'<div class="p-flowchev__bar" style="--sz:{n*100}%;--pos:{round((i-1)*100/(n-1),2)}%">'
+        f'<span class="p-flowchev__no">STEP {i:02d}</span>'
+        f'<span class="p-flowchev__ttl">{t}</span></div>'
+        f'<p class="p-flowchev__desc">{d}</p></li>'
         for i, (t, d) in enumerate(steps, 1))
     return ('''
   <section class="l-section -tint">
     <div class="l-container">
 ''' + _sec_heading("Flow", "ご相談の流れ（まずは無料）") + f'''
-      <ol class="p-flowsteps">{li}</ol>
+      <ol class="p-flowchev" style="--n:{n}">{li}</ol>
     </div>
   </section>
 ''')
