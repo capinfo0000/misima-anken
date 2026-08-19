@@ -20,7 +20,7 @@ PUBLISH_LPS = False   # 個別LP(lp/*.html)を公開するか。Falseの間は�
 BUILD_DATE = "2026-07-10"                 # sitemap lastmod / 記事 dateModified
 OG_IMAGE = SITE + "/assets/img/mv.webp"   # OGP画像（メインビジュアル・既存アセット）
 LOGO_URL = SITE + "/assets/img/logo-mark.webp"
-ORG_DESC = ("株式会社Revenge（Re:venge）は、鹿児島県指宿市を拠点に、"
+ORG_DESC = ("株式会社Revenge（Re:venge）は、東京都中央区を拠点に、"
             "セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開する企業です。"
             "通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。")
 
@@ -47,10 +47,10 @@ def _org_node():
         "areaServed": "JP",
         "address": {
             "@type": "PostalAddress",
-            "postalCode": "891-0311",
-            "addressRegion": "鹿児島県",
-            "addressLocality": "指宿市",
-            "streetAddress": "西方9051-1",
+            "postalCode": "104-0061",
+            "addressRegion": "東京都",
+            "addressLocality": "中央区",
+            "streetAddress": "銀座1丁目12-4",
             "addressCountry": "JP",
         },
         "founder": {"@type": "Person", "name": "今別府 尭"},
@@ -243,7 +243,7 @@ def footer():
     <div class="l-container l-footer__inner">
       <div class="l-footer__info">
         <div class="l-footer__logo"><span class="l-footer__mark" aria-hidden="true"></span><span class="l-footer__word">Re:venge</span></div>
-        <p class="l-footer__address">〒891-0311 鹿児島県指宿市西方9051-1<br />セールスプロモーション・BPO・教育研修で企業の成長を支援</p>
+        <p class="l-footer__address">〒104-0061 東京都中央区銀座1丁目12-4<br />セールスプロモーション・BPO・教育研修で企業の成長を支援</p>
       </div>
       <nav class="l-footer__links" aria-label="フッターナビゲーション">
         <div class="l-footer__cols">
@@ -1211,7 +1211,7 @@ profile_body = page_hero("Company Profile", "会社概要", "株式会社ミシ�
       <table class="c-table"><tbody>
         <tr><th>会社名</th><td>株式会社Revenge<br /><span style="font-size:.85em;color:var(--c-text-sub,#666);">※ブランド表記：Re:venge</span></td></tr>
         <tr><th>代表者</th><td>代表取締役社長　今別府 尭</td></tr>
-        <tr><th>所在地</th><td>〒891-0311 鹿児島県指宿市西方9051-1</td></tr>
+        <tr><th>所在地</th><td>〒104-0061 東京都中央区銀座1丁目12-4</td></tr>
         <tr><th>設立</th><td>2026年7月</td></tr>
         <tr><th>資本金</th><td><span data-countup="5000" data-suffix="万円">5,000万円</span></td></tr>
         <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業<br />デジタルソリューション事業</td></tr>
@@ -1572,7 +1572,7 @@ llms = "\n".join([
     "",
     "> " + ORG_DESC,
     "",
-    "鹿児島県指宿市を拠点とする企業。代表取締役社長：今別府 尭。設立：2026年7月。"
+    "東京都中央区を拠点とする企業。代表取締役社長：今別府 尭。設立：2026年7月。"
     "事業内容：セールスプロモーション事業／BPO事業／教育・研修事業／デジタルソリューション事業。対応エリア：全国。"
     "お問い合わせ：info@revenge.co.jp",
     "",
