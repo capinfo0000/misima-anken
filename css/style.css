@@ -965,17 +965,17 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-pkg:hover::before{ height:5px; opacity:1; }
 .page-s04 .p-pkg__kind{ color:#1d2088; }  /* 区分をネイビー＝技術寄りの印象 */
 .page-s04 .p-pkg__more{
-  background-color:#e60012;                 /* フォールバック（gradientが効かない環境でも視認可） */
-  background-image:var(--s04-grad); background-size:180% 100%;
-  transition:background-position .45s ease, box-shadow .28s, transform .2s;
+  background:#e60012;                        /* 普通（他ページと同じ赤）。ホバーで虹色に */
+  transition:background .35s ease, box-shadow .28s, transform .2s;
 }
-.page-s04 .p-pkg__more:hover{ background-position:100% 0; opacity:1; box-shadow:0 10px 22px -10px rgba(230,0,18,.55); }
+.page-s04 .p-pkg__more:hover{ background:var(--rainbow-flow); background-size:200% 100%; animation:rainbowFlow 2.4s linear infinite; opacity:1; box-shadow:0 10px 22px -10px rgba(230,0,18,.45); }
 /* ajike風：中央寄せタイトル＋内側の薄グレーボックス */
 .page-s04 .p-pkg{ text-align:center; padding:1.6rem 1.4rem; }
 .page-s04 .p-pkg__kind{ justify-content:center; }
 .page-s04 .p-pkg__name{ text-align:center; font-size:1.15rem; margin:0 0 .9rem; }
-.page-s04 .p-pkg__box{ background:#f6f7fb; border:1px solid #eef0f5; border-radius:12px; padding:1rem 1.1rem; margin:0 0 1.2rem; flex:1 0 auto; display:flex; align-items:center; }
-.page-s04 .p-pkg__box .p-pkg__summary{ text-align:left; margin:0; }
+.page-s04 .p-pkg__box{ background:#f6f7fb; border:1px solid #eef0f5; border-radius:12px; padding:1rem 1.1rem; margin:0 0 1.2rem; flex:1 0 auto; display:flex; flex-direction:column; justify-content:center; }
+.page-s04 .p-pkg__box .p-pkg__summary{ text-align:left; margin:0; overflow-wrap:anywhere; }
+.u-nowrap{ white-space:nowrap; }
 
 /* --- 強み(c-stat)：カード化してホバーで浮上 --- */
 .page-s04 .c-stat{ border-radius:12px; transition:transform .25s, box-shadow .25s; }
@@ -1019,7 +1019,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-monitor__inner{ display:flex; align-items:center; gap:.9rem 1.4rem; flex-wrap:wrap; padding:1.15rem 0; }
 .page-s04 .p-monitor__badge{
   flex:none; align-self:flex-start; font-family:var(--font-en); font-weight:700; font-size:.72rem; letter-spacing:.06em;
-  color:#fff; background:var(--s04-grad); border-radius:999px; padding:.5rem .95rem; box-shadow:0 8px 18px -10px rgba(230,0,18,.5);
+  color:#fff; background:#e60012; border-radius:999px; padding:.5rem .95rem; box-shadow:0 8px 18px -10px rgba(230,0,18,.5);
 }
 .page-s04 .p-monitor__body{ flex:1 1 380px; }
 .page-s04 .p-monitor__title{ margin:0 0 .3rem; font-size:1rem; font-weight:700; line-height:1.6; }

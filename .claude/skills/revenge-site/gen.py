@@ -789,6 +789,12 @@ def strengths_section():
 
 PKG_VISIBLE = 3   # 各グループの初期表示件数。これを超えた分は折りたたみ行に入り「もっと見る」で開閉。
 
+def _nb(text):
+    # 文（。区切り）を改行不可のかたまりにする＝改行は文の切れ目でだけ起き、途中で割れない。
+    # 収まる幅なら一行、足りなければ文単位で自然に折り返す。
+    parts = [p for p in re.split(r'(?<=。)', text) if p]
+    return "".join(f'<span class="u-nowrap">{p}</span>' for p in parts)
+
 def packages_section():
     # 商品タイプごとに別セクション。見出しは共通の c-section-heading を使用。
     # 商品が PKG_VISIBLE 件を超えたら、超過分は閉じた2列目（.p-pkg-grid.-more）に自動で入る。
@@ -815,7 +821,7 @@ def packages_section():
   <section class="l-section{tint}">
     <div class="l-container">
 ''' + _sec_heading(gsub, gtitle) + f'''
-      <p class="p-lead-text -center reveal">{gdesc}<small>（詳細は無料ヒアリングでご提案）</small></p>
+      <p class="p-lead-text -center reveal">{_nb(gdesc)}<span class="u-nowrap"><small>（詳細は無料ヒアリングでご提案）</small></span></p>
       <div class="p-pkg-grid{_ncls(len(vis))}">{cards}</div>{more}
       <div class="c-btn-wrap"><a href="contact.html?type=digital" class="c-btn">この内容で無料相談する</a></div>
     </div>
