@@ -965,7 +965,7 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-pkg:hover::before{ height:5px; opacity:1; }
 .page-s04 .p-pkg__kind{ color:#1d2088; }  /* 区分をネイビー＝技術寄りの印象 */
 .page-s04 .p-pkg__more{
-  background:#e60012;                        /* 普通（他ページと同じ赤）。ホバーで虹色に */
+  background:var(--text-strong);             /* 黒（サイト共通の-fillボタンと同じ）。ホバーで虹色に */
   transition:background .35s ease, box-shadow .28s, transform .2s;
 }
 .page-s04 .p-pkg__more:hover{ background:var(--rainbow-flow); background-size:200% 100%; animation:rainbowFlow 2.4s linear infinite; opacity:1; box-shadow:0 10px 22px -10px rgba(230,0,18,.45); }
