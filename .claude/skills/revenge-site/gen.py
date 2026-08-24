@@ -21,7 +21,7 @@ BUILD_DATE = "2026-07-10"                 # sitemap lastmod / 記事 dateModifie
 OG_IMAGE = SITE + "/assets/img/mv.webp"   # OGP画像（メインビジュアル・既存アセット）
 LOGO_URL = SITE + "/assets/img/logo-mark.webp"
 ORG_DESC = ("株式会社Revenge（Re:venge）は、東京都中央区を拠点に、"
-            "セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開する企業です。"
+            "セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業・海外貿易事業を展開する企業です。"
             "通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。")
 
 def _abs(path):
@@ -355,7 +355,7 @@ def svc_detail_page(s):
     body = "".join(f"<p>{p}</p>\n" for p in s["body"])
     pts = "".join(f"<li>{p}</li>" for p in s["points"])
     # 相談ボタン：詳細ページの事業に応じてお問い合わせ種別を自動セット（?type=…）
-    ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital"}.get(s["slug"], "")
+    ctype = {"service-01": "promotion", "service-02": "bpo", "service-03": "training", "service-04": "digital", "service-05": "trade"}.get(s["slug"], "")
     contact_href = f"contact.html?type={ctype}" if ctype else "contact.html"
     # extra（強み・料金・相談フロー・CTA）は事業説明とは分け、独立セクション群として下に並べる。
     extra = s.get("extra", "")
@@ -894,6 +894,29 @@ SERVICES.append({
     "tail": RAG_EMBED,        # このページだけ埋め込みRAG（右下チャット）を読み込む
 })
 
+# ================================================================ 海外貿易事業（service-05）
+# 日本で余剰となっている着物・伝統品を、海外の新たな需要（アート／インテリア等）へつなぐ貿易事業。
+# 画像は差し替え用プレースホルダ（assets/img/service05.webp）。
+SERVICES.append({
+    "slug": "service-05", "title": "海外貿易事業", "img": "service05",
+    "desc": "日本で価値を失いつつあるモノを、海外の新たな需要へ。着物など日本の伝統品を、アート・インテリアとして海外へ届けます。",
+    "lead": "日本で価値を失いつつあるモノを、海外の新たな需要へつなぐ。",
+    "points": [
+        "国内で余剰となっている着物・日本文化商材の仕入れ",
+        "海外市場への輸出・販売",
+        "着物をアート・インテリアとして再提案",
+        "海外の販売先・パートナーの開拓",
+        "日本文化・伝統品の海外展開",
+        "将来的には「日本では余っているが海外では価値がある商品」へ取扱領域を拡大",
+    ],
+    "body": [
+        "国内では、着物をはじめとする日本の伝統品が大量に余っており、状態が良くても買取価格がつかなかったり、処分されてしまったりするケースがあります。",
+        "一方、海外では日本文化や伝統工芸への関心が高く、着物を「着るもの」だけでなく、アート・インテリア・装飾品として活用する文化もあります。たとえばオランダなどでは、着物をT字型のハンガーに掛け、壁面アートとして飾る活用方法も見られます。",
+        "私たちは、国内で余剰となっている日本文化商材を仕入れ、海外市場の需要と結びつけて輸出・販売します。単なる物販・輸出ではなく、日本の文化的価値を世界の需要につなぐ貿易事業として展開していきます。",
+        "目指すのは「日本では不要とされるモノに、世界でもう一度価値をつける。」こと。着物を入口に、将来的には日本では余っているが海外では価値がある商品へと取扱いを広げていきます。",
+    ],
+})
+
 # ================================================================ 個別LP（lp/<slug>.html）
 # LP本文はデータ駆動：PACKAGES の "lp" キーに内容を持たせる。
 # 構成（リサーチの勝ちパターン）＝FVベネフィット＋CTA → 課題 → 特徴 → 実物 → 料金 → 流れ → FAQ → CTA。
@@ -1094,7 +1117,7 @@ index_body = """
         <div class="p-top-about__img reveal -left"><img src="assets/img/about.webp" alt="通信の現場で活躍するスタッフ" loading="lazy"></div>
         <div class="reveal -right">
           <div class="c-section-heading -left"><span class="c-section-heading__sub">About Us</span><h2 class="c-section-heading__title">私たちの存在意義</h2></div>
-          <p class="p-top-about__text">株式会社Revengeは、セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開しています。通信業界を中心に、販売促進・業務受託・人材育成・デジタル活用を通じて、企業の売上向上と人・組織の成長に貢献。「無知による搾取をなくす」という想いのもと、一人ひとりの“人生を変えるきっかけ”を提供し、お客様に寄り添うパートナーであり続けます。</p>
+          <p class="p-top-about__text">株式会社Revengeは、セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業・海外貿易事業を展開しています。通信業界を中心に、販売促進・業務受託・人材育成・デジタル活用を通じて、企業の売上向上と人・組織の成長に貢献。「無知による搾取をなくす」という想いのもと、一人ひとりの“人生を変えるきっかけ”を提供し、お客様に寄り添うパートナーであり続けます。</p>
           <a href="purpose.html" class="c-btn">詳しく見る</a>
         </div>
       </div>
@@ -1219,7 +1242,7 @@ profile_body = page_hero("Company Profile", "会社概要", "株式会社ミシ�
         <tr><th>代表者</th><td>代表取締役社長　今別府 尭</td></tr>
         <tr><th>所在地</th><td>〒104-0061 東京都中央区銀座1丁目12-4</td></tr>
         <tr><th>設立</th><td>2026年7月</td></tr>
-        <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業<br />デジタルソリューション事業</td></tr>
+        <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業<br />デジタルソリューション事業<br />海外貿易事業</td></tr>
         <tr><th>対応エリア</th><td>全国</td></tr>
         <tr><th>お問い合わせ</th><td><a href="contact.html">お問い合わせフォーム</a>よりお気軽にご連絡ください。</td></tr>
         <tr><th>営業時間</th><td>9:00〜18:00（土日祝を除く）</td></tr>
@@ -1268,11 +1291,11 @@ group_body = page_hero("Group", "グループ会社", "ミシマグループの�
   </section>
 """
 
-services_body = page_hero("Services", "事業内容", "セールスプロモーション・BPO・教育／研修・デジタルソリューションの4事業で、企業の成長を支援します。",
+services_body = page_hero("Services", "事業内容", "セールスプロモーション・BPO・教育／研修・デジタルソリューション・海外貿易の5事業で、企業の成長を支援します。",
     [("事業内容", "services.html")]) + """
   <section class="p-top-service l-section">
     <div class="l-container">
-      <p class="p-lead-text" style="margin-bottom:2.5rem;">セールスプロモーション事業・BPO事業・教育／研修事業に加え、デジタルソリューション事業まで。幅広い領域で、クライアント企業の売上向上と、人・組織の成長、デジタル活用を支援します。</p>
+      <p class="p-lead-text" style="margin-bottom:2.5rem;">セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業に加え、海外貿易事業まで。幅広い領域で、クライアント企業の成長と、日本の価値の海外展開を支援します。</p>
       <div class="p-top-service__grid">
         __SVC_CARDS__
       </div>
@@ -1397,7 +1420,7 @@ contact_body = page_hero("Contact", "お問い合わせ", "セールスプロモ
         <label><span class="p-form__label">会社名</span><input type="text" name="company" placeholder="株式会社〇〇" /></label>
         <label><span class="p-form__label">お名前<span class="p-form__req">必須</span></span><input type="text" name="name" required placeholder="山田 太郎" /></label>
         <label><span class="p-form__label">お問い合わせ種別</span>
-          <select name="type"><option value="promotion">セールスプロモーションについて</option><option value="bpo">BPO事業について</option><option value="training">教育・研修事業について</option><option value="digital">デジタルソリューションについて</option><option value="other">その他</option></select>
+          <select name="type"><option value="promotion">セールスプロモーションについて</option><option value="bpo">BPO事業について</option><option value="training">教育・研修事業について</option><option value="digital">デジタルソリューションについて</option><option value="trade">海外貿易事業について</option><option value="other">その他</option></select>
         </label>
         <label><span class="p-form__label">メールアドレス<span class="p-form__req">必須</span></span><input type="email" name="email" required placeholder="example@example.com" /></label>
         <label><span class="p-form__label">お問い合わせ内容<span class="p-form__req">必須</span></span><textarea name="message" rows="6" required placeholder="お問い合わせ内容をご記入ください"></textarea></label>
@@ -1475,7 +1498,7 @@ services_body = services_body.replace("__SVC_CARDS__", svc_cards(SERVICES, False
 index_body = index_body.replace("__NEWS_TOP__", NEWS_FALLBACK)
 
 pages = [
-    ("index.html","人生を変えるきっかけを｜株式会社Revenge","株式会社Revenge — セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業を展開。通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。","top",index_body),
+    ("index.html","人生を変えるきっかけを｜株式会社Revenge","株式会社Revenge — セールスプロモーション事業・BPO事業・教育／研修事業・デジタルソリューション事業・海外貿易事業を展開。通信業界を中心に、企業の売上向上と人・組織の成長、デジタル活用を支援します。","top",index_body),
     ("message.html","代表メッセージ","株式会社ミシマ 代表メッセージ。","company",message_body),
     ("purpose.html","社名の由来","株式会社ミシマの社名の由来。","company",purpose_body),
     ("profile.html","会社概要","株式会社ミシマの会社概要。","company",profile_body),
@@ -1578,7 +1601,7 @@ llms = "\n".join([
     "> " + ORG_DESC,
     "",
     "東京都中央区を拠点とする企業。代表取締役社長：今別府 尭。設立：2026年7月。"
-    "事業内容：セールスプロモーション事業／BPO事業／教育・研修事業／デジタルソリューション事業。対応エリア：全国。"
+    "事業内容：セールスプロモーション事業／BPO事業／教育・研修事業／デジタルソリューション事業／海外貿易事業。対応エリア：全国。"
     "お問い合わせ：info@revenge.co.jp",
     "",
     "## 会社情報",
@@ -1587,11 +1610,12 @@ llms = "\n".join([
     _llm_link("会社概要", "profile.html", "会社名・所在地・設立などの基本情報"),
     "",
     "## 事業",
-    _llm_link("事業内容", "services.html", "4事業の概要"),
+    _llm_link("事業内容", "services.html", "5事業の概要"),
     _llm_link("セールスプロモーション事業", "service/service-01.html", "販売支援・営業支援"),
     _llm_link("BPO事業", "service/service-02.html", "業務請負・アウトソーシング"),
     _llm_link("教育・研修事業", "service/service-03.html", "人材育成・研修"),
     _llm_link("デジタルソリューション事業", "service/service-04.html", "HP制作・埋め込みRAG・イベント運営システム・新規開発"),
+    _llm_link("海外貿易事業", "service/service-05.html", "日本の着物・伝統品を海外の需要へ（アート・インテリア活用）"),
 ] + ([
     "",
     "## デジタルソリューション（LP）",

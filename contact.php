@@ -66,6 +66,7 @@ $typeMap = array(
   'bpo'       => 'BPO事業について',
   'training'  => '教育・研修事業について',
   'digital'   => 'デジタルソリューションについて',
+  'trade'     => '海外貿易事業について',
   'other'     => 'その他',
 );
 $typeLabel = isset($typeMap[$type]) ? $typeMap[$type] : 'その他';

@@ -316,8 +316,9 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
    Project : Top Service (image cards)
    ============================================================ */
 .p-top-service__grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;}
-@media (min-width:600px){.p-top-service__grid{grid-template-columns:repeat(2,1fr);}}
-@media (min-width:1000px){.p-top-service__grid{grid-template-columns:repeat(4,1fr);}}
+@media (min-width:560px){.p-top-service__grid{grid-template-columns:repeat(2,1fr);}}
+@media (min-width:900px){.p-top-service__grid{grid-template-columns:repeat(3,1fr);}}
+@media (min-width:1200px){.p-top-service__grid{grid-template-columns:repeat(5,1fr);}}
 /* デジタルソリューション：パッケージ料金カード／注記／相談フロー（service-04・LP） */
 .p-pkg-grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;margin:1.2rem 0 1.6rem;}
 @media (min-width:700px){.p-pkg-grid{grid-template-columns:repeat(2,1fr);}}
