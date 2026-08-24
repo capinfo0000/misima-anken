@@ -1219,7 +1219,6 @@ profile_body = page_hero("Company Profile", "会社概要", "株式会社ミシ�
         <tr><th>代表者</th><td>代表取締役社長　今別府 尭</td></tr>
         <tr><th>所在地</th><td>〒104-0061 東京都中央区銀座1丁目12-4</td></tr>
         <tr><th>設立</th><td>2026年7月</td></tr>
-        <tr><th>資本金</th><td><span data-countup="5000" data-suffix="万円">5,000万円</span></td></tr>
         <tr><th>事業内容</th><td>セールスプロモーション事業<br />BPO事業<br />教育・研修事業<br />デジタルソリューション事業</td></tr>
         <tr><th>対応エリア</th><td>全国</td></tr>
         <tr><th>お問い合わせ</th><td><a href="contact.html">お問い合わせフォーム</a>よりお気軽にご連絡ください。</td></tr>
@@ -1585,7 +1584,7 @@ llms = "\n".join([
     "## 会社情報",
     _llm_link("代表メッセージ", "message.html", "代表取締役からのメッセージ"),
     _llm_link("社名の由来", "purpose.html", "社名・ブランドに込めた思い"),
-    _llm_link("会社概要", "profile.html", "会社名・所在地・設立・資本金などの基本情報"),
+    _llm_link("会社概要", "profile.html", "会社名・所在地・設立などの基本情報"),
     "",
     "## 事業",
     _llm_link("事業内容", "services.html", "4事業の概要"),
