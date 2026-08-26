@@ -47,6 +47,7 @@ body{
   font-size:15px;line-height:1.95;letter-spacing:.04em;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
   overflow-x:clip;max-width:100%;
+  word-break:auto-phrase;line-break:strict;   /* 日本語を文節単位で自然に折り返す（中央寄せの細切れ改行を軽減） */
 }
 img,svg{max-width:100%;display:block;}
 a{color:inherit;text-decoration:none;transition:color .2s,opacity .2s;}
@@ -315,8 +316,9 @@ body::before{content:"";position:fixed;inset:0 0 auto 0;height:4px;z-index:200;b
    Project : Top Service (image cards)
    ============================================================ */
 .p-top-service__grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;}
-@media (min-width:600px){.p-top-service__grid{grid-template-columns:repeat(2,1fr);}}
-@media (min-width:1000px){.p-top-service__grid{grid-template-columns:repeat(4,1fr);}}
+@media (min-width:560px){.p-top-service__grid{grid-template-columns:repeat(2,1fr);}}
+@media (min-width:900px){.p-top-service__grid{grid-template-columns:repeat(3,1fr);}}
+@media (min-width:1200px){.p-top-service__grid{grid-template-columns:repeat(5,1fr);}}
 /* デジタルソリューション：パッケージ料金カード／注記／相談フロー（service-04・LP） */
 .p-pkg-grid{display:grid;gap:var(--space-4);grid-template-columns:1fr;margin:1.2rem 0 1.6rem;}
 @media (min-width:700px){.p-pkg-grid{grid-template-columns:repeat(2,1fr);}}
@@ -530,7 +532,7 @@ button.c-btn{font-family:inherit;cursor:pointer;}
 .p-page-hero{position:relative;text-align:center;padding:calc(var(--header-h) + var(--space-10)) 0 var(--space-8);background:var(--bg-soft);}
 .p-page-hero__sub{font-family:var(--font-en);font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--text-muted);font-size:.72rem;margin-bottom:var(--space-2);}
 .p-page-hero__title{font-family:var(--font-serif);font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:500;line-height:1.5;letter-spacing:.08em;color:var(--text-strong);}
-.p-page-hero__lead{color:var(--text-muted);margin-top:var(--space-3);max-width:60ch;margin-inline:auto;font-size:.92rem;}
+.p-page-hero__lead{color:var(--text-muted);margin-top:var(--space-3);max-width:46em;margin-inline:auto;font-size:.92rem;}
 
 .p-prose{max-width:var(--container-narrow);margin-inline:auto;}
 .p-prose h2{font-family:var(--font-serif);font-size:1.4rem;font-weight:500;color:var(--text-strong);margin:var(--space-6) 0 var(--space-3);padding-bottom:var(--space-2);border-bottom:1px solid var(--line);}
@@ -554,7 +556,7 @@ button.c-btn{font-family:inherit;cursor:pointer;}
 .p-stats{display:grid;gap:var(--space-3);grid-template-columns:repeat(2,1fr);max-width:var(--container-narrow);margin-inline:auto;}
 @media (min-width:760px){.p-stats{grid-template-columns:repeat(4,1fr);}}
 
-.p-lead-text{font-size:.95rem;color:var(--text-muted);max-width:60ch;margin-inline:auto;text-align:center;}
+.p-lead-text{font-size:.95rem;color:var(--text-muted);max-width:52em;margin-inline:auto;text-align:center;word-break:auto-phrase;line-break:strict;}
 
 /* ============================================================
    Reveal on scroll
@@ -965,10 +967,10 @@ body::before{background:linear-gradient(90deg,#e60012,#ed6d1f,#f5a200,#009944,#4
 .page-s04 .p-pkg:hover::before{ height:5px; opacity:1; }
 .page-s04 .p-pkg__kind{ color:#1d2088; }  /* 区分をネイビー＝技術寄りの印象 */
 .page-s04 .p-pkg__more{
-  background:var(--text-strong);             /* 黒（サイト共通の-fillボタンと同じ）。ホバーで虹色に */
-  transition:background .35s ease, box-shadow .28s, transform .2s;
+  background:var(--text-strong); border:1.5px solid transparent;   /* 黒。ホバーで「文字だけ虹」＝サイト共通ボタンと統一 */
+  transition:background .3s ease, color .3s ease, border-color .3s ease, box-shadow .28s;
 }
-.page-s04 .p-pkg__more:hover{ background:var(--rainbow-flow); background-size:200% 100%; animation:rainbowFlow 2.4s linear infinite; opacity:1; box-shadow:0 10px 22px -10px rgba(230,0,18,.45); }
+.page-s04 .p-pkg__more:hover{ background:var(--rainbow-flow); background-size:200% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; border-color:var(--text-strong); animation:rainbowFlow 2.4s linear infinite; box-shadow:0 10px 24px rgba(0,0,0,.12); }
 /* ajike風：中央寄せタイトル＋内側の薄グレーボックス */
 .page-s04 .p-pkg{ text-align:center; padding:1.6rem 1.4rem; }
 .page-s04 .p-pkg__kind{ justify-content:center; }
